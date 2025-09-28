@@ -1,0 +1,349 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Delizioso</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'restaurant-primary': '#8B4513',
+                        'restaurant-secondary': '#D2691E',
+                        'restaurant-accent': '#FF6B35',
+                        'restaurant-dark': '#2C1810',
+                    },
+                    fontFamily: {
+                        'serif': ['Georgia', 'serif'],
+                        'elegant': ['Playfair Display', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="font-sans min-h-screen bg-gradient-to-br from-restaurant-dark via-restaurant-primary to-restaurant-secondary relative overflow-hidden">
+    
+    <!-- Elementos decorativos de fondo -->
+    <div class="absolute inset-0">
+        <div class="absolute top-20 left-10 w-40 h-40 bg-restaurant-accent/20 rounded-full animate-pulse"></div>
+        <div class="absolute bottom-20 right-20 w-60 h-60 bg-restaurant-secondary/20 rounded-full animate-bounce" style="animation-duration: 3s;"></div>
+        <div class="absolute top-1/3 right-10 w-32 h-32 bg-white/10 rounded-full animate-pulse" style="animation-delay: 1s;"></div>
+        <div class="absolute bottom-1/3 left-20 w-24 h-24 bg-restaurant-accent/15 rounded-full animate-pulse" style="animation-delay: 2s;"></div>
+    </div>
+
+    <!-- Pattern overlay -->
+    <div class="absolute inset-0 opacity-5">
+        <div style="background-image: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="white" fill-opacity="0.1"><circle cx="30" cy="30" r="4"/></g></svg>'); background-size: 60px 60px;"></div>
+    </div>
+
+    <div class="relative z-10 flex items-center justify-center min-h-screen p-4">
+        <div class="w-full max-w-md">
+            
+            <!-- Header con Logo -->
+            <div class="text-center mb-8">
+                <a href="/" class="inline-flex items-center justify-center mb-6 group">
+                    <i class="fas fa-arrow-left text-white/70 hover:text-white text-lg mr-3 transition-colors duration-200"></i>
+                    <span class="text-white/70 hover:text-white transition-colors duration-200">Volver al inicio</span>
+                </a>
+                
+                <div class="text-4xl font-elegant font-bold text-white mb-4">
+                    <i class="fas fa-utensils mr-3 text-restaurant-accent"></i>
+                    Delizioso
+                </div>
+                <h1 class="text-2xl font-elegant font-semibold text-white mb-2">Accede a tu Cuenta</h1>
+                <p class="text-white/80">Inicia sesión para gestionar tus reservas y disfrutar de una experiencia personalizada</p>
+            </div>
+
+            <!-- Formulario de Login -->
+            <div class="bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl">
+                <form class="space-y-6" id="login-form">
+                    
+                    <!-- Campo Email -->
+                    <div class="space-y-2">
+                        <label for="email" class="block text-sm font-medium text-white/90">
+                            <i class="fas fa-envelope mr-2 text-restaurant-accent"></i>
+                            Correo Electrónico
+                        </label>
+                        <div class="relative">
+                            <input type="email" 
+                                   id="email" 
+                                   name="email" 
+                                   required
+                                   class="w-full px-4 py-4 bg-white/20 border border-white/30 rounded-xl text-white placeholder-white/60 focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200 backdrop-blur-sm"
+                                   placeholder="cliente@email.com">
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fas fa-user text-white/40"></i>
+                            </div>
+                        </div>
+                        <div class="text-red-300 text-sm hidden" id="email-error">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            <span>Por favor ingresa un email válido</span>
+                        </div>
+                    </div>
+
+                    <!-- Campo Contraseña -->
+                    <div class="space-y-2">
+                        <label for="password" class="block text-sm font-medium text-white/90">
+                            <i class="fas fa-lock mr-2 text-restaurant-accent"></i>
+                            Contraseña
+                        </label>
+                        <div class="relative">
+                            <input type="password" 
+                                   id="password" 
+                                   name="password" 
+                                   required
+                                   class="w-full px-4 py-4 bg-white/20 border border-white/30 rounded-xl text-white placeholder-white/60 focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200 backdrop-blur-sm"
+                                   placeholder="••••••••">
+                            <button type="button" 
+                                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-white/40 hover:text-white/70 transition-colors duration-200"
+                                    id="toggle-password">
+                                <i class="fas fa-eye" id="password-icon"></i>
+                            </button>
+                        </div>
+                        <div class="text-red-300 text-sm hidden" id="password-error">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            <span>La contraseña debe tener al menos 6 caracteres</span>
+                        </div>
+                    </div>
+
+                    <!-- Recordar sesión y Olvidé contraseña -->
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input id="remember-me" 
+                                   name="remember-me" 
+                                   type="checkbox" 
+                                   class="h-4 w-4 text-restaurant-accent bg-white/20 border-white/30 rounded focus:ring-restaurant-accent focus:ring-2">
+                            <label for="remember-me" class="ml-2 block text-sm text-white/80">
+                                Recordar sesión
+                            </label>
+                        </div>
+
+                        <div class="text-sm">
+                            <a href="#" class="text-restaurant-accent hover:text-restaurant-secondary transition-colors duration-200 font-medium">
+                                ¿Olvidaste tu contraseña?
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Botón de Login -->
+                    <button type="submit" 
+                            class="w-full bg-restaurant-accent hover:bg-restaurant-secondary text-white py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                            id="login-button">
+                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        <span id="button-text">Iniciar Sesión</span>
+                    </button>
+
+                    <!-- Mensaje de error general -->
+                    <div class="bg-red-500/20 border border-red-500/30 rounded-xl p-4 hidden" id="general-error">
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-triangle text-red-300 mr-3"></i>
+                            <div>
+                                <h3 class="text-red-100 font-medium">Error de autenticación</h3>
+                                <p class="text-red-200 text-sm" id="error-message">Credenciales inválidas. Verifica tu email y contraseña.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Enlaces adicionales -->
+            <div class="mt-8 text-center space-y-4">
+                <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+                    <h3 class="text-white font-medium mb-3">¿Primera vez en Delizioso?</h3>
+                    <p class="text-white/70 text-sm mb-4">
+                        Crea tu cuenta y disfruta de beneficios exclusivos: reservas prioritarias, menú personalizado y ofertas especiales
+                    </p>
+                    <button class="bg-restaurant-accent/20 hover:bg-restaurant-accent/30 text-white border border-restaurant-accent/50 hover:border-restaurant-accent px-6 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 mb-4">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Crear Cuenta Nueva
+                    </button>
+                    
+                    
+                </div>
+                
+                
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle password visibility
+        const togglePassword = document.getElementById('toggle-password');
+        const passwordInput = document.getElementById('password');
+        const passwordIcon = document.getElementById('password-icon');
+
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            if (type === 'text') {
+                passwordIcon.classList.remove('fa-eye');
+                passwordIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordIcon.classList.remove('fa-eye-slash');
+                passwordIcon.classList.add('fa-eye');
+            }
+        });
+
+        // Form validation and submission
+        const loginForm = document.getElementById('login-form');
+        const emailInput = document.getElementById('email');
+        const emailError = document.getElementById('email-error');
+        const passwordError = document.getElementById('password-error');
+        const generalError = document.getElementById('general-error');
+        const loginButton = document.getElementById('login-button');
+        const buttonText = document.getElementById('button-text');
+
+        // Real-time validation
+        emailInput.addEventListener('blur', function() {
+            validateEmail();
+        });
+
+        passwordInput.addEventListener('blur', function() {
+            validatePassword();
+        });
+
+        // Clear errors on focus
+        emailInput.addEventListener('focus', function() {
+            hideError('email-error');
+            hideGeneralError();
+        });
+
+        passwordInput.addEventListener('focus', function() {
+            hideError('password-error');
+            hideGeneralError();
+        });
+
+        function validateEmail() {
+            const email = emailInput.value.trim();
+            const emailRegex = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+            
+            if (!email) {
+                showError('email-error', 'El email es requerido');
+                return false;
+            }
+            
+            if (!emailRegex.test(email)) {
+                showError('email-error', 'Por favor ingresa un email válido');
+                return false;
+            }
+            
+            hideError('email-error');
+            return true;
+        }
+
+        function validatePassword() {
+            const password = passwordInput.value;
+            
+            if (!password) {
+                showError('password-error', 'La contraseña es requerida');
+                return false;
+            }
+            
+            if (password.length < 6) {
+                showError('password-error', 'La contraseña debe tener al menos 6 caracteres');
+                return false;
+            }
+            
+            hideError('password-error');
+            return true;
+        }
+
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.querySelector('span').textContent = message;
+            errorElement.classList.remove('hidden');
+        }
+
+        function hideError(elementId) {
+            document.getElementById(elementId).classList.add('hidden');
+        }
+
+        function showGeneralError(message) {
+            document.getElementById('error-message').textContent = message;
+            generalError.classList.remove('hidden');
+        }
+
+        function hideGeneralError() {
+            generalError.classList.add('hidden');
+        }
+
+        // Form submission
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const emailValid = validateEmail();
+            const passwordValid = validatePassword();
+            
+            if (!emailValid || !passwordValid) {
+                return;
+            }
+            
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            
+            // Show loading state
+            loginButton.disabled = true;
+            buttonText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Iniciando sesión...';
+            
+            // Simulate login request (replace with actual API call)
+            setTimeout(() => {
+                // Simulate different scenarios
+                if (email === 'admin@delizioso.com' && password === 'admin123') {
+                    // Success - redirect to dashboard
+                    showSuccessAndRedirect();
+                } else {
+                    // Error - show error message
+                    showGeneralError('Email o contraseña incorrectos. Intenta nuevamente.');
+                    resetButton();
+                }
+            }, 2000);
+        });
+
+        function showSuccessAndRedirect() {
+            buttonText.innerHTML = '<i class="fas fa-check mr-2"></i>¡Bienvenido!';
+            loginButton.classList.remove('bg-restaurant-accent', 'hover:bg-restaurant-secondary');
+            loginButton.classList.add('bg-green-500');
+            
+            setTimeout(() => {
+                // Redirect to dashboard (replace with actual URL)
+                window.location.href = '/Admin/Dashboard';
+            }, 1000);
+        }
+
+        function resetButton() {
+            loginButton.disabled = false;
+            buttonText.innerHTML = 'Iniciar Sesión';
+        }
+
+        // Prevent form resubmission on page refresh
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+
+        // Add floating animation keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+            @@keyframes float {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-20px); }
+            }
+            
+            .animate-float {
+                animation: float 3s ease-in-out infinite;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

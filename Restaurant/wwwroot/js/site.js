@@ -1,0 +1,220 @@
+﻿// Mobile menu toggle
+const mobileMenuButton = document.getElementById('mobile-menu-button');
+const mobileMenu = document.getElementById('mobile-menu');
+const menuOpen = document.getElementById('menu-open');
+const menuClose = document.getElementById('menu-close');
+
+mobileMenuButton.addEventListener('click', () => {
+    mobileMenu.classList.toggle('hidden');
+    menuOpen.classList.toggle('hidden');
+    menuClose.classList.toggle('hidden');
+});
+
+// Funcionalidad de tabs del menú
+const menuTabs = document.querySelectorAll('.menu-tab');
+const menuItems = document.querySelectorAll('.menu-item');
+
+menuTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        const category = tab.getAttribute('data-category');
+
+        // Actualizar tabs activos
+        menuTabs.forEach(t => {
+            t.classList.remove('active', 'bg-restaurant-accent', 'text-white');
+            t.classList.add('bg-white/10', 'text-white');
+        });
+
+        tab.classList.remove('bg-white/10');
+        tab.classList.add('active', 'bg-restaurant-accent', 'text-white');
+
+        // Filtrar items del menú
+        menuItems.forEach(item => {
+            const itemCategory = item.getAttribute('data-category');
+
+            if (category === 'all' || itemCategory === category) {
+                item.style.display = 'block';
+                item.classList.add('animate-fade-in-up');
+            } else {
+                item.style.display = 'none';
+                item.classList.remove('animate-fade-in-up');
+            }
+        });
+    });
+});
+
+// Funcionalidad del formulario de reservas
+const reservationForm = document.getElementById('reservation-form');
+const fechaInput = document.getElementById('fecha');
+
+// Establecer fecha mínima como hoy
+const today = new Date().toISOString().split('T')[0];
+fechaInput.min = today;
+
+// Establecer fecha máxima como 2 días desde hoy
+const maxDate = new Date();
+maxDate.setDate(maxDate.getDate() + 2);
+fechaInput.max = maxDate.toISOString().split('T')[0];
+
+reservationForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    // Obtener datos del formulario
+    const formData = new FormData(reservationForm);
+    const reservationData = {
+        nombre: formData.get('nombre'),
+        telefono: formData.get('telefono'),
+        email: formData.get('email'),
+        fecha: formData.get('fecha'),
+        hora: formData.get('hora'),
+        personas: formData.get('personas'),
+        ocasion: formData.get('ocasion'),
+        comentarios: formData.get('comentarios')
+    };
+
+    // Validaciones adicionales
+    if (!validateReservation(reservationData)) {
+        return;
+    }
+
+    // Mostrar loading en el botón
+    const submitBtn = reservationForm.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Procesando...';
+    submitBtn.disabled = true;
+
+    // Simular envío (en producción conectar con el backend)
+    setTimeout(() => {
+        showReservationSuccess(reservationData);
+        reservationForm.reset();
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }, 2000);
+});
+
+function validateReservation(data) {
+    const selectedDate = new Date(data.fecha);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (selectedDate < today) {
+        showAlert('La fecha seleccionada debe ser hoy o posterior', 'error');
+        return false;
+    }
+
+    if (!data.nombre.trim() || !data.telefono.trim() || !data.email.trim()) {
+        showAlert('Por favor completa todos los campos obligatorios', 'error');
+        return false;
+    }
+
+    if (!isValidEmail(data.email)) {
+        showAlert('Por favor ingresa un email válido', 'error');
+        return false;
+    }
+
+    return true;
+}
+
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+function showReservationSuccess(data) {
+    const successModal = `
+                <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" id="success-modal">
+                    <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center animate-fade-in-up">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-green-500 text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">¡Reserva Confirmada!</h3>
+                        <p class="text-gray-600 mb-4">
+                            Hemos recibido tu reserva para <strong>${data.personas} persona${data.personas > 1 ? 's' : ''}</strong> 
+                            el <strong>${formatDate(data.fecha)}</strong> a las <strong>${data.hora}</strong>.
+                        </p>
+                        <p class="text-sm text-gray-500 mb-6">
+                            Te enviaremos un email de confirmación a <strong>${data.email}</strong> 
+                            en los próximos minutos.
+                        </p>
+                        <button onclick="closeModal('success-modal')" 
+                                class="bg-restaurant-accent hover:bg-restaurant-secondary text-white px-8 py-3 rounded-xl font-semibold transition-colors duration-200">
+                            Perfecto
+                        </button>
+                    </div>
+                </div>
+            `;
+    document.body.insertAdjacentHTML('beforeend', successModal);
+}
+
+function showAlert(message, type = 'info') {
+    const alertClass = type === 'error' ? 'bg-red-100 border-red-500 text-red-700' : 'bg-blue-100 border-blue-500 text-blue-700';
+    const alertModal = `
+                <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" id="alert-modal">
+                    <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center animate-fade-in-up">
+                        <div class="w-16 h-16 ${alertClass} rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas ${type === 'error' ? 'fa-exclamation-triangle' : 'fa-info-circle'} text-2xl"></i>
+                        </div>
+                        <p class="text-gray-700 mb-6">${message}</p>
+                        <button onclick="closeModal('alert-modal')" 
+                                class="bg-restaurant-accent hover:bg-restaurant-secondary text-white px-8 py-3 rounded-xl font-semibold transition-colors duration-200">
+                            Entendido
+                        </button>
+                    </div>
+                </div>
+            `;
+    document.body.insertAdjacentHTML('beforeend', alertModal);
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const options = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    };
+    return date.toLocaleDateString('es-ES', options);
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.remove();
+    }
+}
+
+// Smooth scrolling for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href').substring(1);
+        const targetSection = document.getElementById(targetId);
+
+        if (targetSection) {
+            const offsetTop = targetSection.offsetTop - 80;
+            window.scrollTo({
+                top: offsetTop,
+                behavior: 'smooth'
+            });
+        }
+
+        // Close mobile menu if open
+        if (!mobileMenu.classList.contains('hidden')) {
+            mobileMenu.classList.add('hidden');
+            menuOpen.classList.remove('hidden');
+            menuClose.classList.add('hidden');
+        }
+    });
+});
+
+// Navbar scroll effect
+window.addEventListener('scroll', () => {
+    const navbar = document.getElementById('navbar');
+    if (window.scrollY > 50) {
+        navbar.classList.add('bg-white', 'shadow-xl');
+        navbar.classList.remove('bg-white/95');
+    } else {
+        navbar.classList.add('bg-white/95');
+        navbar.classList.remove('bg-white', 'shadow-xl');
+    }
+});
+    
