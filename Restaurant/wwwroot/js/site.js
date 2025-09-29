@@ -50,9 +50,9 @@ const fechaInput = document.getElementById('fecha');
 const today = new Date().toISOString().split('T')[0];
 fechaInput.min = today;
 
-// Establecer fecha máxima como 2 días desde hoy
+// Establecer fecha máxima como 30 días desde hoy
 const maxDate = new Date();
-maxDate.setDate(maxDate.getDate() + 2);
+maxDate.setDate(maxDate.getDate() + 30);
 fechaInput.max = maxDate.toISOString().split('T')[0];
 
 reservationForm.addEventListener('submit', function (e) {
