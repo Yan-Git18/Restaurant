@@ -29,6 +29,16 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear,
+        input[type="password"]::-webkit-credentials-auto-fill-button {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+    </style>
 </head>
 <body class="font-sans min-h-screen bg-gradient-to-br from-restaurant-dark via-restaurant-primary to-restaurant-secondary relative overflow-hidden">
     
@@ -60,12 +70,22 @@
                     Delizioso
                 </div>
                 <h1 class="text-2xl font-elegant font-semibold text-white mb-2">Accede a tu Cuenta</h1>
-                <p class="text-white/80">Inicia sesión para gestionar tus reservas y disfrutar de una experiencia personalizada</p>
+                <p class="text-white/80">Inicia sesión para disfrutar de una experiencia personalizada</p>
             </div>
 
             <!-- Formulario de Login -->
             <div class="bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl">
-                <form class="space-y-6" id="login-form">
+                <form asp-controller ="Cuenta" asp-action ="Login" method="post" class="space-y-6" id="login-form">
+
+                    @if (TempData["Mensaje"] != null)
+                    {
+                        <div class="mb-6 bg-@(TempData["Tipo"] == "success" ? "green" : "red")-500/20 border border-@(TempData["Tipo"] == "success" ? "green" : "red")-500/30 rounded-xl p-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-@(TempData["Tipo"] == "success" ? "check-circle" : "exclamation-triangle") text-@(TempData["Tipo"] == "success" ? "green" : "red")-300 mr-3"></i>
+                                <p class="text-@(TempData["Tipo"] == "success" ? "green" : "red")-100">@TempData["Mensaje"]</p>
+                            </div>
+                        </div>
+                    }
                     
                     <!-- Campo Email -->
                     <div class="space-y-2">
@@ -159,14 +179,12 @@
             <!-- Enlaces adicionales -->
             <div class="mt-8 text-center space-y-4">
                 <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
-                    <h3 class="text-white font-medium mb-3">¿Primera vez en Delizioso?</h3>
-                    <p class="text-white/70 text-sm mb-4">
-                        Crea tu cuenta y disfruta de beneficios exclusivos: reservas prioritarias, menú personalizado y ofertas especiales
-                    </p>
-                    <button class="bg-restaurant-accent/20 hover:bg-restaurant-accent/30 text-white border border-restaurant-accent/50 hover:border-restaurant-accent px-6 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 mb-4">
+                    <h3 class="text-white font-medium mb-5">¿Primera vez en Delizioso?</h3>
+                    
+                    <a href="/Cuenta/Register" class="bg-restaurant-accent/20 hover:bg-restaurant-accent/30 text-white border border-restaurant-accent/50 hover:border-restaurant-accent px-6 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 mb-4">
                         <i class="fas fa-user-plus mr-2"></i>
-                        Crear Cuenta Nueva
-                    </button>
+                        Crear Una Cuenta
+                    </a>
                     
                     
                 </div>
@@ -176,6 +194,7 @@
         </div>
     </div>
 
+    
     <script>
         // Toggle password visibility
         const togglePassword = document.getElementById('toggle-password');
@@ -185,7 +204,7 @@
         togglePassword.addEventListener('click', function() {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
-            
+
             if (type === 'text') {
                 passwordIcon.classList.remove('fa-eye');
                 passwordIcon.classList.add('fa-eye-slash');
@@ -195,135 +214,22 @@
             }
         });
 
-        // Form validation and submission
-        const loginForm = document.getElementById('login-form');
-        const emailInput = document.getElementById('email');
-        const emailError = document.getElementById('email-error');
-        const passwordError = document.getElementById('password-error');
-        const generalError = document.getElementById('general-error');
-        const loginButton = document.getElementById('login-button');
-        const buttonText = document.getElementById('button-text');
-
-        // Real-time validation
-        emailInput.addEventListener('blur', function() {
-            validateEmail();
-        });
-
-        passwordInput.addEventListener('blur', function() {
-            validatePassword();
-        });
-
         // Clear errors on focus
+        const emailInput = document.getElementById('email');
+        const generalError = document.getElementById('general-error');
+
         emailInput.addEventListener('focus', function() {
-            hideError('email-error');
             hideGeneralError();
         });
 
         passwordInput.addEventListener('focus', function() {
-            hideError('password-error');
             hideGeneralError();
         });
 
-        function validateEmail() {
-            const email = emailInput.value.trim();
-            const emailRegex = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
-            
-            if (!email) {
-                showError('email-error', 'El email es requerido');
-                return false;
-            }
-            
-            if (!emailRegex.test(email)) {
-                showError('email-error', 'Por favor ingresa un email válido');
-                return false;
-            }
-            
-            hideError('email-error');
-            return true;
-        }
-
-        function validatePassword() {
-            const password = passwordInput.value;
-            
-            if (!password) {
-                showError('password-error', 'La contraseña es requerida');
-                return false;
-            }
-            
-            if (password.length < 6) {
-                showError('password-error', 'La contraseña debe tener al menos 6 caracteres');
-                return false;
-            }
-            
-            hideError('password-error');
-            return true;
-        }
-
-        function showError(elementId, message) {
-            const errorElement = document.getElementById(elementId);
-            errorElement.querySelector('span').textContent = message;
-            errorElement.classList.remove('hidden');
-        }
-
-        function hideError(elementId) {
-            document.getElementById(elementId).classList.add('hidden');
-        }
-
-        function showGeneralError(message) {
-            document.getElementById('error-message').textContent = message;
-            generalError.classList.remove('hidden');
-        }
-
         function hideGeneralError() {
-            generalError.classList.add('hidden');
-        }
-
-        // Form submission
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const emailValid = validateEmail();
-            const passwordValid = validatePassword();
-            
-            if (!emailValid || !passwordValid) {
-                return;
+            if (generalError) {
+                generalError.classList.add('hidden');
             }
-            
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
-            
-            // Show loading state
-            loginButton.disabled = true;
-            buttonText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Iniciando sesión...';
-            
-            // Simulate login request (replace with actual API call)
-            setTimeout(() => {
-                // Simulate different scenarios
-                if (email === 'admin@delizioso.com' && password === 'admin123') {
-                    // Success - redirect to dashboard
-                    showSuccessAndRedirect();
-                } else {
-                    // Error - show error message
-                    showGeneralError('Email o contraseña incorrectos. Intenta nuevamente.');
-                    resetButton();
-                }
-            }, 2000);
-        });
-
-        function showSuccessAndRedirect() {
-            buttonText.innerHTML = '<i class="fas fa-check mr-2"></i>¡Bienvenido!';
-            loginButton.classList.remove('bg-restaurant-accent', 'hover:bg-restaurant-secondary');
-            loginButton.classList.add('bg-green-500');
-            
-            setTimeout(() => {
-                // Redirect to dashboard (replace with actual URL)
-                window.location.href = '/Admin/Dashboard';
-            }, 1000);
-        }
-
-        function resetButton() {
-            loginButton.disabled = false;
-            buttonText.innerHTML = 'Iniciar Sesión';
         }
 
         // Prevent form resubmission on page refresh
@@ -338,12 +244,16 @@
                 0%, 100% { transform: translateY(0px); }
                 50% { transform: translateY(-20px); }
             }
-            
+
             .animate-float {
                 animation: float 3s ease-in-out infinite;
             }
         `;
         document.head.appendChild(style);
     </script>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
 </body>
 </html>

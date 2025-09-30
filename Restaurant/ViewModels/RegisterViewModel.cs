@@ -7,6 +7,10 @@ namespace Restaurant.ViewModels
         [Required(ErrorMessage = "El nombre es obligatorio")]
         public string Nombre { get; set; }
 
+        [Required(ErrorMessage = "Los apellidos son obligatorios")]
+        [StringLength(100)]
+        public string Apellidos { get; set; }
+
         [Required(ErrorMessage = "El email es obligatorio")]
         [EmailAddress(ErrorMessage = "Formato de email inválido")]
         public string Email { get; set; }

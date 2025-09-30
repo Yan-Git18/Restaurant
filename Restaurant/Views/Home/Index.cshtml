@@ -85,7 +85,7 @@
 
                                     <div class="space-y-3">
                                         <!-- Opción Cliente -->
-                                        <button onclick="showLoginForm('cliente')" class="w-full bg-gradient-to-r from-restaurant-accent to-yellow-500 hover:from-yellow-500 hover:to-restaurant-accent text-white p-4 rounded-lg transition-all duration-200 transform hover:scale-102 shadow-md">
+                                        <a href="/Cuenta/Login" class="block w-full bg-gradient-to-r from-restaurant-accent to-yellow-500 hover:from-yellow-500 hover:to-restaurant-accent text-white p-4 rounded-lg transition-all duration-200 transform hover:scale-102 shadow-md">
                                             <div class="flex items-center">
                                                 <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
                                                     <i class="fas fa-user text-xl"></i>
@@ -96,10 +96,10 @@
                                                 </div>
                                                 <i class="fas fa-chevron-right ml-auto"></i>
                                             </div>
-                                        </button>
+                                        </a>
 
                                         <!-- Opción Empleado -->
-                                        <button onclick="showLoginForm('empleado')" class="w-full bg-gradient-to-r from-restaurant-secondary to-amber-700 hover:from-amber-700 hover:to-restaurant-secondary text-white p-4 rounded-lg transition-all duration-200 transform hover:scale-102 shadow-md">
+                                        <a href="/Cuenta/Login" class="block w-full bg-gradient-to-r from-restaurant-secondary to-amber-700 hover:from-amber-700 hover:to-restaurant-secondary text-white p-4 rounded-lg transition-all duration-200 transform hover:scale-102 shadow-md">
                                             <div class="flex items-center">
                                                 <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
                                                     <i class="fas fa-id-badge text-xl"></i>
@@ -110,10 +110,10 @@
                                                 </div>
                                                 <i class="fas fa-chevron-right ml-auto"></i>
                                             </div>
-                                        </button>
+                                        </a>
 
                                         <!-- Opción Administrador -->
-                                        <button onclick="showLoginForm('admin')" class="w-full bg-gradient-to-r from-restaurant-dark to-gray-800 hover:from-gray-800 hover:to-restaurant-dark text-white p-4 rounded-lg transition-all duration-200 transform hover:scale-102 shadow-md">
+                                        <a href="/Cuenta/Login" class="block w-full bg-gradient-to-r from-restaurant-dark to-gray-800 hover:from-gray-800 hover:to-restaurant-dark text-white p-4 rounded-lg transition-all duration-200 transform hover:scale-102 shadow-md">
                                             <div class="flex items-center">
                                                 <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
                                                     <i class="fas fa-crown text-xl"></i>
@@ -124,14 +124,14 @@
                                                 </div>
                                                 <i class="fas fa-chevron-right ml-auto"></i>
                                             </div>
-                                        </button>
+                                        </a>
                                     </div>
 
                                     <div class="mt-6 pt-4 border-t border-gray-200 text-center">
                                         <p class="text-sm text-gray-600">¿Primera vez aquí?</p>
-                                        <button onclick="showRegisterForm()" class="text-restaurant-accent hover:text-restaurant-secondary font-medium text-sm mt-1 transition-colors duration-200">
+                                        <a href="/Cuenta/Register" class="text-restaurant-accent hover:text-restaurant-secondary font-medium text-sm mt-1 transition-colors duration-200">
                                             Crear cuenta de cliente
-                                        </button>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -198,57 +198,17 @@
                             Reservar Ya
                         </a>
 
-                        <!-- Login Mobile -->
-                        <div id="mobileLoginContainer">
-                            <!-- Botón cuando NO está logueado (móvil) -->
-                            <button id="mobileLoginBtn" onclick="toggleMobileLoginMenu()" class="block w-full text-center bg-restaurant-dark hover:bg-restaurant-accent text-white px-6 py-3 rounded-full font-medium transition-all duration-200 transform hover:scale-105 shadow-lg">
-                                <i class="fas fa-user mr-2"></i>
-                                Iniciar Sesión
-                            </button>
+                        <!-- Botón Login - cuando NO está logueado -->
+                        <a href="/Cuenta/Login" id="mobileLoginBtn" class="block w-full text-center bg-restaurant-dark hover:bg-restaurant-accent text-white px-6 py-3 rounded-full font-medium transition-all duration-200 transform hover:scale-105 shadow-lg">
+                            <i class="fas fa-user mr-2"></i>
+                            Iniciar Sesión
+                        </a>
 
-                            <!-- Botón cuando SÍ está logueado (móvil) -->
-                            <button id="mobileLoggedInBtn" onclick="toggleMobileUserMenu()" class="w-full text-center bg-restaurant-accent hover:bg-restaurant-secondary text-white px-6 py-3 rounded-full font-medium transition-all duration-200 transform hover:scale-105 shadow-lg hidden">
-                                <i class="fas fa-user-check mr-2"></i>
-                                <span id="mobileUserName">Juan Pérez</span>
-                            </button>
-                        </div>
-
-                        <!-- Menú de login móvil -->
-                        <div id="mobileLoginMenu" class="hidden bg-gray-50 rounded-lg p-4 space-y-3">
-                            <div class="text-center mb-4">
-                                <h4 class="font-semibold text-restaurant-primary">Selecciona tu acceso</h4>
-                            </div>
-
-                            <button onclick="showLoginForm('cliente')" class="w-full bg-restaurant-accent hover:bg-yellow-500 text-white p-3 rounded-lg transition-all duration-200 flex items-center">
-                                <i class="fas fa-user mr-3"></i>
-                                <div class="text-left">
-                                    <div class="font-semibold">Cliente</div>
-                                    <div class="text-xs opacity-90">Gestiona reservas</div>
-                                </div>
-                            </button>
-
-                            <button onclick="showLoginForm('empleado')" class="w-full bg-restaurant-secondary hover:bg-amber-700 text-white p-3 rounded-lg transition-all duration-200 flex items-center">
-                                <i class="fas fa-id-badge mr-3"></i>
-                                <div class="text-left">
-                                    <div class="font-semibold">Empleado</div>
-                                    <div class="text-xs opacity-90">Panel trabajo</div>
-                                </div>
-                            </button>
-
-                            <button onclick="showLoginForm('admin')" class="w-full bg-restaurant-dark hover:bg-gray-800 text-white p-3 rounded-lg transition-all duration-200 flex items-center">
-                                <i class="fas fa-crown mr-3"></i>
-                                <div class="text-left">
-                                    <div class="font-semibold">Administrador</div>
-                                    <div class="text-xs opacity-90">Gestión completa</div>
-                                </div>
-                            </button>
-
-                            <div class="pt-2 border-t border-gray-200 text-center">
-                                <button onclick="showRegisterForm()" class="text-restaurant-accent text-sm font-medium">
-                                    Crear cuenta cliente
-                                </button>
-                            </div>
-                        </div>
+                        <!-- Botón cuando SÍ está logueado -->
+                        <button id="mobileLoggedInBtn" onclick="toggleMobileUserMenu()" class="hidden w-full text-center bg-restaurant-accent hover:bg-restaurant-secondary text-white px-6 py-3 rounded-full font-medium transition-all duration-200 transform hover:scale-105 shadow-lg">
+                            <i class="fas fa-user-check mr-2"></i>
+                            <span id="mobileUserName">Usuario</span>
+                        </button>
 
                         <!-- Menú usuario logueado móvil -->
                         <div id="mobileUserMenu" class="hidden bg-gray-50 rounded-lg p-4 space-y-2">
@@ -257,7 +217,7 @@
                                     <i class="fas fa-user text-white text-sm"></i>
                                 </div>
                                 <div>
-                                    <div class="font-semibold text-restaurant-primary text-sm" id="mobileUserNameDisplay">Juan Pérez</div>
+                                    <div class="font-semibold text-restaurant-primary text-sm" id="mobileUserNameDisplay">Usuario</div>
                                     <div class="text-xs text-gray-600" id="mobileUserType">Cliente</div>
                                 </div>
                             </div>
@@ -275,9 +235,7 @@
                 </div>
             </div>
         </div>
-    </nav>
-
-    
+    </nav>    
 
 
     <!-- Hero Section -->
@@ -1256,7 +1214,7 @@
         document.head.insertAdjacentHTML('beforeend', animationCSS);
     </script>
 
-    <script src="~/js/login.js"></script>
+    <script src="~/js/navHome.js"></script>
 
     <script src="~/js/site.js"></script>
 

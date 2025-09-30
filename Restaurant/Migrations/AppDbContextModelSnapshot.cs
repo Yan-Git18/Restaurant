@@ -335,13 +335,18 @@ namespace Restaurant.Migrations
 
             modelBuilder.Entity("Restaurant.Models.Rest_Persona", b =>
                 {
-                    b.Property<int>("ClienteId")
+                    b.Property<int>("PersonaId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ClienteId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PersonaId"));
 
                     b.Property<string>("Apellidos")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Correo")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -367,13 +372,13 @@ namespace Restaurant.Migrations
                     b.Property<int?>("UsuarioId")
                         .HasColumnType("int");
 
-                    b.HasKey("ClienteId");
+                    b.HasKey("PersonaId");
 
                     b.HasIndex("UsuarioId")
                         .IsUnique()
                         .HasFilter("[UsuarioId] IS NOT NULL");
 
-                    b.ToTable("Clientes");
+                    b.ToTable("Personas");
                 });
 
             modelBuilder.Entity("Restaurant.Models.Rest_Producto", b =>
@@ -524,6 +529,11 @@ namespace Restaurant.Migrations
                         {
                             RolId = 1,
                             Nombre = "Administrador"
+                        },
+                        new
+                        {
+                            RolId = 2,
+                            Nombre = "Cliente"
                         });
                 });
 
@@ -573,10 +583,19 @@ namespace Restaurant.Migrations
                         {
                             UsuarioId = 1,
                             Activo = true,
-                            Correo = "admin@restaurant.com",
+                            Correo = "admin@delizioso.com",
                             FechaCreacion = new DateTime(2025, 9, 27, 16, 41, 0, 0, DateTimeKind.Unspecified),
                             PasswordHash = "admin123",
                             RolId = 1
+                        },
+                        new
+                        {
+                            UsuarioId = 2,
+                            Activo = true,
+                            Correo = "cliente@gmail.com",
+                            FechaCreacion = new DateTime(2025, 9, 27, 16, 41, 0, 0, DateTimeKind.Unspecified),
+                            PasswordHash = "cliente123",
+                            RolId = 2
                         });
                 });
 

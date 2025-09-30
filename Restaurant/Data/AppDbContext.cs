@@ -8,7 +8,7 @@ namespace RESTAURANT.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<Rest_Categoria> Categorias { get; set; }
-        public DbSet<Rest_Persona> Clientes { get; set; }
+        public DbSet<Rest_Persona> Personas { get; set; }
         public DbSet<Rest_Comprobante> Comprobantes { get; set; }
         public DbSet<Rest_DetallePedido> DetallesPedido { get; set; }
         public DbSet<Rest_Inventario> Inventarios { get; set; }
@@ -79,6 +79,11 @@ namespace RESTAURANT.Data
                 .HasMaxLength(100)
                 .IsRequired();
 
+            modelBuilder.Entity<Rest_Persona>()
+                .Property(c => c.Correo)
+                .HasMaxLength(100)
+                .IsRequired();
+
             modelBuilder.Entity<Rest_Producto>()
                 .Property(p => p.Nombre)
                 .HasMaxLength(100)
@@ -92,7 +97,7 @@ namespace RESTAURANT.Data
             modelBuilder.Entity<Rest_Usuario>()
                 .Property(u => u.Correo)
                 .HasMaxLength(100)
-                .IsRequired();
+                .IsRequired();            
 
             // ===== ÍNDICES =====
 
@@ -225,7 +230,8 @@ namespace RESTAURANT.Data
 
             // Roles
             modelBuilder.Entity<Rest_Rol>().HasData(
-                new Rest_Rol { RolId = 1, Nombre = "Administrador" }
+                new Rest_Rol { RolId = 1, Nombre = "Administrador" },
+                new Rest_Rol { RolId = 2, Nombre = "Cliente" }
             );
 
             // Usuarios - CON FECHAS ESTÁTICAS
@@ -233,9 +239,18 @@ namespace RESTAURANT.Data
                 new Rest_Usuario
                 {
                     UsuarioId = 1,
-                    Correo = "admin@restaurant.com",
+                    Correo = "admin@delizioso.com",
                     PasswordHash = "admin123",
                     RolId = 1,
+                    FechaCreacion = new DateTime(2025, 09, 27, 16, 41, 0),
+                    Activo = true
+                },
+                new Rest_Usuario
+                {
+                    UsuarioId = 2,
+                    Correo = "cliente@gmail.com",
+                    PasswordHash = "cliente123",
+                    RolId = 2,
                     FechaCreacion = new DateTime(2025, 09, 27, 16, 41, 0),
                     Activo = true
                 }

@@ -134,23 +134,24 @@ namespace Restaurant.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Clientes",
+                name: "Personas",
                 columns: table => new
                 {
-                    ClienteId = table.Column<int>(type: "int", nullable: false)
+                    PersonaId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Nombre = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Apellidos = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     Telefono = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: false),
+                    Correo = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Direccion = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     FechaRegistro = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
                     UsuarioId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Clientes", x => x.ClienteId);
+                    table.PrimaryKey("PK_Personas", x => x.PersonaId);
                     table.ForeignKey(
-                        name: "FK_Clientes_Usuarios_UsuarioId",
+                        name: "FK_Personas_Usuarios_UsuarioId",
                         column: x => x.UsuarioId,
                         principalTable: "Usuarios",
                         principalColumn: "UsuarioId",
@@ -174,17 +175,17 @@ namespace Restaurant.Migrations
                 {
                     table.PrimaryKey("PK_Pedidos", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Pedidos_Clientes_ClienteId",
-                        column: x => x.ClienteId,
-                        principalTable: "Clientes",
-                        principalColumn: "ClienteId",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
                         name: "FK_Pedidos_Mesas_MesaId",
                         column: x => x.MesaId,
                         principalTable: "Mesas",
                         principalColumn: "MesaId",
                         onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Pedidos_Personas_ClienteId",
+                        column: x => x.ClienteId,
+                        principalTable: "Personas",
+                        principalColumn: "PersonaId",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -205,16 +206,16 @@ namespace Restaurant.Migrations
                 {
                     table.PrimaryKey("PK_Reservas", x => x.ReservaId);
                     table.ForeignKey(
-                        name: "FK_Reservas_Clientes_ClienteId",
-                        column: x => x.ClienteId,
-                        principalTable: "Clientes",
-                        principalColumn: "ClienteId",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
                         name: "FK_Reservas_Mesas_MesaId",
                         column: x => x.MesaId,
                         principalTable: "Mesas",
                         principalColumn: "MesaId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Reservas_Personas_ClienteId",
+                        column: x => x.ClienteId,
+                        principalTable: "Personas",
+                        principalColumn: "PersonaId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -345,7 +346,11 @@ namespace Restaurant.Migrations
             migrationBuilder.InsertData(
                 table: "Roles",
                 columns: new[] { "RolId", "Descripcion", "Nombre" },
-                values: new object[] { 1, null, "Administrador" });
+                values: new object[,]
+                {
+                    { 1, null, "Administrador" },
+                    { 2, null, "Cliente" }
+                });
 
             migrationBuilder.InsertData(
                 table: "Productos",
@@ -360,14 +365,11 @@ namespace Restaurant.Migrations
             migrationBuilder.InsertData(
                 table: "Usuarios",
                 columns: new[] { "UsuarioId", "Activo", "Correo", "FechaCreacion", "PasswordHash", "RolId", "UltimoAcceso" },
-                values: new object[] { 1, true, "admin@restaurant.com", new DateTime(2025, 9, 27, 16, 41, 0, 0, DateTimeKind.Unspecified), "admin123", 1, null });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Clientes_UsuarioId",
-                table: "Clientes",
-                column: "UsuarioId",
-                unique: true,
-                filter: "[UsuarioId] IS NOT NULL");
+                values: new object[,]
+                {
+                    { 1, true, "admin@delizioso.com", new DateTime(2025, 9, 27, 16, 41, 0, 0, DateTimeKind.Unspecified), "admin123", 1, null },
+                    { 2, true, "cliente@gmail.com", new DateTime(2025, 9, 27, 16, 41, 0, 0, DateTimeKind.Unspecified), "cliente123", 2, null }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comprobantes_VentaId",
@@ -415,6 +417,13 @@ namespace Restaurant.Migrations
                 name: "IX_Pedidos_MesaId",
                 table: "Pedidos",
                 column: "MesaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Personas_UsuarioId",
+                table: "Personas",
+                column: "UsuarioId",
+                unique: true,
+                filter: "[UsuarioId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Productos_CategoriaId_Disponible",
@@ -495,10 +504,10 @@ namespace Restaurant.Migrations
                 name: "Pedidos");
 
             migrationBuilder.DropTable(
-                name: "Clientes");
+                name: "Mesas");
 
             migrationBuilder.DropTable(
-                name: "Mesas");
+                name: "Personas");
 
             migrationBuilder.DropTable(
                 name: "Usuarios");
