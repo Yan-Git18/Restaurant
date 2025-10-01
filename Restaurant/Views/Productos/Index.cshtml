@@ -1,0 +1,237 @@
+﻿@model List<Restaurant.Models.Rest_Producto>
+@{
+    ViewData["Title"] = "Productos";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/Dashboard.css" />
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <div class="dashboard-header">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h1>Gestión de Productos</h1>
+                    <p class="mb-0">Listado y administración de productos disponibles</p>
+                </div>
+                <div>
+                    <span class="badge bg-light text-dark">
+                        <i class="bi bi-calendar me-2"></i>
+                        <span id="current-date"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-rutas">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="section-title mb-0">
+                        Listado de Productos
+                        <span class="badge bg-primary ms-2">@Model.Count</span>
+                    </h4>
+                    <a asp-controller="Productos" asp-action="Crear" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Nuevo Producto
+                    </a>
+                </div>
+
+                <div class="table-responsive">
+                    <table id="tablaProductos" class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Imagen</th>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Precio</th>
+                                <th>Categoría</th>
+                                <th>Inventario</th>
+                                <th>Estado</th>
+                                <th>Fecha Creación</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Any())
+                            {
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td><strong>@item.Id</strong></td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(item.ImagenUrl))
+                                            {
+                                                <img src="@item.ImagenUrl" alt="@item.Nombre" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
+                                            }
+                                            else
+                                            {
+                                                <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; border-radius: 4px;">
+                                                    <i class="fas fa-image"></i>
+                                                </div>
+                                            }
+                                        </td>
+                                        <td><strong>@item.Nombre</strong></td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(item.Descripcion))
+                                            {
+                                                @(item.Descripcion.Length > 50 ? item.Descripcion.Substring(0, 50) + "..." : item.Descripcion)
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted fst-italic">Sin descripción</span>
+                                            }
+                                        </td>
+                                        <td><span class="badge bg-success">@item.Precio.ToString("C")</span></td>
+                                        <td>
+                                            @if (item.Categoria != null)
+                                            {
+                                                <span class="badge bg-info">@item.Categoria.Nombre</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Sin categoría</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (item.Inventario != null)
+                                            {
+                                                <span class="badge bg-primary">@item.Inventario.Nombre</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Sin inventario</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (item.Disponible)
+                                            {
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check-circle me-1"></i>Disponible
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">
+                                                    <i class="fas fa-times-circle me-1"></i>No disponible
+                                                </span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <small>@item.FechaCreacion.ToString("dd/MM/yyyy")</small>
+                                        </td>
+                                        <td>
+                                            <div role="group">
+                                                <a asp-controller="Productos" asp-action="Editar" asp-route-id="@item.Id"
+                                                   class="btn btn-warning btn-sm" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-danger btn-sm btn-eliminar"
+                                                        data-id="@item.Id" data-nombre="@item.Nombre" title="Eliminar">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="10" class="text-center py-4">
+                                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                        <p class="text-muted">No hay productos registrados</p>
+                                        <a asp-controller="Productos" asp-action="Crear" class="btn btn-success">
+                                            <i class="fas fa-plus"></i> Crear primer producto
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="text-start mt-3">
+                    <a asp-controller="Admin" asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario oculto para eliminar -->
+        <form id="form-eliminar" method="post" asp-controller="Productos" asp-action="EliminarConfirmar" style="display:none;">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" id="input-id" />
+        </form>
+    </div>
+</body>
+</html>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Manejador de eliminación con SweetAlert2
+            document.querySelectorAll('.btn-eliminar').forEach(button => {
+                button.addEventListener('click', function () {
+                    const id = this.dataset.id;
+                    const nombre = this.dataset.nombre;
+
+                    Swal.fire({
+                        title: '¿Estás seguro?',
+                        html: `Se eliminará el producto: <strong>${nombre}</strong>`,
+                        text: "¡No podrás revertir esta acción!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: '<i class="fas fa-trash me-1"></i> Sí, eliminar',
+                        cancelButtonText: '<i class="fas fa-times me-1"></i> Cancelar',
+                        focusCancel: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            document.getElementById('input-id').value = id;
+                            document.getElementById('form-eliminar').submit();
+                        }
+                    });
+                });
+            });
+
+            // Mostrar fecha actual
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const currentDateElement = document.getElementById('current-date');
+            if (currentDateElement) {
+                currentDateElement.textContent = new Date().toLocaleDateString('es-ES', options);
+            }
+
+            // Auto-ocultar alertas después de 5 segundos
+            setTimeout(function() {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(alert => {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 5000);
+        });
+    </script>
+
+    <script>
+        // Inicializar DataTables
+        $(document).ready(function () {
+            $('#tablaProductos').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                },
+                order: [[0, 'desc']],
+                pageLength: 10,
+                responsive: true,
+                columnDefs: [
+                    { orderable: false, targets: [1, 9] }
+                ]
+            });
+        });
+    </script>
+}

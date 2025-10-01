@@ -18,7 +18,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LoginPath = "/Cuenta/Login"; // Ruta personalizada para la página de inicio de sesión
         options.Cookie.Name = "DeliziosoAuth"; // Nombre personalizado para la cookie de autenticación
         options.AccessDeniedPath = "/Cuenta/AccessDenied"; // Ruta personalizada para la página de acceso denegado
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(10); // Tiempo de expiración de la cookie
+        options.ExpireTimeSpan = TimeSpan.FromHours(4); // Tiempo de expiración de la cookie
         options.SlidingExpiration = true;
     });
 
