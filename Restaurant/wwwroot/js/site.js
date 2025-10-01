@@ -12,26 +12,10 @@ if (reservationForm && fechaInput) {
     maxDate.setDate(maxDate.getDate() + 30);
     fechaInput.max = maxDate.toISOString().split('T')[0];
 
-    reservationForm.addEventListener('submit', function (e) {
+    reservationForm.addEventListener('submit', async function (e) {
         e.preventDefault();
 
-        // Obtener datos del formulario
         const formData = new FormData(reservationForm);
-        const reservationData = {
-            nombre: formData.get('nombre'),
-            telefono: formData.get('telefono'),
-            email: formData.get('email'),
-            fecha: formData.get('fecha'),
-            hora: formData.get('hora'),
-            personas: formData.get('personas'),
-            ocasion: formData.get('ocasion'),
-            comentarios: formData.get('comentarios')
-        };
-
-        // Validaciones adicionales
-        if (!validateReservation(reservationData)) {
-            return;
-        }
 
         // Mostrar loading en el botón
         const submitBtn = reservationForm.querySelector('button[type="submit"]');
@@ -39,13 +23,27 @@ if (reservationForm && fechaInput) {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Procesando...';
         submitBtn.disabled = true;
 
-        // Simular envío (conectar con backend en producción)
-        setTimeout(() => {
-            showReservationSuccess(reservationData);
-            reservationForm.reset();
+        try {
+            const response = await fetch(reservationForm.action, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const reservationData = Object.fromEntries(formData.entries());
+
+                showReservationSuccess(reservationData);
+                reservationForm.reset();
+            } else {
+                showAlert("Ocurrió un error al guardar tu reserva.", "error");
+            }
+        } catch (err) {
+            console.error(err);
+            showAlert("Error de conexión con el servidor.", "error");
+        } finally {
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
-        }, 2000);
+        }
     });
 }
 
@@ -123,14 +121,10 @@ function showAlert(message, type = 'info') {
 }
 
 function formatDate(dateString) {
-    const date = new Date(dateString);
-    const options = {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    };
-    return date.toLocaleDateString('es-ES', options);
+    const [year, month, day] = dateString.split("-");
+    const date = new Date(year, month - 1, day);
+    const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+    return date.toLocaleDateString("es-ES", options);
 }
 
 function closeModal(modalId) {

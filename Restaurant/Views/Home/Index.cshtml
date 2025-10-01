@@ -794,7 +794,8 @@
                         </p>
                     </div>
 
-                    <form class="space-y-6" id="reservation-form">
+                    @* <form class="space-y-6" id="reservation-form" method="post"> *@
+                    <form asp-action="Crear" asp-controller="Reservas" method="post" class="space-y-6" id="reservation-form">
                         <div class="grid md:grid-cols-2 gap-6">
                             <div>
                                 <label for="nombre" class="block text-sm font-medium text-gray-700 mb-2">
