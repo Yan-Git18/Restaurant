@@ -1,0 +1,92 @@
+﻿@model Restaurant.Models.Rest_Mesa
+@{
+    ViewData["Title"] = "Editar Mesa";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/Dashboard.css" />
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <div class="dashboard-header mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1>Editar mesa</h1>
+                </div>
+                <div>
+                    <span class="badge bg-light text-dark">
+                        <i class="bi bi-calendar me-2"></i>
+                        <span id="current-date"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 col-lg-4">
+                <div class="card card-vehiculos">
+                    <div class="card-body">
+                        <form asp-controller="Mesas" asp-action="Editar" method="post">
+                            @Html.AntiForgeryToken()
+                            <input asp-for="MesaId" type="hidden" />
+
+                            <div class="mb-3">
+                                <label asp-for="Numero" class="form-label">Número de mesa</label>
+                                <input asp-for="Numero" type="number" min="1" class="form-control" required />
+                                <span asp-validation-for="Numero" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Capacidad" class="form-label">Capacidad</label>
+                                <input asp-for="Capacidad" type="number" min="1" class="form-control" required />
+                                <span asp-validation-for="Capacidad" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Estado" class="form-label">Estado</label>
+                                <select asp-for="Estado" class="form-select" required>
+                                    <option value="Libre">Libre</option>
+                                    <option value="Ocupada">Ocupada</option>
+                                    <option value="Reservada">Reservada</option>
+                                    <option value="Mantenimiento">Mantenimiento</option>
+                                </select>
+                                <span asp-validation-for="Estado" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Observaciones" class="form-label">Observaciones</label>
+                                <textarea asp-for="Observaciones" rows="3" class="form-control"></textarea>
+                                <span asp-validation-for="Observaciones" class="text-danger small"></span>
+                            </div>
+
+                            <div class="text-end">
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fas fa-save me-1"></i> Guardar
+                                </button>
+                                <a asp-controller="Mesas" asp-action="Index" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-1"></i> Volver
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+@section Scripts {
+    <script>
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-ES', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

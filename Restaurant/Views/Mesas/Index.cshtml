@@ -1,0 +1,212 @@
+﻿@model List<Restaurant.Models.Rest_Mesa>
+@{
+    ViewData["Title"] = "Mesas";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/Dashboard.css" />
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <div class="dashboard-header mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1>Gestión de mesas</h1>
+                    <p class="mb-0">Listado y administración de mesas del restaurante</p>
+                </div>
+                <div>
+                    <span class="badge bg-light text-dark">
+                        <i class="bi bi-calendar me-2"></i>
+                        <span id="current-date"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-rutas">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="section-title mb-0">
+                        Listado de Mesas
+                        <span class="badge bg-primary ms-2">@Model.Count</span>
+                    </h4>
+                    <a asp-controller="Mesas" asp-action="Crear" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Nueva Mesa
+                    </a>
+                </div>
+
+                <div class="table-responsive">
+                    <table id="tablaMesas" class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Número</th>
+                                <th>Capacidad</th>
+                                <th>Estado</th>
+                                <th>Observaciones</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Any())
+                            {
+                                @foreach (var mesa in Model)
+                                {
+                                    <tr>
+                                        <td><strong>@mesa.MesaId</strong></td>
+                                        <td>@mesa.Numero</td>
+                                        <td>@mesa.Capacidad personas</td>
+                                        <td>
+                                            @switch (mesa.Estado)
+                                            {
+                                                case "Libre":
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check-circle me-1"></i> Libre
+                                                    </span>
+                                                    break;
+                                                case "Ocupada":
+                                                    <span class="badge bg-danger">
+                                                        <i class="fas fa-chair me-1"></i> Ocupada
+                                                    </span>
+                                                    break;
+                                                case "Reservada":
+                                                    <span class="badge bg-warning text-dark">
+                                                        <i class="fas fa-calendar-check me-1"></i> Reservada
+                                                    </span>
+                                                    break;
+                                                case "Mantenimiento":
+                                                    <span class="badge bg-secondary">
+                                                        <i class="fas fa-tools me-1"></i> Mantenimiento
+                                                    </span>
+                                                    break;
+                                                default:
+                                                    <span class="badge bg-light text-dark">Desconocido</span>
+                                                    break;
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(mesa.Observaciones))
+                                            {
+                                                @(mesa.Observaciones.Length > 50 ? mesa.Observaciones.Substring(0, 50) + "..." : mesa.Observaciones)
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted fst-italic">Sin observaciones</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div role="group">
+                                                <a asp-controller="Mesas" asp-action="Editar" asp-route-id="@mesa.MesaId"
+                                                   class="btn btn-warning btn-sm" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-danger btn-sm btn-eliminar"
+                                                        data-id="@mesa.MesaId" data-numero="@mesa.Numero" title="Eliminar">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                        <p class="text-muted">No hay mesas registradas</p>
+                                        <a asp-controller="Mesas" asp-action="Crear" class="btn btn-success">
+                                            <i class="fas fa-plus"></i> Crear primera mesa
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="text-start mt-3">
+                    <a asp-controller="Admin" asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario oculto para eliminar -->
+        <form id="form-eliminar" method="post" asp-controller="Mesas" asp-action="EliminarConfirmar" style="display:none;">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" id="input-id" />
+        </form>
+    </div>
+</body>
+</html>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Confirmación con SweetAlert2
+            document.querySelectorAll('.btn-eliminar').forEach(button => {
+                button.addEventListener('click', function () {
+                    const id = this.dataset.id;
+                    const numero = this.dataset.numero;
+
+                    Swal.fire({
+                        title: '¿Estás seguro?',
+                        html: `Se eliminará la mesa número <strong>${numero}</strong>`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: '<i class="fas fa-trash me-1"></i> Sí, eliminar',
+                        cancelButtonText: '<i class="fas fa-times me-1"></i> Cancelar',
+                        focusCancel: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            document.getElementById('input-id').value = id;
+                            document.getElementById('form-eliminar').submit();
+                        }
+                    });
+                });
+            });
+
+            // Mostrar fecha actual
+            const currentDateElement = document.getElementById('current-date');
+            if (currentDateElement) {
+                currentDateElement.textContent = new Date().toLocaleDateString('es-ES', {
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                });
+            }
+
+            // Auto-ocultar alertas
+            setTimeout(function () {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(alert => {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 5000);
+        });
+    </script>
+
+    <script>
+        // Inicializar DataTables
+        $(document).ready(function () {
+            $('#tablaMesas').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                },
+                order: [[0, 'asc']],
+                pageLength: 10,
+                responsive: true,
+                columnDefs: [
+                    { orderable: false, targets: [5] }
+                ]
+            });
+        });
+    </script>
+}
