@@ -1,103 +1,207 @@
-﻿//using Microsoft.AspNetCore.Mvc;
-//using Microsoft.EntityFrameworkCore;
-//using Restaurant.Controllers;
-//using RESTAURANT.Data;
-//using Restaurant.ViewModels;
-//using System;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Restaurant.Controllers;
+using Restaurant.Models;
+using Restaurant.ViewModels;
+using RESTAURANT.Data;
+using System;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
-//namespace Restaurant.Tests.Controllers
-//{
-//    [TestClass]
-//    public class ReservasControllerTests
-//    {
-//        private AppDbContext _context;
-//        private ReservasController _controller;
+namespace Restaurant.Tests
+{
+    [TestClass]
+    public class ReservasTest
+    {
+        private AppDbContext GetDbContext()
+        {
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString()) // BD en memoria
+                .Options;
 
-//        [TestInitialize]
-//        public void Setup()
-//        {
-//            var options = new DbContextOptionsBuilder<AppDbContext>()
-//                .UseInMemoryDatabase(databaseName: "ReservasTestDb")
-//                .Options;
+            return new AppDbContext(options);
+        }
 
-//            _context = new AppDbContext(options);
-//            _controller = new ReservasController(_context);
-//        }
+        private ClaimsPrincipal GetUser(int? personaId = null)
+        {
+            var claims = new List<Claim> { new Claim(ClaimTypes.Name, "testuser") };
 
-//        [TestCleanup]
-//        public void Cleanup()
-//        {
-//            _context.Database.EnsureDeleted();
-//            _context.Dispose();
-//        }
+            if (personaId.HasValue)
+                claims.Add(new Claim("PersonaId", personaId.Value.ToString()));
 
-//        [TestMethod]
-//        public void Crear_Get_DeberiaRetornarVista()
-//        {
-//            // Act
-//            var result = _controller.Crear() as ViewResult;
+            var identity = new ClaimsIdentity(claims, "TestAuth");
+            return new ClaimsPrincipal(identity);
+        }
 
-//            // Assert
-//            Assert.IsNotNull(result);
-//            Assert.IsNull(result.Model);
-//        }
+        // ================== ESCENARIOS EXITOSOS ==================
 
-//        [TestMethod]
-//        public void Crear_Post_ModeloInvalido_DeberiaRetornarVistaConModelo()
-//        {
-//            // Arrange
-//            var model = new ReservaFormViewModel();
-//            _controller.ModelState.AddModelError("Nombre", "El nombre es requerido");
+        [TestMethod]
+        public async Task Get_Crear_ReturnsView_WithAutocompletedModel_WhenUserIsAuthenticated()
+        {
+            var context = GetDbContext();
+            var persona = new Rest_Persona { PersonaId = 1, Nombre = "Juan", Telefono = "999", Correo = "juan@test.com" };
+            context.Personas.Add(persona);
+            await context.SaveChangesAsync();
 
-//            // Act
-//            var result = _controller.Crear(model) as ViewResult;
+            var controller = new ReservasController(context);
+            controller.ControllerContext.HttpContext = new DefaultHttpContext { User = GetUser(1) };
 
-//            // Assert
-//            Assert.IsNotNull(result);
-//            Assert.AreEqual(model, result.Model);
-//        }
+            var result = await controller.Crear() as ViewResult;
+            var model = result?.Model as ReservaFormViewModel;
 
-//        [TestMethod]
-//        public void Crear_Post_ModeloValido_DeberiaGuardarReservaYRedirigir()
-//        {
-//            // Arrange
-//            var model = new ReservaFormViewModel
-//            {
-//                Nombre = "Juan Pérez",
-//                Telefono = "987654321",
-//                Fecha = DateTime.Today,
-//                Hora = "19:30",
-//                Personas = "4",
-//                Ocasion = "Cumpleaños",
-//                Comentarios = "Mesa cerca a la ventana"
-//            };
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Juan", model?.Nombre);
+            Assert.AreEqual("999", model?.Telefono);
+            Assert.AreEqual("juan@test.com", model?.Email);
+        }
 
-//            // Act
-//            var result = _controller.Crear(model) as RedirectToActionResult;
+        [TestMethod]
+        public async Task Post_Crear_CreatesReserva_ForAuthenticatedUser()
+        {
+            var context = GetDbContext();
+            var persona = new Rest_Persona { PersonaId = 1, Nombre = "Carlos", Telefono = "111", Correo = "carlos@test.com" };
+            context.Personas.Add(persona);
+            await context.SaveChangesAsync();
 
-//            // Assert
-//            Assert.IsNotNull(result);
-//            Assert.AreEqual("Index", result.ActionName);
-//            Assert.AreEqual("Home", result.ControllerName);
+            var controller = new ReservasController(context);
+            controller.ControllerContext.HttpContext = new DefaultHttpContext { User = GetUser(1) };
 
-//            var reserva = _context.Reservas.Include(r => r.Cliente).FirstOrDefault();
-//            Assert.IsNotNull(reserva);
-//            Assert.AreEqual("Juan Pérez", reserva.Cliente.Nombre);
-//            Assert.AreEqual("987654321", reserva.Cliente.Telefono);
-//            Assert.AreEqual(4, reserva.NumeroPersonas);
-//            StringAssert.Contains(reserva.Observaciones, "Cumpleaños");
-//            StringAssert.Contains(reserva.Observaciones, "Mesa cerca a la ventana");
-//            Assert.AreEqual("Pendiente", reserva.Estado);
-//        }
+            var model = new ReservaFormViewModel
+            {
+                Nombre = "Carlos",
+                Telefono = "111",
+                Email = "carlos@test.com",
+                Fecha = DateTime.Today,
+                Hora = "19:00",
+                Personas = "4",
+                Ocasion = "Cena",
+                Comentarios = "Sin gluten"
+            };
 
-//        [TestMethod]
-//        public void Confirmacion_DeberiaRetornarVista()
-//        {
-//            // Act
-//            var result = _controller.Confirmacion() as ViewResult;
+            var result = await controller.Crear(model) as RedirectToActionResult;
 
-//            // Assert
-//            Assert.IsNotNull(result);
-//        }
-//    }
-//}
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Confirmacion", result.ActionName);
+            Assert.AreEqual(1, await context.Reservas.CountAsync());
+        }
+
+        [TestMethod]
+        public async Task Post_Crear_CreatesNewPersona_WhenUserIsNotAuthenticated()
+        {
+            var context = GetDbContext();
+            var controller = new ReservasController(context);
+            controller.ControllerContext.HttpContext = new DefaultHttpContext(); // No autenticado
+
+            var model = new ReservaFormViewModel
+            {
+                Nombre = "Lucia",
+                Telefono = "123",
+                Email = "lucia@test.com",
+                Fecha = DateTime.Today,
+                Hora = "20:00",
+                Personas = "2",
+                Ocasion = "Cumpleaños",
+                Comentarios = "Mesa al fondo"
+            };
+
+            var result = await controller.Crear(model) as RedirectToActionResult;
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Confirmacion", result.ActionName);
+            Assert.AreEqual(1, await context.Personas.CountAsync());
+            Assert.AreEqual(1, await context.Reservas.CountAsync());
+        }
+
+        [TestMethod]
+        public void Confirmacion_RedirectsToHomeIndex()
+        {
+            var context = GetDbContext();
+            var controller = new ReservasController(context);
+
+            var result = controller.Confirmacion() as RedirectToActionResult;
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Index", result.ActionName);
+            Assert.AreEqual("Home", result.ControllerName);
+        }
+
+        // ================== ESCENARIOS DE ERROR ==================
+
+        [TestMethod]
+        public async Task Post_Crear_ReturnsView_WhenModelIsInvalid()
+        {
+            var context = GetDbContext();
+            var controller = new ReservasController(context);
+            controller.ModelState.AddModelError("Nombre", "El nombre es obligatorio");
+
+            var model = new ReservaFormViewModel
+            {
+                Telefono = "000",
+                Email = "error@test.com"
+                // Nombre faltante → Error
+            };
+
+            var result = await controller.Crear(model) as ViewResult;
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(model, result.Model); // Retorna el mismo modelo
+            Assert.AreEqual(0, await context.Reservas.CountAsync()); // Nada guardado
+        }
+
+        [TestMethod]
+        public async Task Post_Crear_ReturnsView_WhenPersonaNotFound()
+        {
+            var context = GetDbContext();
+            var controller = new ReservasController(context);
+            controller.ControllerContext.HttpContext = new DefaultHttpContext { User = GetUser(99) }; // Persona inexistente
+
+            var model = new ReservaFormViewModel
+            {
+                Nombre = "Error",
+                Telefono = "000",
+                Email = "error@test.com",
+                Fecha = DateTime.Today,
+                Hora = "18:00",
+                Personas = "2"
+            };
+
+            var result = await controller.Crear(model) as ViewResult;
+
+            Assert.IsNotNull(result);
+            Assert.IsFalse(controller.ModelState.IsValid);
+            Assert.AreEqual(0, await context.Reservas.CountAsync());
+        }
+
+        [TestMethod]
+        public async Task Post_Crear_ReturnsView_WhenPersonaIdClaimIsInvalid()
+        {
+            var context = GetDbContext();
+            var controller = new ReservasController(context);
+
+            // Usuario autenticado pero sin claim PersonaId
+            controller.ControllerContext.HttpContext = new DefaultHttpContext
+            {
+                User = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, "user") }, "TestAuth"))
+            };
+
+            var model = new ReservaFormViewModel
+            {
+                Nombre = "Error",
+                Telefono = "000",
+                Email = "error@test.com",
+                Fecha = DateTime.Today,
+                Hora = "18:00",
+                Personas = "2"
+            };
+
+            var result = await controller.Crear(model) as ViewResult;
+
+            Assert.IsNotNull(result);
+            Assert.IsFalse(controller.ModelState.IsValid);
+            Assert.AreEqual(0, await context.Reservas.CountAsync());
+        }
+    }
+}

@@ -4,62 +4,66 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="container py-4">
-    <div class="roles-header d-flex justify-content-between align-items-center">
-        <h2><i class="fa fa-users me-2"></i>Gestión de Usuarios</h2>
-        <a asp-action="Create" class="btn btn-nuevo">
-            <i class="fa fa-plus me-2"></i>Crear Usuario
+<div class="dashboard-header d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0"><i class="fa fa-users me-2"></i>Gestión de Usuarios</h2>
+    <span class="fecha-hoy"></span>
+</div>
+
+<div class="card card-usuarios shadow-sm p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0"><i class="fa fa-list me-2"></i>Lista de Usuarios</h4>
+        <a asp-action="Create" class="btn btn-success d-flex align-items-center">
+            <i class="fa fa-plus me-2"></i>Nuevo Usuario
         </a>
     </div>
 
-    <div class="table-card">
-        @if (Model != null && Model.Any())
-        {
-            <table class="modern-table">
-                <thead>
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover" id="usuariosTable">
+                <thead class="table-light">
                     <tr>
-                        <th width="20%">Correo</th>
-                        <th width="15%">Rol</th>
-                        <th width="10%">Estado</th>
-                        <th width="12%">Fecha Creación</th>
-                        <th width="15%">Último Acceso</th>
-                        <th width="28%">Acciones</th>
+                        <th>Correo</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Fecha Creación</th>
+                        <th>Último Acceso</th>
+                        <th class="text-center">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var u in Model)
                     {
                         <tr>
-                            <td>
-                                <span class="usuario-correo">@u.Correo</span>
-                            </td>
-                            <td>
-                                <span class="usuario-rol">@u.Rol?.Nombre</span>
-                            </td>
+                            <td><span class="fw-semibold">@u.Correo</span></td>
+                            <td><span class="badge bg-secondary">@u.Rol?.Nombre</span></td>
                             <td>
                                 @if (u.Activo)
                                 {
-                                    <span class="badge-activo">Activo</span>
+                                    <span class="badge bg-success">Activo</span>
                                 }
                                 else
                                 {
-                                    <span class="badge-inactivo">Inactivo</span>
+                                    <span class="badge bg-danger">Inactivo</span>
                                 }
                             </td>
-                            <td>
-                                <span class="usuario-fecha">@u.FechaCreacion.ToString("dd/MM/yyyy")</span>
-                            </td>
-                            <td>
-                                <span class="usuario-fecha">@(u.UltimoAcceso?.ToString("dd/MM/yyyy HH:mm") ?? "-")</span>
-                            </td>
-                            <td>
-                                <a asp-action="Edit" asp-route-id="@u.UsuarioId" class="action-btn btn-edit">
-                                    <i class="fa fa-edit me-1"></i>Editar
+                            <td>@u.FechaCreacion.ToString("dd/MM/yyyy")</td>
+                            <td>@(u.UltimoAcceso?.ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
+                            <td class="text-center">
+                                <a asp-action="Edit" asp-route-id="@u.UsuarioId" class="btn btn-sm btn-warning me-2">
+                                    <i class="fas fa-edit"></i>
                                 </a>
-                                <button type="button" class="action-btn btn-delete" onclick="confirmarEliminacionUsuario(@u.UsuarioId)">
-                                    <i class="fa fa-trash me-1"></i>Eliminar
+                                <button type="button" class="btn btn-sm btn-danger"
+                                        onclick="confirmarEliminacionUsuario(@u.UsuarioId)">
+                                    <i class="fas fa-trash"></i>
                                 </button>
-                                <form id="form-eliminar-usuario-@u.UsuarioId" asp-action="DeleteConfirmed" asp-route-id="@u.UsuarioId" method="post" style="display:none;">
+
+                                <!-- Form oculto -->
+                                <form id="form-eliminar-usuario-@u.UsuarioId"
+                                      asp-action="Delete"
+                                      asp-route-id="@u.UsuarioId"
+                                      method="post"
+                                      style="display:none;">
                                     @Html.AntiForgeryToken()
                                 </form>
                             </td>
@@ -67,35 +71,45 @@
                     }
                 </tbody>
             </table>
-        }
-        else
-        {
-            <div class="empty-state">
-                <i class="fa fa-users"></i>
-                <h4>No hay usuarios registrados</h4>
-                <p>Comienza creando tu primer usuario</p>
-            </div>
-        }
-    </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center">
+            <i class="fa fa-info-circle me-2"></i>No hay usuarios registrados.
+        </div>
+    }
 </div>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script>
+        // DataTable
+        $(document).ready(function () {
+            $('#usuariosTable').DataTable({
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+                }
+            });
+        });
+
+        // SweetAlert2 para confirmación de eliminación
         function confirmarEliminacionUsuario(id) {
             Swal.fire({
                 title: '¿Estás seguro?',
                 text: "Este usuario será eliminado permanentemente",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#f5576c',
-                cancelButtonColor: '#a0aec0',
+                confirmButtonColor: '#e74c3c',
+                cancelButtonColor: '#95a5a6',
                 confirmButtonText: 'Sí, eliminar',
                 cancelButtonText: 'Cancelar',
                 customClass: {
-                    popup: 'rounded-3',
-                    confirmButton: 'rounded-2',
-                    cancelButton: 'rounded-2'
+                    popup: 'rounded-3 shadow',
+                    confirmButton: 'rounded-pill px-4',
+                    cancelButton: 'rounded-pill px-4'
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -103,5 +117,12 @@
                 }
             });
         }
+
+        // Fecha actual dinámica
+        document.addEventListener("DOMContentLoaded", function () {
+            const fecha = new Date();
+            const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.querySelector(".fecha-hoy").innerText = fecha.toLocaleDateString('es-ES', opciones);
+        });
     </script>
 }

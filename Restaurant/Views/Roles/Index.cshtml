@@ -3,89 +3,174 @@
     ViewData["Title"] = "Roles";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
-
-
-<div class="container py-4">
-    <div class="roles-header d-flex justify-content-between align-items-center">
-        <h2><i class="fa fa-shield-alt me-2"></i>Gestión de Roles</h2>
-        <a asp-action="Create" class="btn btn-nuevo">
-            <i class="fa fa-plus me-2"></i>Nuevo Rol
-        </a>
-    </div>
-
-    <div class="table-card">
-        @if (Model != null && Model.Any())
-        {
-            <table class="modern-table">
-                <thead>
-                    <tr>
-                        <th width="10%">ID</th>
-                        <th width="25%">Nombre</th>
-                        <th width="40%">Descripción</th>
-                        <th width="25%">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var rol in Model)
-                    {
-                        <tr>
-                            <td>
-                                <span class="badge-id">#@rol.RolId</span>
-                            </td>
-                            <td>
-                                <span class="rol-name">@rol.Nombre</span>
-                            </td>
-                            <td>
-                                <span class="rol-description">@rol.Descripcion</span>
-                            </td>
-                            <td>
-                                <a asp-action="Edit" asp-route-id="@rol.RolId" class="action-btn btn-edit">
-                                    <i class="fa fa-edit me-1"></i>Editar
-                                </a>
-                                <button type="button" class="action-btn btn-delete" onclick="confirmarEliminacion(@rol.RolId)">
-                                    <i class="fa fa-trash me-1"></i>Eliminar
-                                </button>
-                                <form id="form-eliminar-@rol.RolId" method="post" asp-action="DeleteConfirmed" asp-route-id="@rol.RolId" style="display:none;"></form>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
-        else
-        {
-            <div class="empty-state">
-                <i class="fa fa-shield-alt"></i>
-                <h4>No hay roles registrados</h4>
-                <p>Comienza creando tu primer rol</p>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/Dashboard.css" />
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <div class="dashboard-header">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h1>Gestión de Roles</h1>
+                    <p class="mb-0">Listado y administración de roles del sistema</p>
+                </div>
+                <div>
+                    <span class="badge bg-light text-dark">
+                        <i class="bi bi-calendar me-2"></i>
+                        <span id="current-date"></span>
+                    </span>
+                </div>
             </div>
-        }
+        </div>
+
+        <div class="card card-roles">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="section-title mb-0">
+                        Listado de Roles
+                        <span class="badge bg-primary ms-2">@Model.Count()</span>
+                    </h4>
+                    <a asp-action="Create" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Nuevo Rol
+                    </a>
+                </div>
+
+                <div class="table-responsive">
+                    <table id="tablaRoles" class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Any())
+                            {
+                                @foreach (var rol in Model)
+                                {
+                                    <tr>
+                                        <td><strong>@rol.RolId</strong></td>
+                                        <td><span class="badge bg-info">@rol.Nombre</span></td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(rol.Descripcion))
+                                            {
+                                                @(rol.Descripcion.Length > 50 ? rol.Descripcion.Substring(0, 50) + "..." : rol.Descripcion)
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted fst-italic">Sin descripción</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div role="group">
+                                                <a asp-action="Edit" asp-route-id="@rol.RolId"
+                                                   class="btn btn-warning btn-sm" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-danger btn-sm btn-eliminar"
+                                                        data-id="@rol.RolId" data-nombre="@rol.Nombre" title="Eliminar">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                                <form id="form-eliminar-@rol.RolId" method="post" asp-action="DeleteConfirmed" asp-route-id="@rol.RolId" style="display:none;">
+                                                    @Html.AntiForgeryToken()
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center py-4">
+                                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                        <p class="text-muted">No hay roles registrados</p>
+                                        <a asp-action="Create" class="btn btn-success">
+                                            <i class="fas fa-plus"></i> Crear primer rol
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="text-start mt-3">
+                    <a asp-controller="Admin" asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+</body>
+</html>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        function confirmarEliminacion(id) {
-            Swal.fire({
-                title: '¿Estás seguro?',
-                text: "¡No podrás revertir esta acción!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#f5576c',
-                cancelButtonColor: '#a0aec0',
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar',
-                customClass: {
-                    popup: 'rounded-3',
-                    confirmButton: 'rounded-2',
-                    cancelButton: 'rounded-2'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById("form-eliminar-" + id).submit();
-                }
+        document.addEventListener('DOMContentLoaded', function () {
+            // Confirmación de eliminación con SweetAlert2
+            document.querySelectorAll('.btn-eliminar').forEach(button => {
+                button.addEventListener('click', function () {
+                    const id = this.dataset.id;
+                    const nombre = this.dataset.nombre;
+
+                    Swal.fire({
+                        title: '¿Estás seguro?',
+                        html: `Se eliminará el rol: <strong>${nombre}</strong>`,
+                        text: "¡No podrás revertir esta acción!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: '<i class="fas fa-trash me-1"></i> Sí, eliminar',
+                        cancelButtonText: '<i class="fas fa-times me-1"></i> Cancelar',
+                        focusCancel: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            document.getElementById('form-eliminar-' + id).submit();
+                        }
+                    });
+                });
             });
-        }
+
+            // Mostrar fecha actual
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const currentDateElement = document.getElementById('current-date');
+            if (currentDateElement) {
+                currentDateElement.textContent = new Date().toLocaleDateString('es-ES', options);
+            }
+
+            // Auto-ocultar alertas después de 5 segundos
+            setTimeout(function () {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(alert => {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 5000);
+        });
+
+        // Inicializar DataTables
+        $(document).ready(function () {
+            $('#tablaRoles').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                },
+                order: [[0, 'desc']],
+                pageLength: 10,
+                responsive: true,
+                columnDefs: [
+                    { orderable: false, targets: [3] }
+                ]
+            });
+        });
     </script>
 }

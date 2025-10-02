@@ -140,7 +140,7 @@ namespace Restaurant.Controllers
             return View(usuario);
         }
 
-        [HttpPost]
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
