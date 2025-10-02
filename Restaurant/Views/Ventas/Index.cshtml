@@ -1,0 +1,23 @@
+﻿@model Restaurant.Models.Rest_Venta;
+
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title></title>
+    </head>
+    <body>
+        <h2>Completar una Venta</h2>
+        <form asp-action="Crear" method="post">
+            <div class="form-group">
+                <label>Pedidios por Completar</label>
+                <select name="ProductosSeleccionados" multiple class="form-control">
+                    @foreach (var pedido in ViewBag.Pedidos)
+                    {
+                        <option value="@pedido.value"> @pedido.text </option>
+                    }
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Registrar Venta</button>
+        </form>
+    </body>
+    </html>
