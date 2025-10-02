@@ -136,6 +136,11 @@ namespace Restaurant.Controllers
         [HttpGet]
         public IActionResult Register()
         {
+            if (User.Identity!.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Admin");
+            }
+
             return View();
         }
 
@@ -210,6 +215,8 @@ namespace Restaurant.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            Response.Cookies.Delete("DeliziosoAuth");
+
             TempData["Mensaje"] = "Sesión cerrada exitosamente";
             TempData["Tipo"] = "success";
             return RedirectToAction("Index", "Home");

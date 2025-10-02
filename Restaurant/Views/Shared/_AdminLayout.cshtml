@@ -1,0 +1,203 @@
+﻿@using System.Security.Claims;
+
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+
+    var rolUsuario = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value ?? "";
+    // var cargoUsuario = User.Claims.FirstOrDefault(c => c.Type == "Cargo")?.Value?.Trim() ?? "";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Delizioso</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <link rel="stylesheet" href="~/css/Layout.css" />
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar d-flex flex-column" id="sidebar">
+        <div class="text-center mb-4">
+            <div class="d-flex align-items-center justify-content-start gap-2 px-3">
+                <img src="~/images/delizioso.png" alt="Logo" width="40" height="40" class="rounded-circle border bg-white" />
+                <h5 class="fw-semibold m-0 text-white">DELIZIOSO</h5>
+            </div>
+        </div>
+
+        <div class="px-3 text-white small">MENÚ</div>
+        <nav class="nav flex-column">
+            <a asp-controller="Admin" asp-action="Index" class="nav-link @(currentController == "Admin" ? "active" : "")">
+                <i class="fas fa-table-columns"></i> <span>Dashboard</span>
+            </a>
+        </nav>
+
+        <div class="px-3 text-white small mt-3">ADMINISTRACION</div>
+        <nav class="nav flex-column">
+            <nav class="nav flex-column">
+                @if (rolUsuario == "Administrador")
+                {
+                    <a asp-controller="Categorias" asp-action="Index" class="nav-link @(currentController == "Categorias" ? "active" : "")">
+                        <i class="fa fa-list"></i> <span>Categorías</span>
+                    </a>
+                    <a asp-controller="Productos" asp-action="Index" class="nav-link @(currentController == "Productos" ? "active" : "")">
+                        <i class="fa fa-box"></i> <span>Productos</span>
+                    </a>
+                    <a asp-controller="Inventario" asp-action="Index" class="nav-link @(currentController == "Inventario" ? "active" : "")">
+                        <i class="fa fa-boxes-packing"></i> <span>Inventario</span>
+                    </a>
+                    <a asp-controller="Mesas" asp-action="Index" class="nav-link @(currentController == "Mesas" ? "active" : "")">
+                        <i class="fa fa-chair"></i> <span>Mesas</span>
+                    </a>
+
+
+                    <div class="px-3 text-white small mt-3">GESTIÓN DE USUARIOS</div>
+
+
+                    <a asp-controller="Roles" asp-action="Index" class="nav-link @(currentController == "Roles" ? "active" : "")">
+                        <i class="fa fa-user-shield"></i> <span>Roles</span>
+                    </a>
+                    <a asp-controller="Usuarios" asp-action="Index" class="nav-link @(currentController == "Usuarios" ? "active" : "")">
+                        <i class="fa fa-users"></i> <span>Usuarios</span>
+                    </a>
+                    <a asp-controller="Clientes" asp-action="Index" class="nav-link @(currentController == "Clientes" ? "active" : "")">
+                        <i class="fa fa-users-line"></i> <span>Clientes</span>
+                    </a>
+                    <a asp-controller="Empleados" asp-action="Index" class="nav-link @(currentController == "Empleados" ? "active" : "")">
+                        <i class="fa fa-user-tie"></i> <span>Empleados</span>
+                    </a>
+
+
+                    <div class="px-3 text-white small mt-3">VENTAS & PEDIDOS</div>
+
+
+                    <a asp-controller="Pedidos" asp-action="Index" class="nav-link @(currentController == "Pedidos" ? "active" : "")">
+                        <i class="fa fa-shopping-cart"></i> <span>Pedidos</span>
+                    </a>
+                    <a asp-controller="Comprobantes" asp-action="Index" class="nav-link @(currentController == "Comprobantes" ? "active" : "")">
+                        <i class="fa fa-ticket"></i> <span>Comprobantes</span>
+                    </a>
+                    <a asp-controller="Pagos" asp-action="Index" class="nav-link @(currentController == "Pagos" ? "active" : "")">
+                        <i class="fa-solid fa-money-check-dollar"></i> <span>Pagos</span>
+                    </a>
+                    <a asp-controller="Ventas" asp-action="Index" class="nav-link @(currentController == "Ventas" ? "active" : "")">
+                        <i class="fa-solid fa-chart-simple"></i> <span>Ventas</span>
+                    </a>
+
+
+                    <div class="px-3 text-white small mt-3">RESERVAS</div>
+
+                    <a asp-controller="Reservas" asp-action="Index" class="nav-link @(currentController == "Reservas" ? "active" : "")">
+                        <i class="fa-solid fa-check-to-slot"></i> <span>Reservas</span>
+                    </a>
+
+                }
+            </nav>
+        </nav>
+        <div class="logout mt-auto px-3 mb-3">
+            <form asp-controller="Cuenta" asp-action="Logout" method="post">
+                <button type="submit" class="btn btn-danger w-100 rounded-pill">
+                    <i class="fa fa-sign-out-alt me-2"></i> <span>Cerrar Sesión</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="main-content">
+        <div class="topbar">
+            <div class="topbar-container">
+                <button class="btn btn-link" id="toggleSidebar"><i class="fa fa-bars"></i></button>          
+
+            </div>
+        </div>
+
+        <main class="p-4">
+            @RenderBody()
+        </main>
+    </div>
+
+
+    <script>
+        // Toggle sidebar
+        document.getElementById('toggleSidebar').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        });
+
+        // Respaldo en JavaScript para resaltar elemento activo
+        document.addEventListener('DOMContentLoaded', function() {
+            // Solo ejecutar si no estamos usando el enfoque Razor
+        @if (currentController == null)
+        {
+            <text>
+                        const currentPath = window.location.pathname.toLowerCase();
+                        const navLinks = document.querySelectorAll('.sidebar .nav-link');
+
+                        // Remover todas las clases active primero
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                        });
+
+                        // Mapa de rutas a controladores
+                        const routeMap = {
+                            '/admin/index': 'Admin',
+                            '/usuarios': 'Usuarios',
+                            '/roles': 'Roles',
+                            '/empleados': 'Empleados',
+                            '/clientes': 'Clientes',
+                            '/categorias': 'Categorias',
+                            '/productos': 'Productos',
+                            '/inventario': 'Inventario',
+                            '/mesas': 'Mesas',
+                            '/pedidos': 'Pedidos',
+                            '/comprobantes': 'Comprobantes',
+                            '/pagos': 'Pagos',
+                            '/Ventas': 'Ventas'
+                        };
+
+                        // Activar el enlace correspondiente
+                        for (const [path, controller] of Object.entries(routeMap)) {
+                            if (currentPath.includes(path)) {
+                                const selector = `[href*="${controller}"]`;
+                                const link = document.querySelector(`.sidebar .nav-link${selector}`);
+                                if (link) link.classList.add('active');
+                                break;
+                            }
+                        }
+            </text>
+        }
+        });
+    </script>
+    @if (TempData["Mensaje"] != null)
+    {
+        var tipo = TempData["Tipo"]?.ToString().ToLower() ?? "success";
+        <script>
+            document.body.dataset.swalMensaje = '@TempData["Mensaje"]';
+            document.body.dataset.swalTipo = '@tipo';
+        </script>
+    }
+    <script src="~/js/sweetalert-notify.js"></script>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,160 @@
+﻿:root {
+    --primary-color: #4361ee;
+    --secondary-color: #3f37c9;
+    --accent-color: #4cc9f0;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --success-color: #4bb543;
+    --warning-color: #f8961e;
+    --danger-color: #f94144;
+    --rutas-color: #6f42c1;
+    --horarios-color: #20c997;
+    --productos-color: #0d6efd;
+    --pedidos-color: #d63384;
+    --reportes-color: #6610f2;
+}
+
+body {
+    display: flex;
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f5f7fb;
+    color: #4a4a4a;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #002855;
+    padding-top: 1rem;
+    flex-shrink: 0;
+    color: white;
+    transition: width 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 0 20px 20px 0;
+    overflow-x: hidden;
+}
+
+    .sidebar .nav-link {
+        color: white;
+        padding: 0.75rem 1.25rem;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        margin: 4px 8px;
+        white-space: nowrap;
+        overflow: hidden;
+        border-left: 4px solid transparent;
+    }
+
+        .sidebar .nav-link:hover {
+            background-color: #003b80;
+            color: white;
+        }
+
+        /* Estilo activo único para todos los elementos */
+        .sidebar .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-left: 4px solid white;
+            font-weight: 500;
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            min-width: 20px;
+            text-align: center;
+        }
+
+    /* Estilo al colapsar */
+    .sidebar.collapsed {
+        width: 100px;
+    }
+
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 0.75rem;
+        }
+
+            .sidebar.collapsed .nav-link span,
+            .sidebar.collapsed h5,
+            .sidebar.collapsed .text-muted,
+            .sidebar.collapsed .logout {
+                display: none !important;
+            }
+
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.topbar {
+    width: 100%;
+    background-color: transparent;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.topbar-container {
+    background-color: white;
+    border-radius: 12px;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background-color: #efeded;
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    flex-grow: 1;
+    margin: 0 1rem;
+}
+
+    .search-box input {
+        border: none;
+        background: transparent;
+        outline: none;
+        width: 100%;
+        margin: 0 0.5rem;
+    }
+
+.topbar-icons {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+    .topbar-icons .icon-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: 1px solid #ccc;
+        background-color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .topbar-icons img.profile-pic {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid #ccc;
+    }
+
+.logout {
+    margin-top: auto;
+    padding: 1rem;
+}

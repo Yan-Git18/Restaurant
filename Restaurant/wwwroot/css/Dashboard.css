@@ -1,0 +1,283 @@
+﻿:root {
+    --primary-color: #4361ee;
+    --secondary-color: #3f37c9;
+    --accent-color: #4cc9f0;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --success-color: #4bb543;
+    --warning-color: #f8961e;
+    --danger-color: #f94144;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f5f7fb;
+    color: #4a4a4a;
+}
+
+.card {
+    border: none;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid transparent;
+}
+
+.card-usuarios .btn-more:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.card-roles .btn-more:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.card-empleados .btn-more:hover {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    color: white;
+}
+
+.card-contratos .btn-more:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: white;
+}
+
+.card-facturas .btn-more:hover {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+    color: white;
+}
+
+.card-vehiculos .btn-more:hover {
+    background-color: var(--warning-color);
+    border-color: var(--warning-color);
+    color: white;
+}
+
+.card-mantenimientos .btn-more:hover {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+    color: white;
+}
+
+.card-rutas .btn-more:hover {
+    background-color: #6f42c1;
+    border-color: #6f42c1;
+    color: white;
+}
+
+.card-horarios .btn-more:hover {
+    background-color: #20c997;
+    border-color: #20c997;
+    color: white;
+}
+
+.card-productos .btn-more:hover {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+}
+
+.card-pedidos .btn-more:hover {
+    background-color: #d63384;
+    border-color: #d63384;
+    color: white;
+}
+
+.card-reportes .btn-more:hover {
+    background-color: #6610f2;
+    border-color: #6610f2;
+    color: white;
+}
+
+.card-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.card-usuarios .card-icon {
+    background-color: rgba(67, 97, 238, 0.1);
+    color: var(--primary-color);
+}
+
+.card-roles .card-icon {
+    background-color: rgba(67, 97, 238, 0.1);
+    color: var(--primary-color);
+}
+
+.card-empleados .card-icon {
+    background-color: rgba(63, 55, 201, 0.1);
+    color: var(--secondary-color);
+}
+
+.card-contratos .card-icon {
+    background-color: rgba(76, 201, 240, 0.1);
+    color: var(--accent-color);
+}
+
+.card-facturas .card-icon {
+    background-color: rgba(75, 181, 67, 0.1);
+    color: var(--success-color);
+}
+
+.card-vehiculos .card-icon {
+    background-color: rgba(248, 150, 30, 0.1);
+    color: var(--warning-color);
+}
+
+.card-mantenimientos .card-icon {
+    background-color: rgba(249, 65, 68, 0.1);
+    color: var(--danger-color);
+}
+
+.card-rutas .card-icon {
+    background-color: rgba(111, 66, 193, 0.1);
+    color: #6f42c1;
+}
+
+.card-horarios .card-icon {
+    background-color: rgba(32, 201, 151, 0.1);
+    color: #20c997;
+}
+
+.card-productos .card-icon {
+    background-color: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+}
+
+.card-pedidos .card-icon {
+    background-color: rgba(214, 51, 132, 0.1);
+    color: #d63384;
+}
+
+.card-reportes .card-icon {
+    background-color: rgba(102, 16, 242, 0.1);
+    color: #6610f2;
+}
+
+.stat-number {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-more {
+    background-color: transparent;
+    border: 1px solid #dee2e6;
+    color: #6c757d;
+    font-size: 0.8rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+    .btn-more:hover {
+        background-color: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+.section-title {
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+    .section-title:after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 50px;
+        height: 3px;
+        background: var(--primary-color);
+        border-radius: 3px;
+    }
+
+.dashboard-header {
+    margin-bottom: 2rem;
+}
+
+    .dashboard-header h1 {
+        font-weight: 700;
+        color: var(--dark-color);
+    }
+
+    .dashboard-header p {
+        color: #6c757d;
+    }
+
+
+
+.card-usuarios {
+    border-left-color: #4cc9f0;
+}
+
+.card-roles {
+    border-left-color: var(--primary-color);
+}
+
+.card-empleados {
+    border-left-color: var(--secondary-color);
+}
+
+.card-contratos {
+    border-left-color: var(--accent-color);
+}
+
+.card-facturas {
+    border-left-color: var(--success-color);
+}
+
+.card-vehiculos {
+    border-left-color: var(--warning-color);
+}
+
+.card-mantenimientos {
+    border-left-color: var(--danger-color);
+}
+
+.card-rutas {
+    border-left-color: #6f42c1;
+}
+
+.card-horarios {
+    border-left-color: #20c997;
+}
+
+.card-productos {
+    border-left-color: #0d6efd;
+}
+
+.card-pedidos {
+    border-left-color: #d63384;
+}
+
+.card-reportes {
+    border-left-color: #6610f2;
+}
+
+.card-detalles {
+    border-left: 4px solid #0d6efd !important;
+}

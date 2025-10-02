@@ -1,9 +1,207 @@
-﻿
-
-@* Pantalla de bienvenida *@
-
-@{
-    ViewData["Title"] = "Admin Dashboard";
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h1>Welcome to the Admin Dashboard</h1>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewData["Title"]</title>
+
+    <link rel="stylesheet" href="~/css/Dashboard.css?v=1.0" />
+
+</head>
+<body>
+
+    <div class="container-fluid py-4">
+        <div class="dashboard-header">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h1>Bienvenido al Panel de Control</h1>
+                    <p class="mb-0">Resumen general y estadísticas del sistema</p>
+                </div>
+                <div>
+                    <span class="badge bg-light text-dark">
+                        <i class="bi bi-calendar me-2"></i>
+                        <span id="current-date"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 1: Usuarios y Gestión -->
+        <div class="row mb-4">
+            <div class="col-12 mb-3">
+                <h4 class="section-title">Administración del Restaurant</h4>
+            </div>
+
+            <!-- Tarjeta Usuarios -->
+            <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                <div class="card card-usuarios h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span class="stat-label">Categorías</span>
+                                <h3 class="stat-number">@ViewData["TotalCategorias"]</h3>
+                            </div>
+                            <div class="card-icon">
+                                <i class="fa fa-list"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 d-flex justify-content-between align-items-center">
+                            <a asp-controller="Categorias" asp-action="Index" class="btn btn-more">Ver detalles</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta Roles -->
+            <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                <div class="card card-roles h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span class="stat-label">Productos</span>
+                                <h3 class="stat-number">@ViewData["TotalProductos"]</h3>
+                            </div>
+                            <div class="card-icon">
+                                <i class="fa fa-box"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 d-flex justify-content-between align-items-center">
+                            <a asp-controller="Productos" asp-action="Index" class="btn btn-more">Ver detalles</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta Mesas -->
+            <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                <div class="card card-contratos h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span class="stat-label">Mesas</span>
+                                <h3 class="stat-number">@ViewData["TotalContratos"]</h3>
+                            </div>
+                            <div class="card-icon">
+                                <i class="fa fa-file-contract"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 d-flex justify-content-between align-items-center">
+                            <a asp-controller="Mesas" asp-action="Index" class="btn btn-more">Ver detalles</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 2: Gestión de Usuarios -->
+        <div class="row mb-4">
+            <div class="col-12 mb-3">
+                <h4 class="section-title">Gestión de Usuarios</h4>
+            </div>
+
+            <!-- Tarjeta Roles -->
+            <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                <div class="card card-vehiculos h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span class="stat-label">Roles</span>
+                                <h3 class="stat-number">@ViewData["TotalRoles"]</h3>
+                            </div>
+                            <div class="card-icon">
+                                <i class="fa fa-user-shield"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 d-flex justify-content-between align-items-center">
+                            <a asp-controller="Roles" asp-action="Index" class="btn btn-more">Ver detalles</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta Usuarios -->
+            <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                <div class="card card-mantenimientos h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span class="stat-label">Usuarios</span>
+                                <h3 class="stat-number">@ViewData["TotalUsuarios"]</h3>
+                            </div>
+                            <div class="card-icon">
+                                <i class="fa fa-users"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 d-flex justify-content-between align-items-center">
+                            <a asp-controller="Usuarios" asp-action="Index" class="btn btn-more">Ver detalles</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- Sección 3: Ventas & Pedidos -->
+        <div class="row">
+            <div class="col-12 mb-3">
+                <h4 class="section-title">Ventas & Pedidos</h4>
+            </div>
+
+            <!-- Tarjeta Productos -->
+            <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                <div class="card card-productos h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span class="stat-label">Pedidos</span>
+                                <h3 class="stat-number">@ViewData["TotalPedidos"]</h3>
+                            </div>
+                            <div class="card-icon">
+                                <i class="fa fa-box"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 d-flex justify-content-between align-items-center">
+                            <a asp-controller="Pedidos" asp-action="Index" class="btn btn-more">Ver detalles</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta Pedidos -->
+            <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                <div class="card card-pedidos h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span class="stat-label">Ventas</span>
+                                <h3 class="stat-number">@ViewData["TotalVentas"]</h3>
+                            </div>
+                            <div class="card-icon">
+                                <i class="fa fa-shopping-cart"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 d-flex justify-content-between align-items-center">
+                            <a asp-controller="Ventas" asp-action="Index" class="btn btn-more">Ver detalles</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+        </div>
+    </div>
+
+    <script>
+        // Mostrar fecha actual
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-ES', options);
+
+
+    </script>
+</body>
+</html>
