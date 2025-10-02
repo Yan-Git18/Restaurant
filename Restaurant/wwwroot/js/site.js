@@ -16,13 +16,13 @@ if (reservationForm && fechaInput) {
         e.preventDefault();
 
         const formData = new FormData(reservationForm);
-
-        // Mostrar loading en el botón
-        const submitBtn = reservationForm.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Procesando...';
-        submitBtn.disabled = true;
-
+        const reservationData = {
+            nombre: formData.get('nombre'),
+            telefono: formData.get('telefono'),
+            email: formData.get('email'),
+            fecha: formData.get('fecha'),
+            hora: formData.get('hora'),
+            personas: formData.get('personas'),
         try {
             const response = await fetch(reservationForm.action, {
                 method: 'POST',
@@ -41,6 +41,21 @@ if (reservationForm && fechaInput) {
             console.error(err);
             showAlert("Error de conexión con el servidor.", "error");
         } finally {
+        // Validaciones adicionales
+        if (!validateReservation(reservationData)) {
+            return;
+        }
+
+        // Mostrar loading en el botón
+        const submitBtn = reservationForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Procesando...';
+        submitBtn.disabled = true;
+
+        // Simular envío (conectar con backend en producción)
+        setTimeout(() => {
+            showReservationSuccess(reservationData);
+            reservationForm.reset();
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
         }
@@ -106,14 +121,10 @@ function showAlert(message, type = 'info') {
     const alertModal = `
         <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" id="alert-modal">
             <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center animate-fade-in-up">
-                <div class="w-16 h-16 ${alertClass} rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas ${type === 'error' ? 'fa-exclamation-triangle' : 'fa-info-circle'} text-2xl"></i>
-                </div>
-                <p class="text-gray-700 mb-6">${message}</p>
-                <button onclick="closeModal('alert-modal')" 
-                        class="bg-restaurant-accent hover:bg-restaurant-secondary text-white px-8 py-3 rounded-xl font-semibold transition-colors duration-200">
-                    Entendido
-                </button>
+    const [year, month, day] = dateString.split("-");
+    const date = new Date(year, month - 1, day);
+    const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+    return date.toLocaleDateString("es-ES", options);
             </div>
         </div>
     `;
@@ -121,10 +132,14 @@ function showAlert(message, type = 'info') {
 }
 
 function formatDate(dateString) {
-    const [year, month, day] = dateString.split("-");
-    const date = new Date(year, month - 1, day);
-    const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
-    return date.toLocaleDateString("es-ES", options);
+    const date = new Date(dateString);
+    const options = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    };
+    return date.toLocaleDateString('es-ES', options);
 }
 
 function closeModal(modalId) {

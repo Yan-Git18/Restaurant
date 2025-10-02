@@ -38,6 +38,7 @@ namespace Restaurant.Models
         public virtual Rest_Mesa? Mesa { get; set; }
 
         public virtual ICollection<Rest_DetallePedido> DetallesPedido { get; set; } = new List<Rest_DetallePedido>();
+
         public virtual Rest_Venta? Venta { get; set; }
     }
 }
