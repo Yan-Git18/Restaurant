@@ -1,0 +1,190 @@
+﻿/* ----- Header ----- */
+.roles-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+    .roles-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: pulse 8s ease-in-out infinite;
+    }
+
+    .roles-header h2 {
+        color: white;
+        margin: 0;
+        font-weight: 700;
+        font-size: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+/* ----- Botón "Nuevo"/"Volver" ----- */
+.btn-nuevo {
+    background: white;
+    color: #667eea;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 1;
+}
+
+    .btn-nuevo:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        color: #764ba2;
+    }
+
+/* ----- Card ----- */
+.table-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.08);
+    overflow: hidden;
+    animation: fadeInUp 0.6s ease;
+}
+
+/* ----- Tablas modernas ----- */
+.modern-table {
+    margin: 0;
+    width: 100%;
+}
+
+    .modern-table thead {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+
+        .modern-table thead th {
+            border: none;
+            padding: 1.25rem 1rem;
+            font-weight: 600;
+            color: #2d3748;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+    .modern-table tbody tr {
+        border-bottom: 1px solid #f1f3f5;
+        transition: all 0.3s ease;
+    }
+
+        .modern-table tbody tr:hover {
+            background: linear-gradient(90deg, #f8f9ff 0%, #ffffff 100%);
+            transform: scale(1.01);
+        }
+
+    .modern-table tbody td {
+        padding: 1.25rem 1rem;
+        vertical-align: middle;
+        border: none;
+    }
+
+/* ----- Badges ----- */
+.badge-id {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-block;
+}
+
+/* ----- Texto de tabla ----- */
+.rol-name {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 1rem;
+}
+
+.rol-description {
+    color: #718096;
+    font-size: 0.9rem;
+}
+
+/* ----- Botones de acción ----- */
+.action-btn {
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin-right: 0.5rem;
+}
+
+.btn-edit {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+}
+
+    .btn-edit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        color: white;
+    }
+
+.btn-delete {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+    .btn-delete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        color: white;
+    }
+
+/* ----- Formularios ----- */
+.form-label {
+    color: #2d3748;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.form-control {
+    border: 2px solid #e9ecef;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+    }
+
+/* ----- Validación ----- */
+.text-danger {
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+/* ----- Empty state ----- */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #a0aec0;
+}
+
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.3;
+    }

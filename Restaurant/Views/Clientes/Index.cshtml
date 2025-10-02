@@ -1,0 +1,62 @@
+﻿@model IEnumerable<Restaurant.Models.Rest_Persona>
+@{
+    ViewData["Title"] = "Lista de Clientes";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="roles-header d-flex justify-content-between align-items-center">
+        <h2><i class="fa fa-users me-2"></i>Gestión de Clientes</h2>
+    </div>
+
+    <div class="table-card">
+        @if (Model != null && Model.Any())
+        {
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th width="8%">ID</th>
+                        <th width="18%">Nombre</th>
+                        <th width="18%">Apellidos</th>
+                        <th width="22%">Correo</th>
+                        <th width="15%">Teléfono</th>
+                        <th width="19%">Fecha Registro</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var cliente in Model)
+                    {
+                        <tr>
+                            <td>
+                                <span class="badge-id">#@cliente.PersonaId</span>
+                            </td>
+                            <td>
+                                <span class="rol-name">@cliente.Nombre</span>
+                            </td>
+                            <td>
+                                <span class="rol-name">@cliente.Apellidos</span>
+                            </td>
+                            <td>
+                                <span class="usuario-correo">@cliente.Correo</span>
+                            </td>
+                            <td>
+                                <span class="usuario-rol">@cliente.Telefono</span>
+                            </td>
+                            <td>
+                                <span class="usuario-fecha">@cliente.FechaRegistro.ToString("dd/MM/yyyy")</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fa fa-users"></i>
+                <h4>No hay clientes registrados</h4>
+                <p>Los clientes aparecerán aquí cuando se registren</p>
+            </div>
+        }
+    </div>
+</div>

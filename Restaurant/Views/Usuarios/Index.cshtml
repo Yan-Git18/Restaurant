@@ -1,0 +1,107 @@
+﻿@model IEnumerable<Restaurant.Models.Rest_Usuario>
+@{
+    ViewData["Title"] = "Usuarios";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="roles-header d-flex justify-content-between align-items-center">
+        <h2><i class="fa fa-users me-2"></i>Gestión de Usuarios</h2>
+        <a asp-action="Create" class="btn btn-nuevo">
+            <i class="fa fa-plus me-2"></i>Crear Usuario
+        </a>
+    </div>
+
+    <div class="table-card">
+        @if (Model != null && Model.Any())
+        {
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th width="20%">Correo</th>
+                        <th width="15%">Rol</th>
+                        <th width="10%">Estado</th>
+                        <th width="12%">Fecha Creación</th>
+                        <th width="15%">Último Acceso</th>
+                        <th width="28%">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var u in Model)
+                    {
+                        <tr>
+                            <td>
+                                <span class="usuario-correo">@u.Correo</span>
+                            </td>
+                            <td>
+                                <span class="usuario-rol">@u.Rol?.Nombre</span>
+                            </td>
+                            <td>
+                                @if (u.Activo)
+                                {
+                                    <span class="badge-activo">Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-inactivo">Inactivo</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="usuario-fecha">@u.FechaCreacion.ToString("dd/MM/yyyy")</span>
+                            </td>
+                            <td>
+                                <span class="usuario-fecha">@(u.UltimoAcceso?.ToString("dd/MM/yyyy HH:mm") ?? "-")</span>
+                            </td>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@u.UsuarioId" class="action-btn btn-edit">
+                                    <i class="fa fa-edit me-1"></i>Editar
+                                </a>
+                                <button type="button" class="action-btn btn-delete" onclick="confirmarEliminacionUsuario(@u.UsuarioId)">
+                                    <i class="fa fa-trash me-1"></i>Eliminar
+                                </button>
+                                <form id="form-eliminar-usuario-@u.UsuarioId" asp-action="DeleteConfirmed" asp-route-id="@u.UsuarioId" method="post" style="display:none;">
+                                    @Html.AntiForgeryToken()
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fa fa-users"></i>
+                <h4>No hay usuarios registrados</h4>
+                <p>Comienza creando tu primer usuario</p>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmarEliminacionUsuario(id) {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "Este usuario será eliminado permanentemente",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f5576c',
+                cancelButtonColor: '#a0aec0',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                customClass: {
+                    popup: 'rounded-3',
+                    confirmButton: 'rounded-2',
+                    cancelButton: 'rounded-2'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById("form-eliminar-usuario-" + id).submit();
+                }
+            });
+        }
+    </script>
+}
