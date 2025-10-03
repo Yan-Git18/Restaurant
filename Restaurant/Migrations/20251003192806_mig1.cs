@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Restaurant.Migrations
 {
     /// <inheritdoc />
-    public partial class Mig1 : Migration
+    public partial class mig1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -38,7 +38,6 @@ namespace Restaurant.Migrations
                     Nombre = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Descripcion = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     UnidadMedida = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    Stock = table.Column<int>(type: "int", nullable: false),
                     StockMinimo = table.Column<int>(type: "int", nullable: false),
                     FechaActualizacion = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -56,7 +55,9 @@ namespace Restaurant.Migrations
                     Numero = table.Column<int>(type: "int", nullable: false),
                     Capacidad = table.Column<int>(type: "int", nullable: false),
                     Estado = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    Observaciones = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true)
+                    Observaciones = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    FechaCreacion = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Activo = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -90,7 +91,9 @@ namespace Restaurant.Migrations
                     Disponible = table.Column<bool>(type: "bit", nullable: false),
                     FechaCreacion = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CategoriaId = table.Column<int>(type: "int", nullable: false),
-                    InventarioId = table.Column<int>(type: "int", nullable: false)
+                    InventarioId = table.Column<int>(type: "int", nullable: false),
+                    Stock = table.Column<int>(type: "int", nullable: false),
+                    Activo = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -169,7 +172,8 @@ namespace Restaurant.Migrations
                     Observaciones = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     TipoPedido = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     ClienteId = table.Column<int>(type: "int", nullable: false),
-                    MesaId = table.Column<int>(type: "int", nullable: true)
+                    MesaId = table.Column<int>(type: "int", nullable: true),
+                    Total = table.Column<decimal>(type: "decimal(10,2)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -328,19 +332,19 @@ namespace Restaurant.Migrations
 
             migrationBuilder.InsertData(
                 table: "Inventarios",
-                columns: new[] { "Id", "Descripcion", "FechaActualizacion", "Nombre", "Stock", "StockMinimo", "UnidadMedida" },
-                values: new object[] { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Bebidas", 50, 0, "Litro" });
+                columns: new[] { "Id", "Descripcion", "FechaActualizacion", "Nombre", "StockMinimo", "UnidadMedida" },
+                values: new object[] { 1, null, new DateTime(2025, 9, 27, 12, 0, 0, 0, DateTimeKind.Unspecified), "Bebidas", 5, "Litro" });
 
             migrationBuilder.InsertData(
                 table: "Mesas",
-                columns: new[] { "MesaId", "Capacidad", "Estado", "Numero", "Observaciones" },
+                columns: new[] { "MesaId", "Activo", "Capacidad", "Estado", "FechaCreacion", "Numero", "Observaciones" },
                 values: new object[,]
                 {
-                    { 1, 4, "Libre", 1, null },
-                    { 2, 2, "Libre", 2, null },
-                    { 3, 6, "Libre", 3, null },
-                    { 4, 4, "Libre", 4, null },
-                    { 5, 8, "Libre", 5, null }
+                    { 1, true, 4, "Libre", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, null },
+                    { 2, true, 2, "Libre", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, null },
+                    { 3, true, 6, "Libre", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, null },
+                    { 4, true, 4, "Libre", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 4, null },
+                    { 5, true, 8, "Libre", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 5, null }
                 });
 
             migrationBuilder.InsertData(
@@ -354,12 +358,12 @@ namespace Restaurant.Migrations
 
             migrationBuilder.InsertData(
                 table: "Productos",
-                columns: new[] { "Id", "CategoriaId", "Descripcion", "Disponible", "FechaCreacion", "ImagenUrl", "InventarioId", "Nombre", "Precio" },
+                columns: new[] { "Id", "Activo", "CategoriaId", "Descripcion", "Disponible", "FechaCreacion", "ImagenUrl", "InventarioId", "Nombre", "Precio", "Stock" },
                 values: new object[,]
                 {
-                    { 1, 1, null, true, new DateTime(2025, 9, 27, 12, 0, 0, 0, DateTimeKind.Unspecified), null, 1, "Agua Mineral", 2.50m },
-                    { 2, 1, null, true, new DateTime(2025, 9, 27, 12, 0, 0, 0, DateTimeKind.Unspecified), null, 1, "Refresco", 4.00m },
-                    { 3, 1, null, true, new DateTime(2025, 9, 27, 12, 0, 0, 0, DateTimeKind.Unspecified), null, 1, "Jugo Natural", 6.00m }
+                    { 1, true, 1, null, true, new DateTime(2025, 9, 27, 12, 0, 0, 0, DateTimeKind.Unspecified), null, 1, "Agua Mineral", 2.50m, 5 },
+                    { 2, true, 1, null, true, new DateTime(2025, 9, 27, 12, 0, 0, 0, DateTimeKind.Unspecified), null, 1, "Refresco", 4.00m, 7 },
+                    { 3, true, 1, null, true, new DateTime(2025, 9, 27, 12, 0, 0, 0, DateTimeKind.Unspecified), null, 1, "Jugo Natural", 6.00m, 8 }
                 });
 
             migrationBuilder.InsertData(
@@ -386,11 +390,6 @@ namespace Restaurant.Migrations
                 name: "IX_DetallesPedido_ProductoId",
                 table: "DetallesPedido",
                 column: "ProductoId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Inventarios_Stock",
-                table: "Inventarios",
-                column: "Stock");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Mesas_Estado",
@@ -434,6 +433,11 @@ namespace Restaurant.Migrations
                 name: "IX_Productos_InventarioId",
                 table: "Productos",
                 column: "InventarioId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Productos_Stock",
+                table: "Productos",
+                column: "Stock");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservas_ClienteId",

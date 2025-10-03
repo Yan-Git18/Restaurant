@@ -97,7 +97,7 @@ namespace RESTAURANT.Data
             modelBuilder.Entity<Rest_Usuario>()
                 .Property(u => u.Correo)
                 .HasMaxLength(100)
-                .IsRequired();            
+                .IsRequired();
 
             // ===== ÍNDICES =====
 
@@ -129,9 +129,9 @@ namespace RESTAURANT.Data
             modelBuilder.Entity<Rest_Mesa>()
                 .HasIndex(m => m.Estado);
 
-            // Para control de stock
-            modelBuilder.Entity<Rest_Inventario>()
-                .HasIndex(i => i.Stock);
+            // Para control de stock (ahora en productos, no inventarios)
+            modelBuilder.Entity<Rest_Producto>()
+                .HasIndex(p => p.Stock);
 
             // ===== RELACIONES =====
 
@@ -226,7 +226,7 @@ namespace RESTAURANT.Data
                 .HasForeignKey<Rest_Comprobante>(c => c.VentaId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // ===== DATOS INICIALES CON FECHAS ESTÁTICAS =====
+            // ===== DATOS INICIALES =====
 
             // Roles
             modelBuilder.Entity<Rest_Rol>().HasData(
@@ -234,7 +234,7 @@ namespace RESTAURANT.Data
                 new Rest_Rol { RolId = 2, Nombre = "Cliente" }
             );
 
-            // Usuarios - CON FECHAS ESTÁTICAS
+            // Usuarios
             modelBuilder.Entity<Rest_Usuario>().HasData(
                 new Rest_Usuario
                 {
@@ -256,7 +256,6 @@ namespace RESTAURANT.Data
                 }
             );
 
-
             // Mesas
             modelBuilder.Entity<Rest_Mesa>().HasData(
                 new Rest_Mesa { MesaId = 1, Numero = 1, Capacidad = 4, Estado = "Libre" },
@@ -271,14 +270,20 @@ namespace RESTAURANT.Data
                 new Rest_Categoria { Id = 1, Nombre = "Bebidas" }
             );
 
-            // Inventarios
+            // Inventarios (ya sin Stock)
             modelBuilder.Entity<Rest_Inventario>().HasData(
-                new Rest_Inventario { Id = 1, Nombre = "Bebidas", UnidadMedida = "Litro", Stock = 50 }
+                new Rest_Inventario
+                {
+                    Id = 1,
+                    Nombre = "Bebidas",
+                    UnidadMedida = "Litro",
+                    StockMinimo = 5,
+                    FechaActualizacion = new DateTime(2025, 09, 27, 12, 0, 0)
+                }
             );
 
-            // Productos
+            // Productos con stock inicial
             modelBuilder.Entity<Rest_Producto>().HasData(
-                // Bebidas
                 new Rest_Producto
                 {
                     Id = 1,
@@ -287,6 +292,7 @@ namespace RESTAURANT.Data
                     CategoriaId = 1,
                     InventarioId = 1,
                     Disponible = true,
+                    Stock = 5,
                     FechaCreacion = new DateTime(2025, 09, 27, 12, 0, 0)
                 },
                 new Rest_Producto
@@ -297,6 +303,7 @@ namespace RESTAURANT.Data
                     CategoriaId = 1,
                     InventarioId = 1,
                     Disponible = true,
+                    Stock = 7,
                     FechaCreacion = new DateTime(2025, 09, 27, 12, 0, 0)
                 },
                 new Rest_Producto
@@ -307,6 +314,7 @@ namespace RESTAURANT.Data
                     CategoriaId = 1,
                     InventarioId = 1,
                     Disponible = true,
+                    Stock = 8,
                     FechaCreacion = new DateTime(2025, 09, 27, 12, 0, 0)
                 }
             );

@@ -1,0 +1,192 @@
+﻿@model IEnumerable<Restaurant.Models.Rest_Pedido>
+
+@{
+    ViewData["Title"] = "Pedidos";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/Dashboard.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+</head>
+<body>
+    <div class="container-fluid py-4">
+
+        <!-- Header -->
+        <div class="dashboard-header mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1>Gestión de Pedidos</h1>
+                    <p class="mb-0">Listado de pedidos registrados en el sistema</p>
+                </div>
+                <div>
+                    <a asp-action="Crear" class="btn btn-success">
+                        <i class="fas fa-plus-circle me-1"></i> Nuevo Pedido
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Pedidos -->
+        <div class="card card-pedidos">
+            <div class="card-body">
+                <h4 class="section-title mb-3">
+                    Lista de Pedidos
+                    <span class="badge bg-primary ms-2">@Model?.Count()</span>
+                </h4>
+
+                <div class="table-responsive">
+                    <table id="tablaPedidos" class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Mesa</th>
+                                <th>Tipo</th>
+                                <th>Total</th>
+                                <th>Estado</th>
+                                <th>Fecha</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                @foreach (var pedido in Model)
+                                {
+                                    <tr>
+                                        <td><span class="badge bg-secondary">#@pedido.Id</span></td>
+                                        <td>@pedido.Cliente?.Nombre @pedido.Cliente?.Apellidos</td>
+                                        <td>@pedido.Mesa?.Numero</td>
+                                        <td>
+                                            @if (pedido.TipoPedido == "Delivery")
+                                            {
+                                                <span class="badge bg-info"><i class="fas fa-truck"></i> Delivery</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-dark"><i class="fas fa-utensils"></i> En salón</span>
+                                            }
+                                        </td>
+                                        <td><strong>S/ @pedido.Total.ToString("0.00")</strong></td>
+                                        <td>
+                                            @if (pedido.Estado == "Pendiente")
+                                            {
+                                                <span class="badge bg-warning text-dark">
+                                                    <i class="fas fa-clock me-1"></i> Pendiente
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check-circle me-1"></i> Atendido
+                                                </span>
+                                            }
+                                        </td>
+                                        <td><small>@pedido.Fecha.ToString("dd/MM/yyyy HH:mm")</small></td>
+                                        <td>
+                                            <a asp-controller="Pedidos" asp-action="Editar" asp-route-id="@pedido.Id" class="btn btn-sm btn-warning">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a asp-action="Detalles" asp-route-id="@pedido.Id" class="btn btn-sm btn-info text-white">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-danger btnEliminar"
+                                                    data-id="@pedido.Id"
+                                                    data-cliente="@pedido.Cliente?.Nombre">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="8" class="text-center py-4">
+                                        <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                                        <p class="text-muted">No hay pedidos registrados</p>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // Inicializar DataTable
+        $(document).ready(function () {
+            $('#tablaPedidos').DataTable({
+                language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
+                order: [[0, 'asc']],
+                pageLength: 10,
+                responsive: true
+            });
+        });
+
+        // Confirmación al eliminar
+        $(".btnEliminar").click(function () {
+            var pedidoId = $(this).data("id");
+            var cliente = $(this).data("cliente");
+
+            Swal.fire({
+                title: "¿Eliminar Pedido?",
+                text: "El pedido del cliente " + cliente + " será eliminado.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Sí, eliminar",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "/Pedidos/EliminarConfirmar",
+                        type: "POST",
+                        data: { id: pedidoId },
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire(
+                                    "Eliminado",
+                                    "El pedido fue eliminado correctamente.",
+                                    "success"
+                                ).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire(
+                                    "Error",
+                                    "No se pudo eliminar el pedido.",
+                                    "error"
+                                );
+                            }
+                        },
+                        error: function () {
+                            Swal.fire(
+                                "Error",
+                                "Ocurrió un problema al eliminar el pedido.",
+                                "error"
+                            );
+                        }
+                    });
+                }
+            });
+        });
+
+    </script>
+}

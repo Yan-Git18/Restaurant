@@ -48,6 +48,7 @@
                                 <th>Nombre</th>
                                 <th>Descripción</th>
                                 <th>Precio</th>
+                                <th>Stock</th>
                                 <th>Categoría</th>
                                 <th>Inventario</th>
                                 <th>Estado</th>
@@ -86,6 +87,7 @@
                                             }
                                         </td>
                                         <td><span class="badge bg-success">@item.Precio.ToString("C")</span></td>
+                                        <td><span class="badge bg-dark">@item.Stock</span></td> <!-- 👈 nuevo -->
                                         <td>
                                             @if (item.Categoria != null)
                                             {
@@ -225,7 +227,7 @@
                 language: {
                     url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
                 },
-                order: [[0, 'desc']],
+                order: [[0, 'asc']],
                 pageLength: 10,
                 responsive: true,
                 columnDefs: [

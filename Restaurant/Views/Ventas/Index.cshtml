@@ -1,6 +1,6 @@
-﻿@model List<Restaurant.Models.Rest_InventarioViewModel>
+﻿@model List<Restaurant.Models.Rest_Venta>
 @{
-    ViewData["Title"] = "Inventario";
+    ViewData["Title"] = "Ventas";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 <!DOCTYPE html>
@@ -12,11 +12,11 @@
 </head>
 <body>
     <div class="container-fluid py-4">
-        <div class="dashboard-header">
-            <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="dashboard-header mb-4">
+            <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h1>Gestión de Inventario</h1>
-                    <p class="mb-0">Listado y administración de insumos disponibles</p>
+                    <h1><i class="fas fa-file-invoice-dollar me-2"></i>Gestión de Ventas</h1>
+                    <p class="mb-0">Listado y administración de ventas realizadas</p>
                 </div>
                 <div>
                     <span class="badge bg-light text-dark">
@@ -31,64 +31,62 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h4 class="section-title mb-0">
-                        Listado de Inventario
+                        Listado de Ventas
                         <span class="badge bg-primary ms-2">@Model.Count</span>
                     </h4>
-                    <a asp-controller="Inventario" asp-action="Crear" class="btn btn-success">
-                        <i class="fas fa-plus"></i> Nuevo Insumo
+                    <a asp-controller="Ventas" asp-action="Crear" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Nueva Venta
                     </a>
                 </div>
 
                 <div class="table-responsive">
-                    <table id="tablaInventario" class="table table-hover align-middle">
+                    <table id="tablaVentas" class="table table-hover align-middle">
                         <thead class="table-light">
                             <tr>
                                 <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Descripción</th>
-                                <th>Unidad de Medida</th>
-                                <th>Stock</th>
-                                <th>Stock Mínimo</th>
-                                <th>Última Actualización</th>
+                                <th>Cliente</th>
+                                <th>Fecha</th>
+                                <th>Total</th>
+                                <th>Descuento</th>
+                                <th>Impuesto</th>
+                                <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             @if (Model.Any())
                             {
-                                @foreach (var item in Model)
+                                foreach (var item in Model)
                                 {
                                     <tr>
                                         <td><strong>@item.Id</strong></td>
-                                        <td><strong>@item.Nombre</strong></td>
+                                        <td>@item.Pedido?.Cliente?.Nombre</td>
+                                        <td>@item.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td><span class="badge bg-success">S/ @item.Total</span></td>
+                                        <td>@item.Descuento</td>
+                                        <td>@(item.Impuesto * 100)%</td>
                                         <td>
-                                            @if (!string.IsNullOrEmpty(item.Descripcion))
+                                            @if (item.Estado == "Pagada")
                                             {
-                                                @(item.Descripcion.Length > 50 ? item.Descripcion.Substring(0, 50) + "..." : item.Descripcion)
+                                                <span class="badge bg-success">Pagada</span>
+                                            }
+                                            else if (item.Estado == "Anulada")
+                                            {
+                                                <span class="badge bg-danger">Anulada</span>
                                             }
                                             else
                                             {
-                                                <span class="text-muted fst-italic">Sin descripción</span>
+                                                <span class="badge bg-warning">@item.Estado</span>
                                             }
                                         </td>
-                                        <td><span class="badge bg-info">@item.UnidadMedida</span></td>
                                         <td>
-                                            <span class="badge @(item.StockTotal <= item.StockMinimo ? "bg-danger" : "bg-success")">
-                                                @item.StockTotal
-                                            </span>
-                                        </td>
-                                        <td>@item.StockMinimo</td>
-                                        <td>
-                                            <small>@item.FechaActualizacion.ToString("dd/MM/yyyy HH:mm")</small>
-                                        </td>
-                                        <td>
-                                            <div role="group">
-                                                <a asp-controller="Inventario" asp-action="Editar" asp-route-id="@item.Id"
-                                                   class="btn btn-warning btn-sm" title="Editar">
+                                            <div class="btn-group">
+                                                <a asp-controller="Ventas" asp-action="Editar" asp-route-id="@item.Id"
+                                                   class="btn btn-warning btn-sm">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                                 <button type="button" class="btn btn-danger btn-sm btn-eliminar"
-                                                        data-id="@item.Id" data-nombre="@item.Nombre" title="Eliminar">
+                                                        data-id="@item.Id" data-nombre="Venta #@item.Id">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </div>
@@ -101,9 +99,9 @@
                                 <tr>
                                     <td colspan="8" class="text-center py-4">
                                         <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                        <p class="text-muted">No hay insumos registrados en el inventario</p>
-                                        <a asp-controller="Inventario" asp-action="Crear" class="btn btn-success">
-                                            <i class="fas fa-plus"></i> Crear primer insumo
+                                        <p class="text-muted">No hay ventas registradas</p>
+                                        <a asp-controller="Ventas" asp-action="Crear" class="btn btn-success">
+                                            <i class="fas fa-plus"></i> Registrar primera venta
                                         </a>
                                     </td>
                                 </tr>
@@ -121,7 +119,7 @@
         </div>
 
         <!-- Formulario oculto para eliminar -->
-        <form id="form-eliminar" method="post" asp-controller="Inventario" asp-action="EliminarConfirmar" style="display:none;">
+        <form id="form-eliminar" method="post" asp-controller="Ventas" asp-action="EliminarConfirmar" style="display:none;">
             @Html.AntiForgeryToken()
             <input type="hidden" name="id" id="input-id" />
         </form>
@@ -132,22 +130,20 @@
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // SweetAlert para eliminar
             document.querySelectorAll('.btn-eliminar').forEach(button => {
                 button.addEventListener('click', function () {
                     const id = this.dataset.id;
                     const nombre = this.dataset.nombre;
 
                     Swal.fire({
-                        title: '¿Estás seguro?',
-                        html: `Se eliminará el insumo: <strong>${nombre}</strong>`,
+                        title: '¿Anular venta?',
+                        html: `Se anulará la <strong>${nombre}</strong> y se restaurará el stock.`,
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#d33',
                         cancelButtonColor: '#6c757d',
-                        confirmButtonText: '<i class="fas fa-trash me-1"></i> Sí, eliminar',
-                        cancelButtonText: '<i class="fas fa-times me-1"></i> Cancelar',
-                        focusCancel: true
+                        confirmButtonText: '<i class="fas fa-trash me-1"></i> Sí, anular',
+                        cancelButtonText: '<i class="fas fa-times me-1"></i> Cancelar'
                     }).then((result) => {
                         if (result.isConfirmed) {
                             document.getElementById('input-id').value = id;
@@ -157,23 +153,8 @@
                 });
             });
 
-            // Fecha actual
-            const currentDateElement = document.getElementById('current-date');
-            if (currentDateElement) {
-                currentDateElement.textContent = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            }
-
-            // Inicializar DataTables (busqueda + paginacion)
-            $('#tablaInventario').DataTable({
-                language: {
-                    url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
-                },
-                order: [[0, 'desc']],
-                pageLength: 10,
-                responsive: true,
-                columnDefs: [
-                    { orderable: false, targets: [7] }
-                ]
+            document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-ES', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
             });
         });
     </script>

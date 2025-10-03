@@ -16,11 +16,37 @@ namespace Restaurant.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string filtro = "Activos")
         {
-            var usuarios = await _context.Usuarios.Include(u => u.Rol).ToListAsync();
-            return View(usuarios);
+            var query = _context.Usuarios.Include(u => u.Rol).AsQueryable();
+
+            switch (filtro)
+            {
+                case "Inactivos":
+                    query = query.Where(u => !u.Activo);
+                    break;
+                case "Todos":
+                    // no filtramos nada
+                    break;
+                default: // Activos
+                    query = query.Where(u => u.Activo);
+                    break;
+            }
+
+            ViewBag.FiltroActual = filtro;
+            return View(await query.ToListAsync());
         }
+
+
+        //public async Task<IActionResult> Index()
+        //{
+        //    var usuariosActivos = await _context.Usuarios
+        //        .Include(u => u.Rol)
+        //        .Where(u => u.Activo)
+        //        .ToListAsync();
+
+        //    return View(usuariosActivos);
+        //}
 
         public IActionResult Create()
         {
@@ -133,13 +159,6 @@ namespace Restaurant.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> Delete(int id)
-        {
-            var usuario = await _context.Usuarios.Include(u => u.Rol).FirstOrDefaultAsync(u => u.UsuarioId == id);
-            if (usuario == null) return NotFound();
-            return View(usuario);
-        }
-
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -147,9 +166,13 @@ namespace Restaurant.Controllers
             var usuario = await _context.Usuarios.FindAsync(id);
             if (usuario != null)
             {
-                _context.Usuarios.Remove(usuario);
+                // En vez de borrar, deshabilitamos
+                usuario.Activo = false;
+                _context.Update(usuario);
                 await _context.SaveChangesAsync();
             }
+
+            TempData["Mensaje"] = "Usuario deshabilitado correctamente.";
             return RedirectToAction(nameof(Index));
         }
     }

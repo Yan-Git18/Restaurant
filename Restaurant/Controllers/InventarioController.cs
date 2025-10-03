@@ -17,33 +17,36 @@ namespace Restaurant.Controllers
         // GET: Index
         public async Task<IActionResult> Index()
         {
-            var inventario = await _context.Inventarios.ToListAsync();
-            return View(inventario);
+            var inventarios = await _context.Inventarios
+                .Include(i => i.Productos)
+                .ToListAsync();
+
+            var inventarioConStock = inventarios.Select(i => new Rest_InventarioViewModel
+            {
+                Id = i.Id,
+                Nombre = i.Nombre,
+                Descripcion = i.Descripcion,
+                UnidadMedida = i.UnidadMedida,
+                StockTotal = i.Productos.Sum(p => p.Stock),  // 👈 suma de productos
+                StockMinimo = i.StockMinimo,
+                FechaActualizacion = i.FechaActualizacion
+            }).ToList();
+
+            return View(inventarioConStock);
         }
 
-        // GET: Crear
         [HttpGet]
         public IActionResult Crear()
         {
             return View();
         }
 
-        // POST: Crear
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Crear(Rest_Inventario inv)
         {
-            var inventario = new Rest_Inventario
-            {
-                Nombre = inv.Nombre,
-                Descripcion = inv.Descripcion,
-                UnidadMedida = inv.UnidadMedida,
-                Stock = inv.Stock,
-                StockMinimo = inv.StockMinimo,
-                FechaActualizacion = DateTime.Now
-            };
-
-            await _context.Inventarios.AddAsync(inventario);
+            inv.FechaActualizacion = DateTime.Now;
+            await _context.Inventarios.AddAsync(inv);
             await _context.SaveChangesAsync();
 
             TempData["Mensaje"] = "Se agregó el insumo al inventario.";
@@ -51,7 +54,6 @@ namespace Restaurant.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Editar
         [HttpGet]
         public async Task<IActionResult> Editar(int id)
         {
@@ -63,7 +65,6 @@ namespace Restaurant.Controllers
             return View(inventario);
         }
 
-        // POST: Editar
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Editar(Rest_Inventario inv)
@@ -76,7 +77,6 @@ namespace Restaurant.Controllers
             inventario.Nombre = inv.Nombre;
             inventario.Descripcion = inv.Descripcion;
             inventario.UnidadMedida = inv.UnidadMedida;
-            inventario.Stock = inv.Stock;
             inventario.StockMinimo = inv.StockMinimo;
             inventario.FechaActualizacion = DateTime.Now;
 
@@ -113,8 +113,7 @@ namespace Restaurant.Controllers
 
             TempData["Mensaje"] = "Inventario eliminado correctamente.";
             TempData["Tipo"] = "success";
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
-
     }
 }

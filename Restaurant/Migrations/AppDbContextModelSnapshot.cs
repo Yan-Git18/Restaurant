@@ -155,9 +155,6 @@ namespace Restaurant.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("Stock")
-                        .HasColumnType("int");
-
                     b.Property<int>("StockMinimo")
                         .HasColumnType("int");
 
@@ -168,18 +165,15 @@ namespace Restaurant.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Stock");
-
                     b.ToTable("Inventarios");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            FechaActualizacion = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FechaActualizacion = new DateTime(2025, 9, 27, 12, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "Bebidas",
-                            Stock = 50,
-                            StockMinimo = 0,
+                            StockMinimo = 5,
                             UnidadMedida = "Litro"
                         });
                 });
@@ -192,6 +186,9 @@ namespace Restaurant.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MesaId"));
 
+                    b.Property<bool>("Activo")
+                        .HasColumnType("bit");
+
                     b.Property<int>("Capacidad")
                         .HasColumnType("int");
 
@@ -199,6 +196,9 @@ namespace Restaurant.Migrations
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("Numero")
                         .HasColumnType("int");
@@ -220,36 +220,46 @@ namespace Restaurant.Migrations
                         new
                         {
                             MesaId = 1,
+                            Activo = true,
                             Capacidad = 4,
                             Estado = "Libre",
+                            FechaCreacion = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Numero = 1
                         },
                         new
                         {
                             MesaId = 2,
+                            Activo = true,
                             Capacidad = 2,
                             Estado = "Libre",
+                            FechaCreacion = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Numero = 2
                         },
                         new
                         {
                             MesaId = 3,
+                            Activo = true,
                             Capacidad = 6,
                             Estado = "Libre",
+                            FechaCreacion = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Numero = 3
                         },
                         new
                         {
                             MesaId = 4,
+                            Activo = true,
                             Capacidad = 4,
                             Estado = "Libre",
+                            FechaCreacion = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Numero = 4
                         },
                         new
                         {
                             MesaId = 5,
+                            Activo = true,
                             Capacidad = 8,
                             Estado = "Libre",
+                            FechaCreacion = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Numero = 5
                         });
                 });
@@ -324,6 +334,9 @@ namespace Restaurant.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<decimal>("Total")
+                        .HasColumnType("decimal(10,2)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("MesaId");
@@ -389,6 +402,9 @@ namespace Restaurant.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("Activo")
+                        .HasColumnType("bit");
+
                     b.Property<int>("CategoriaId")
                         .HasColumnType("int");
 
@@ -417,9 +433,14 @@ namespace Restaurant.Migrations
                     b.Property<decimal>("Precio")
                         .HasColumnType("decimal(10,2)");
 
+                    b.Property<int>("Stock")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("InventarioId");
+
+                    b.HasIndex("Stock");
 
                     b.HasIndex("CategoriaId", "Disponible");
 
@@ -429,32 +450,38 @@ namespace Restaurant.Migrations
                         new
                         {
                             Id = 1,
+                            Activo = true,
                             CategoriaId = 1,
                             Disponible = true,
                             FechaCreacion = new DateTime(2025, 9, 27, 12, 0, 0, 0, DateTimeKind.Unspecified),
                             InventarioId = 1,
                             Nombre = "Agua Mineral",
-                            Precio = 2.50m
+                            Precio = 2.50m,
+                            Stock = 5
                         },
                         new
                         {
                             Id = 2,
+                            Activo = true,
                             CategoriaId = 1,
                             Disponible = true,
                             FechaCreacion = new DateTime(2025, 9, 27, 12, 0, 0, 0, DateTimeKind.Unspecified),
                             InventarioId = 1,
                             Nombre = "Refresco",
-                            Precio = 4.00m
+                            Precio = 4.00m,
+                            Stock = 7
                         },
                         new
                         {
                             Id = 3,
+                            Activo = true,
                             CategoriaId = 1,
                             Disponible = true,
                             FechaCreacion = new DateTime(2025, 9, 27, 12, 0, 0, 0, DateTimeKind.Unspecified),
                             InventarioId = 1,
                             Nombre = "Jugo Natural",
-                            Precio = 6.00m
+                            Precio = 6.00m,
+                            Stock = 8
                         });
                 });
 

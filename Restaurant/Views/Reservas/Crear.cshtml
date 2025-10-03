@@ -1,0 +1,80 @@
+﻿@model Restaurant.ViewModels.ReservaFormViewModel
+@{
+    ViewData["Title"] = "Crear Reserva";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="container-fluid py-4">
+    <div class="dashboard-header mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1><i class="fas fa-plus-circle text-success me-2"></i>Nueva Reserva</h1>
+                <p class="mb-0">Complete los datos de la reserva</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-calendar-plus me-2"></i>Información de Reserva</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Crear" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Nombre" class="form-label fw-bold">Nombre <span class="text-danger">*</span></label>
+                                <input asp-for="Nombre" class="form-control" />
+                                <span asp-validation-for="Nombre" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Telefono" class="form-label fw-bold">Teléfono <span class="text-danger">*</span></label>
+                                <input asp-for="Telefono" class="form-control" />
+                                <span asp-validation-for="Telefono" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Email" class="form-label fw-bold">Correo <span class="text-danger">*</span></label>
+                                <input asp-for="Email" class="form-control" />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label asp-for="Fecha" class="form-label fw-bold">Fecha <span class="text-danger">*</span></label>
+                                <input asp-for="Fecha" type="date" class="form-control" />
+                                <span asp-validation-for="Fecha" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label asp-for="Hora" class="form-label fw-bold">Hora <span class="text-danger">*</span></label>
+                                <input asp-for="Hora" type="time" class="form-control" />
+                                <span asp-validation-for="Hora" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Personas" class="form-label fw-bold">Personas <span class="text-danger">*</span></label>
+                                <input asp-for="Personas" class="form-control" placeholder="Ej: 2" />
+                                <span asp-validation-for="Personas" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Ocasion" class="form-label fw-bold">Ocasión</label>
+                                <input asp-for="Ocasion" class="form-control" />
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label asp-for="Comentarios" class="form-label fw-bold">Comentarios</label>
+                                <textarea asp-for="Comentarios" class="form-control" rows="3"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Cancelar</a>
+                            <button type="submit" class="btn btn-success"><i class="fas fa-save me-1"></i> Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

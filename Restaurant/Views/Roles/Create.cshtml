@@ -3,39 +3,74 @@
     ViewData["Title"] = "Crear Rol";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
-
-<div class="container py-4">
-    <div class="roles-header d-flex justify-content-between align-items-center">
-        <h2><i class="fa fa-plus me-2"></i>Crear Rol</h2>
-        <a asp-action="Index" class="btn btn-nuevo">
-            <i class="fa fa-arrow-left me-2"></i>Volver
-        </a>
-    </div>
-
-    <div class="table-card p-4">
-        <form asp-action="Create" method="post">
-            <div class="mb-3">
-                <label asp-for="Nombre" class="form-label"></label>
-                <input asp-for="Nombre" class="form-control rounded-3" />
-                <span asp-validation-for="Nombre" class="text-danger"></span>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/Dashboard.css" />
+</head>
+<body>
+    <div class="py-4 col-6">
+        <!-- Encabezado -->
+        <div class="dashboard-header mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1><i class="fas fa-plus-circle text-success me-2"></i>Registrar Nuevo Rol</h1>
+                    <p class="mb-0">Complete los datos para crear un rol en el sistema</p>
+                </div>
+                <div>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Volver
+                    </a>
+                </div>
             </div>
-            <div class="mb-3">
-                <label asp-for="Descripcion" class="form-label"></label>
-                <textarea asp-for="Descripcion" class="form-control rounded-3" rows="4"></textarea>
-                <span asp-validation-for="Descripcion" class="text-danger"></span>
+        </div>
+
+        <!-- Formulario -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-user-shield me-2"></i>Información del Rol</h5>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="Create" method="post">
+                            @Html.AntiForgeryToken()
+
+                            <div class="mb-3">
+                                <label asp-for="Nombre" class="form-label fw-bold">
+                                    <i class="fas fa-tag me-1"></i>Nombre del Rol <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Nombre" class="form-control" placeholder="Ej: Administrador" />
+                                <span asp-validation-for="Nombre" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Descripcion" class="form-label fw-bold">
+                                    <i class="fas fa-align-left me-1"></i>Descripción
+                                </label>
+                                <textarea asp-for="Descripcion" class="form-control" rows="3" placeholder="Descripción del rol..."></textarea>
+                                <span asp-validation-for="Descripcion" class="text-danger small"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <a asp-action="Index" class="btn btn-secondary">
+                                    <i class="fas fa-times me-1"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-save me-1"></i> Guardar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <button type="submit" class="action-btn btn-edit">
-                <i class="fa fa-save me-1"></i>Guardar
-            </button>
-            <a asp-action="Index" class="action-btn btn-delete">
-                <i class="fa fa-times me-1"></i>Cancelar
-            </a>
-        </form>
+        </div>
     </div>
-</div>
+</body>
+</html>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 }

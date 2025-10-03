@@ -22,6 +22,10 @@ namespace Restaurant.Models
         [StringLength(500, ErrorMessage = "Las observaciones no pueden exceder 500 caracteres")]
         public string? Observaciones { get; set; }
 
+        public DateTime FechaCreacion { get; set; } //= DateTime.Now;
+
+        public bool Activo { get; set; } = true;
+
         // Navegación
         public virtual ICollection<Rest_Reserva> Reservas { get; set; } = new List<Rest_Reserva>();
         public virtual ICollection<Rest_Pedido> Pedidos { get; set; } = new List<Rest_Pedido>();

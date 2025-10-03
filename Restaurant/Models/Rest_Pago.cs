@@ -20,7 +20,7 @@ namespace Restaurant.Models
         public decimal Monto { get; set; }
 
         [Display(Name = "Fecha")]
-        public DateTime FechaPago { get; set; } = DateTime.Now;
+        public DateTime FechaPago { get; set; } //= DateTime.Now;
 
         [StringLength(100, ErrorMessage = "La referencia no puede exceder 100 caracteres")]
         public string? Referencia { get; set; } // Número de operación, últimos 4 dígitos de tarjeta, etc.

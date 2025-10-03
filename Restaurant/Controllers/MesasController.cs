@@ -17,9 +17,13 @@ namespace Restaurant.Controllers
         // GET: Mesas
         public async Task<IActionResult> Index()
         {
-            var mesas = await _context.Mesas.ToListAsync();
+            var mesas = await _context.Mesas
+                .Where(m => m.Activo) // solo las activas
+                .ToListAsync();
+
             return View(mesas);
         }
+
 
         // GET: Mesas/Crear
         public IActionResult Crear()
@@ -32,22 +36,26 @@ namespace Restaurant.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Crear(Rest_Mesa mesa)
         {
-            var mesas = new Rest_Mesa
+            if (ModelState.IsValid)
             {
-                Numero = mesa.Numero,
-                Capacidad = mesa.Capacidad,
-                Estado = mesa.Estado,
-                Observaciones = mesa.Observaciones
-            };
+                // validar duplicado
+                var existe = await _context.Mesas.AnyAsync(m => m.Numero == mesa.Numero);
+                if (existe)
+                {
+                    ModelState.AddModelError("Numero", $"Ya existe una mesa con el número {mesa.Numero}.");
+                    return View(mesa);
+                }
 
-            _context.Add(mesas);
-            await _context.SaveChangesAsync();
+                mesa.FechaCreacion = DateTime.Now; // si quieres tener fecha
+                _context.Add(mesa);
+                await _context.SaveChangesAsync();
 
-            TempData["Mensaje"] = "Mesa registrada correctamente";
-            TempData["Tipo"] = "success";
-            return RedirectToAction(nameof(Index));
-            
-            
+                TempData["Mensaje"] = "Mesa registrada correctamente";
+                TempData["Tipo"] = "success";
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(mesa);
         }
 
         // GET: Mesas/Editar/5
@@ -65,8 +73,15 @@ namespace Restaurant.Controllers
         public async Task<IActionResult> Editar(Rest_Mesa mesa)
         {
             var mesas = await _context.Mesas.FindAsync(mesa.MesaId);
-
             if (mesas == null) return NotFound();
+
+            // validar duplicado (excluyendo la misma mesa)
+            var existe = await _context.Mesas.AnyAsync(m => m.Numero == mesa.Numero && m.MesaId != mesa.MesaId);
+            if (existe)
+            {
+                ModelState.AddModelError("Numero", $"Ya existe otra mesa con el número {mesa.Numero}.");
+                return View(mesa);
+            }
 
             mesas.Numero = mesa.Numero;
             mesas.Capacidad = mesa.Capacidad;
@@ -77,8 +92,8 @@ namespace Restaurant.Controllers
             await _context.SaveChangesAsync();
 
             TempData["Mensaje"] = "Mesa actualizada correctamente";
-            TempData["Tipo"] = "success";                          
-            return RedirectToAction(nameof(Index));           
+            TempData["Tipo"] = "success";
+            return RedirectToAction(nameof(Index));
         }
 
         // POST: Mesas/Eliminar
@@ -96,17 +111,19 @@ namespace Restaurant.Controllers
                 return NotFound();
             }
 
-            // ⚠️ Validación: no eliminar si tiene reservas o pedidos asociados
+            // ⚠️ Validación: no desactivar si tiene reservas o pedidos asociados
             if (mesa.Reservas.Any() || mesa.Pedidos.Any())
             {
-                TempData["Mensaje"] = $"No se puede eliminar la mesa #{mesa.Numero} porque tiene reservas o pedidos asociados.";
+                TempData["Mensaje"] = $"No se puede desactivar la mesa #{mesa.Numero} porque tiene reservas o pedidos asociados.";
                 TempData["Tipo"] = "danger";
                 return RedirectToAction(nameof(Index));
             }
 
-            _context.Mesas.Remove(mesa);
+            mesa.Activo = false; // 👈 solo desactivar
+            _context.Mesas.Update(mesa);
             await _context.SaveChangesAsync();
-            TempData["Mensaje"] = "Mesa eliminada correctamente";
+
+            TempData["Mensaje"] = "Mesa desactivada correctamente";
             TempData["Tipo"] = "success";
 
             return RedirectToAction(nameof(Index));

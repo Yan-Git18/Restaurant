@@ -1,0 +1,129 @@
+﻿@model Restaurant.Models.Rest_Pedido
+
+@{
+    ViewData["Title"] = "Detalles del Pedido";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid py-4">
+
+    <!-- Header -->
+    <div class="dashboard-header mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1>Detalles del Pedido</h1>
+                <p class="mb-0">Información completa del pedido #@Model.Id</p>
+            </div>
+            <div>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Volver
+                </a>
+                <a asp-action="Editar" asp-route-id="@Model.Id" class="btn btn-warning">
+                    <i class="fas fa-edit me-1"></i> Editar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card Datos del Pedido -->
+    <div class="card border-start border-4 border-warning shadow-sm mb-4">
+        <div class="card-body">
+
+            <dl class="row mb-0">
+                <dt class="col-sm-3">ID Pedido</dt>
+                <dd class="col-sm-9"><span class="badge bg-secondary">#@Model.Id</span></dd>
+
+                <dt class="col-sm-3">Cliente</dt>
+                <dd class="col-sm-9">@Model.Cliente?.Nombre @Model.Cliente?.Apellidos</dd>
+
+                <dt class="col-sm-3">Mesa</dt>
+                <dd class="col-sm-9">@Model.Mesa?.Numero</dd>
+
+                <dt class="col-sm-3">Tipo de Pedido</dt>
+                <dd class="col-sm-9">
+                    @if (Model.TipoPedido == "Delivery")
+                    {
+                        <span class="badge bg-info"><i class="fas fa-truck"></i> Delivery</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-dark"><i class="fas fa-utensils"></i> En salón</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Total</dt>
+                <dd class="col-sm-9"><strong>S/ @Model.Total.ToString("0.00")</strong></dd>
+
+                <dt class="col-sm-3">Estado</dt>
+                <dd class="col-sm-9">
+                    @if (Model.Estado == "Pendiente")
+                    {
+                        <span class="badge bg-warning text-dark">
+                            <i class="fas fa-clock me-1"></i> Pendiente
+                        </span>
+                    }
+                    else if (Model.Estado == "Atendido")
+                    {
+                        <span class="badge bg-success">
+                            <i class="fas fa-check-circle me-1"></i> Atendido
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i> @Model.Estado</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Fecha</dt>
+                <dd class="col-sm-9">@Model.Fecha.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                <dt class="col-sm-3">Observaciones</dt>
+                <dd class="col-sm-9">@Model.Observaciones</dd>
+            </dl>
+        </div>
+    </div>
+
+    <!-- Card Productos del Pedido -->
+    <div class="card border-start border-4 border-info shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title mb-3"><i class="fas fa-boxes me-1"></i> Productos</h5>
+
+            @if (Model.DetallesPedido != null && Model.DetallesPedido.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unitario (S/)</th>
+                                <th>Subtotal (S/)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var d in Model.DetallesPedido)
+                            {
+                                <tr>
+                                    <td>@d.Producto?.Nombre</td>
+                                    <td>@d.Cantidad</td>
+                                    <td>@(d.Subtotal / d.Cantidad)</td>
+                                    <td>@d.Subtotal.ToString("0.00")</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="3" class="text-end">TOTAL</th>
+                                <th>@Model.Total.ToString("0.00")</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">No hay productos registrados en este pedido.</p>
+            }
+        </div>
+    </div>
+</div>

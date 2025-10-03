@@ -85,6 +85,14 @@
                                     </div>
 
                                     <div class="mb-3">
+                                        <label asp-for="Stock" class="form-label fw-bold">
+                                            <i class="fas fa-boxes me-1"></i> Stock
+                                        </label>
+                                        <input asp-for="Stock" type="number" min="0" class="form-control" />
+                                        <span asp-validation-for="Stock" class="text-danger small"></span>
+                                    </div>
+
+                                    <div class="mb-3">
                                         <label asp-for="ImagenUrl" class="form-label fw-bold">
                                             <i class="fas fa-image me-1"></i>URL de la Imagen
                                         </label>

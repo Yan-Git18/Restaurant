@@ -1,0 +1,69 @@
+﻿@model Restaurant.Models.Rest_Reserva
+@{
+    ViewData["Title"] = "Editar Reserva";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="container-fluid py-4">
+    <div class="dashboard-header mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1><i class="fas fa-edit text-warning me-2"></i>Editar Reserva</h1>
+                <p class="mb-0">Modifique los datos de la reserva</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Información de Reserva</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Editar" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="ReservaId" />
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FechaHora" class="form-label fw-bold">Fecha y Hora</label>
+                                <input asp-for="FechaHora" type="datetime-local" class="form-control" value="@Model.FechaHora.ToString("yyyy-MM-ddTHH:mm")" />
+                                <span asp-validation-for="FechaHora" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label asp-for="NumeroPersonas" class="form-label fw-bold">Personas</label>
+                                <input asp-for="NumeroPersonas" type="number" class="form-control" min="1" max="20"/>
+                                <span asp-validation-for="NumeroPersonas" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label asp-for="Estado" class="form-label fw-bold">Estado</label>
+                                <select asp-for="Estado" class="form-select" asp-items="@(new List<SelectListItem> {
+                                                                                     new SelectListItem { Text = "Pendiente", Value = "Pendiente" },
+                                                                                     new SelectListItem { Text = "Confirmada", Value = "Confirmada" },
+                                                                                     new SelectListItem { Text = "Cancelada", Value = "Cancelada" },
+                                                                                     new SelectListItem { Text = "Completada", Value = "Completada" }
+                                                                                 })">
+                                </select>
+                                <span asp-validation-for="Estado" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                <label asp-for="Observaciones" class="form-label fw-bold">Observaciones</label>
+                                <textarea asp-for="Observaciones" class="form-control" rows="3"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Cancelar</a>
+                            <button type="submit" class="btn btn-warning"><i class="fas fa-save me-1"></i> Actualizar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

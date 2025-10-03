@@ -10,7 +10,7 @@ namespace Restaurant.Models
 
         [Required(ErrorMessage = "La fecha de venta es obligatoria")]
         [Display(Name = "Fecha")]
-        public DateTime Fecha { get; set; } = DateTime.Now;
+        public DateTime Fecha { get; set; } 
 
         [Required(ErrorMessage = "El total es obligatorio")]
         [Range(0.01, 99999.99, ErrorMessage = "El total debe ser mayor a 0")]
@@ -30,7 +30,7 @@ namespace Restaurant.Models
 
         [Required(ErrorMessage = "El estado es obligatorio")]
         [StringLength(20, ErrorMessage = "El estado no puede exceder 20 caracteres")]
-        public string Estado { get; set; } = "Pendiente"; // Pendiente, Pagada, Cancelada
+        public string Estado { get; set; } = "Pendiente";
 
         [Required(ErrorMessage = "El pedido es obligatorio")]
         [Display(Name = "Pedido")]

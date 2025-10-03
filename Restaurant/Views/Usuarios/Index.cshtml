@@ -3,126 +3,193 @@
     ViewData["Title"] = "Usuarios";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/Dashboard.css" />
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <!-- Encabezado -->
+        <div class="dashboard-header mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1>Gestión de Usuarios</h1>
+                    <p class="mb-0">Listado y administración de usuarios registrados en el sistema</p>
+                </div>
+                <div>
+                    <span class="badge bg-light text-dark">
+                        <i class="bi bi-calendar me-2"></i>
+                        <span id="current-date"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
 
-<div class="dashboard-header d-flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-0"><i class="fa fa-users me-2"></i>Gestión de Usuarios</h2>
-    <span class="fecha-hoy"></span>
-</div>
+        <!-- Card principal -->
+        <div class="card card-usuarios shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="section-title mb-0">
+                        Lista de Usuarios
+                        <span class="badge bg-primary ms-2">@Model.Count()</span>
+                    </h4>
+                    <a asp-action="Create" class="btn btn-success">
+                        <i class="fas fa-plus me-1"></i> Nuevo Usuario
+                    </a>
+                </div>
 
-<div class="card card-usuarios shadow-sm p-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="mb-0"><i class="fa fa-list me-2"></i>Lista de Usuarios</h4>
-        <a asp-action="Create" class="btn btn-success d-flex align-items-center">
-            <i class="fa fa-plus me-2"></i>Nuevo Usuario
-        </a>
+                <div class="mb-3">
+                    <a asp-action="Index" asp-route-filtro="Activos" class="btn btn-success @(ViewBag.FiltroActual == "Activos" ? "active" : "")">
+                        <i class="fas fa-check-circle"></i> Activos
+                    </a>
+                    <a asp-action="Index" asp-route-filtro="Inactivos" class="btn btn-danger @(ViewBag.FiltroActual == "Inactivos" ? "active" : "")">
+                        <i class="fas fa-times-circle"></i> Inactivos
+                    </a>
+                    <a asp-action="Index" asp-route-filtro="Todos" class="btn btn-secondary @(ViewBag.FiltroActual == "Todos" ? "active" : "")">
+                        <i class="fas fa-list"></i> Todos
+                    </a>
+                </div>
+
+                <!-- Tabla -->
+                <div class="table-responsive">
+                    <table id="usuariosTable" class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Correo</th>
+                                <th>Rol</th>
+                                <th>Estado</th>
+                                <th>Fecha Creación</th>
+                                <th>Último Acceso</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Any())
+                            {
+                                @foreach (var u in Model)
+                                {
+                                    <tr>
+                                        <td><strong>@u.Correo</strong></td>
+                                        <td>
+                                            <span class="badge bg-info">@u.Rol.Nombre</span>
+                                        </td>
+                                        <td>
+                                            @if (u.Activo)
+                                            {
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check-circle me-1"></i>Activo
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">
+                                                    <i class="fas fa-times-circle me-1"></i>Inactivo
+                                                </span>
+                                            }
+                                        </td>
+                                        <td><small>@u.FechaCreacion.ToString("dd/MM/yyyy")</small></td>
+                                        <td><small>@(u.UltimoAcceso?.ToString("dd/MM/yyyy HH:mm") ?? "-")</small></td>
+                                        <td class="text-center">
+                                            <a asp-action="Edit" asp-route-id="@u.UsuarioId"
+                                               class="btn btn-warning btn-sm me-1" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button"
+                                                    class="btn btn-danger btn-sm btn-eliminar"
+                                                    data-id="@u.UsuarioId"
+                                                    data-correo="@u.Correo"
+                                                    title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            <!-- Form oculto -->
+                                            <form id="form-eliminar-usuario-@u.UsuarioId"
+                                                  asp-action="Delete"
+                                                  asp-route-id="@u.UsuarioId"
+                                                  method="post"
+                                                  style="display:none;">
+                                                @Html.AntiForgeryToken()
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <i class="fas fa-user-slash fa-3x text-muted mb-3"></i>
+                                        <p class="text-muted">No hay usuarios registrados</p>
+                                        <a asp-action="Create" class="btn btn-success">
+                                            <i class="fas fa-plus"></i> Crear primer usuario
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Botón volver -->
+                <div class="text-start mt-3">
+                    <a asp-controller="Admin" asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-
-    @if (Model != null && Model.Any())
-    {
-        <div class="table-responsive">
-            <table class="table table-striped table-hover" id="usuariosTable">
-                <thead class="table-light">
-                    <tr>
-                        <th>Correo</th>
-                        <th>Rol</th>
-                        <th>Estado</th>
-                        <th>Fecha Creación</th>
-                        <th>Último Acceso</th>
-                        <th class="text-center">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var u in Model)
-                    {
-                        <tr>
-                            <td><span class="fw-semibold">@u.Correo</span></td>
-                            <td><span class="badge bg-secondary">@u.Rol?.Nombre</span></td>
-                            <td>
-                                @if (u.Activo)
-                                {
-                                    <span class="badge bg-success">Activo</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-danger">Inactivo</span>
-                                }
-                            </td>
-                            <td>@u.FechaCreacion.ToString("dd/MM/yyyy")</td>
-                            <td>@(u.UltimoAcceso?.ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
-                            <td class="text-center">
-                                <a asp-action="Edit" asp-route-id="@u.UsuarioId" class="btn btn-sm btn-warning me-2">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <button type="button" class="btn btn-sm btn-danger"
-                                        onclick="confirmarEliminacionUsuario(@u.UsuarioId)">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-
-                                <!-- Form oculto -->
-                                <form id="form-eliminar-usuario-@u.UsuarioId"
-                                      asp-action="Delete"
-                                      asp-route-id="@u.UsuarioId"
-                                      method="post"
-                                      style="display:none;">
-                                    @Html.AntiForgeryToken()
-                                </form>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-info text-center">
-            <i class="fa fa-info-circle me-2"></i>No hay usuarios registrados.
-        </div>
-    }
-</div>
+</body>
+</html>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script>
-        // DataTable
-        $(document).ready(function () {
+        document.addEventListener('DOMContentLoaded', function () {
+            // Confirmación de eliminación con SweetAlert2
+            document.querySelectorAll('.btn-eliminar').forEach(button => {
+                button.addEventListener('click', function () {
+                    const id = this.dataset.id;
+                    const correo = this.dataset.correo;
+
+                    Swal.fire({
+                        title: '¿Estás seguro?',
+                        html: `Se eliminará el usuario: <strong>${correo}</strong>`,
+                        text: "¡No podrás revertir esta acción!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: '<i class="fas fa-trash me-1"></i> Sí, eliminar',
+                        cancelButtonText: '<i class="fas fa-times me-1"></i> Cancelar',
+                        focusCancel: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            document.getElementById('form-eliminar-usuario-' + id).submit();
+                        }
+                    });
+                });
+            });
+
+            // Fecha actual
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').textContent =
+                new Date().toLocaleDateString('es-ES', options);
+
+            // DataTables
             $('#usuariosTable').DataTable({
                 language: {
-                    url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
-                }
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                },
+                order: [[3, 'desc']], // Ordenar por Fecha de creación
+                pageLength: 10,
+                responsive: true,
+                columnDefs: [
+                    { orderable: false, targets: [5] } // Acciones no ordenables
+                ]
             });
-        });
-
-        // SweetAlert2 para confirmación de eliminación
-        function confirmarEliminacionUsuario(id) {
-            Swal.fire({
-                title: '¿Estás seguro?',
-                text: "Este usuario será eliminado permanentemente",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#e74c3c',
-                cancelButtonColor: '#95a5a6',
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar',
-                customClass: {
-                    popup: 'rounded-3 shadow',
-                    confirmButton: 'rounded-pill px-4',
-                    cancelButton: 'rounded-pill px-4'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById("form-eliminar-usuario-" + id).submit();
-                }
-            });
-        }
-
-        // Fecha actual dinámica
-        document.addEventListener("DOMContentLoaded", function () {
-            const fecha = new Date();
-            const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.querySelector(".fecha-hoy").innerText = fecha.toLocaleDateString('es-ES', opciones);
         });
     </script>
 }

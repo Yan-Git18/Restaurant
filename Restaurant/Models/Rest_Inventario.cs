@@ -19,16 +19,12 @@ namespace Restaurant.Models
         [Display(Name = "Unidad de Medida")]
         public string UnidadMedida { get; set; }
 
-        [Required(ErrorMessage = "El stock es obligatorio")]
-        [Range(0, int.MaxValue, ErrorMessage = "El stock no puede ser negativo")]
-        public int Stock { get; set; }
-
         [Range(0, int.MaxValue, ErrorMessage = "El stock mínimo no puede ser negativo")]
         [Display(Name = "Stock Mínimo")]
         public int StockMinimo { get; set; } = 0;
 
         [Display(Name = "Fecha de Actualización")]
-        public DateTime FechaActualizacion { get; set; } //= DateTime.Now;
+        public DateTime FechaActualizacion { get; set; }
 
         // Navegación
         public virtual ICollection<Rest_Producto> Productos { get; set; } = new List<Rest_Producto>();

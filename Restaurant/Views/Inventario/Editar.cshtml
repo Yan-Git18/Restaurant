@@ -53,12 +53,6 @@
                             </div>
 
                             <div class="mb-3">
-                                <label asp-for="Stock" class="form-label">Stock</label>
-                                <input asp-for="Stock" type="number" min="0" class="form-control" required />
-                                <span asp-validation-for="Stock" class="text-danger small"></span>
-                            </div>
-
-                            <div class="mb-3">
                                 <label asp-for="StockMinimo" class="form-label">Stock mínimo</label>
                                 <input asp-for="StockMinimo" type="number" min="0" class="form-control" />
                                 <span asp-validation-for="StockMinimo" class="text-danger small"></span>
@@ -93,7 +87,5 @@
             weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
         });
     </script>
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 }

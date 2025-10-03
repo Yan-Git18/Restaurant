@@ -1,0 +1,123 @@
+﻿@model Restaurant.ViewModels.PedidoCreateEditVm
+
+@{
+    ViewData["Title"] = "Editar Pedido";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="dashboard-header mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1><i class="fas fa-edit text-warning me-2"></i>Editar Pedido</h1>
+                <p class="mb-0">Modifique los datos del pedido del cliente</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Información del Pedido</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Editar" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ClienteId" class="form-label fw-bold">Cliente</label>
+                                <select asp-for="ClienteId" class="form-select" asp-items="ViewBag.Clientes">
+                                    <option value="">-- Seleccione un cliente --</option>
+                                </select>
+                                <span asp-validation-for="ClienteId" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="MesaId" class="form-label fw-bold">Mesa</label>
+                                <select asp-for="MesaId" class="form-select" asp-items="ViewBag.Mesas">
+                                    <option value="">-- Seleccione una mesa --</option>
+                                </select>
+                                <span asp-validation-for="MesaId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="TipoPedido" class="form-label fw-bold">Tipo de Pedido</label>
+                                <select asp-for="TipoPedido" class="form-select">
+                                    <option value="Mesa">Mesa</option>
+                                    <option value="Delivery">Delivery</option>
+                                </select>
+                                <span asp-validation-for="TipoPedido" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Estado" class="form-label fw-bold">Estado</label>
+                                <select asp-for="Estado" class="form-select">
+                                    <option value="Pendiente">Pendiente</option>
+                                    <option value="Atendido">Atendido</option>
+                                </select>
+                                <span asp-validation-for="Estado" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Observaciones" class="form-label fw-bold">Observaciones</label>
+                            <textarea asp-for="Observaciones" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Observaciones" class="text-danger"></span>
+                        </div>
+
+                        <hr />
+                        <h5>Detalles del Pedido</h5>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int i = 0; i < Model.Detalles.Count; i++)
+                                {
+                                    <tr>
+                                        <td>
+                                            <select asp-for="Detalles[@i].ProductoId" class="form-select" asp-items="ViewBag.Productos"></select>
+                                        </td>
+                                        <td>
+                                            <input asp-for="Detalles[@i].Cantidad" class="form-control" type="number" min="1" />
+                                        </td>
+                                        <td>
+                                            <input asp-for="Detalles[@i].Precio" class="form-control" type="number" step="0.01" min="0.01" />
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                        <div class="mb-3">
+                            <label asp-for="Total" class="form-label fw-bold">Total</label>
+                            <input asp-for="Total" class="form-control" readonly />
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save me-1"></i> Actualizar Pedido
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

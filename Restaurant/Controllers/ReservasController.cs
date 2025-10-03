@@ -16,6 +16,13 @@ namespace Restaurant.Controllers
             _context = context;
         }
 
+        public IActionResult Index()
+        {
+            var reservas = _context.Reservas.ToList();
+            return View(reservas);
+        }
+
+
         [HttpGet]
         public async Task<IActionResult> Crear()
         {

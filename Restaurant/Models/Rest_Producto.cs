@@ -9,7 +9,7 @@ namespace Restaurant.Models
         public int Id { get; set; }
 
         [Required(ErrorMessage = "El nombre del producto es obligatorio")]
-        [StringLength(100, MinimumLength = 2, ErrorMessage = "El nombre debe tener entre 2 y 100 caracteres")]
+        [StringLength(100, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 2 y 100 caracteres")]
         public string Nombre { get; set; }
 
         [StringLength(500, ErrorMessage = "La descripción no puede exceder 500 caracteres")]
@@ -29,7 +29,7 @@ namespace Restaurant.Models
         public bool Disponible { get; set; } = true;
 
         [Display(Name = "Fecha de Creación")]
-        public DateTime FechaCreacion { get; set; } //= DateTime.Now;
+        public DateTime FechaCreacion { get; set; }
 
         [Required(ErrorMessage = "La categoría es obligatoria")]
         [Display(Name = "Categoría")]
@@ -38,6 +38,14 @@ namespace Restaurant.Models
         [Required(ErrorMessage = "El inventario es obligatorio")]
         [Display(Name = "Inventario")]
         public int InventarioId { get; set; }
+
+        // 👇 Stock ahora está aquí
+        [Required(ErrorMessage = "El stock es obligatorio")]
+        [Range(0, int.MaxValue, ErrorMessage = "El stock no puede ser negativo")]
+        public int Stock { get; set; }
+
+        [Display(Name = "Activo")]
+        public bool Activo { get; set; } = true;
 
         // Navegación
         [ForeignKey("CategoriaId")]

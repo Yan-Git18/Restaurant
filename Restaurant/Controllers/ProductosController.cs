@@ -21,11 +21,13 @@ namespace Restaurant.Controllers
             var productos = await _context.Productos
                 .Include(p => p.Categoria)
                 .Include(p => p.Inventario)
+                .Where(p => p.Activo)   // solo activos en el índice
                 .OrderByDescending(p => p.FechaCreacion)
                 .ToListAsync();
 
             return View(productos);
         }
+
 
         // GET: Crear
         [HttpGet]
@@ -59,7 +61,8 @@ namespace Restaurant.Controllers
                 Disponible = p.Disponible,
                 FechaCreacion = DateTime.Now,
                 CategoriaId = p.CategoriaId,
-                InventarioId = p.InventarioId
+                InventarioId = p.InventarioId,
+                Stock = p.Stock   // 👈 ahora lo guardamos
             };
 
             await _context.Productos.AddAsync(producto);
@@ -124,12 +127,29 @@ namespace Restaurant.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            _context.Productos.Remove(producto);
+            // Validación: no desactivar si está en pedidos actuales (opcional)
+            var enDetalles = await _context.DetallesPedido.AnyAsync(d => d.ProductoId == id);
+            if (enDetalles)
+            {
+                // en lugar de eliminar, marcamos inactivo; si quieres bloquear desactivación puedes retornar error
+                producto.Activo = false;
+                _context.Productos.Update(producto);
+                await _context.SaveChangesAsync();
+
+                TempData["Mensaje"] = "Producto desactivado (está presente en pedidos históricos).";
+                TempData["Tipo"] = "warning";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Si no está en detalles, igual lo desactivamos (no remove)
+            producto.Activo = false;
+            _context.Productos.Update(producto);
             await _context.SaveChangesAsync();
 
-            TempData["Mensaje"] = "Se eliminó el producto.";
+            TempData["Mensaje"] = "Producto desactivado correctamente.";
             TempData["Tipo"] = "success";
             return RedirectToAction(nameof(Index));
         }
+
     }
 }

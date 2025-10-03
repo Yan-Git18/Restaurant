@@ -281,3 +281,21 @@ body {
 .card-detalles {
     border-left: 4px solid #0d6efd !important;
 }
+
+/* Card Clientes */
+.card-clientes {
+    border-right: 5px solid #28a745; /* Verde */
+    border-radius: 15px;
+    background: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* Card Empleados */
+.card-empleados {
+    border-right: 5px solid #007bff; /* Azul */
+    border-radius: 15px;
+    background: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+}
