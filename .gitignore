@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Restaurant/appsettings.json
+/Restaurant/Migrations/20251004162830_fejkl.cs
+/Restaurant/Migrations/20251004162830_fejkl.Designer.cs
