@@ -129,16 +129,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // Inicializar DataTable
-        $(document).ready(function () {
-            $('#tablaPedidos').DataTable({
-                language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
-                order: [[0, 'asc']],
-                pageLength: 10,
-                responsive: true
-            });
-        });
-
         // Confirmación al eliminar
         $(".btnEliminar").click(function () {
             var pedidoId = $(this).data("id");
@@ -188,5 +178,20 @@
             });
         });
 
+    </script>
+
+    <script>
+        $(document).ready(function () {
+        const tienePedidos = @((Model != null && Model.Any()).ToString().ToLower())
+
+            if (tienePedidos) {
+                $('#tablaPedidos').DataTable({
+                    language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
+                    order: [[0, 'asc']],
+                    pageLength: 10,
+                    responsive: true
+                });
+            }
+        });
     </script>
 }

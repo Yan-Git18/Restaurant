@@ -83,7 +83,7 @@
                             else
                             {
                                 <tr>
-                                    <td colspan="6" class="text-center py-4">
+                                    <td colspan="7" class="text-center py-4">
                                         <i class="fas fa-users fa-3x text-muted mb-3"></i>
                                         <p class="text-muted">No hay clientes registrados</p>
                                     </td>
@@ -109,15 +109,20 @@
         // Fecha actual
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-ES', options);
+    </script>
 
-        // DataTable
+    <script>
         $(document).ready(function () {
-            $('#tablaClientes').DataTable({
-                language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
-                order: [[0, 'asc']],
-                pageLength: 10,
-                responsive: true
-            });
+        const tieneClientes = @((Model != null && Model.Any()).ToString().ToLower())
+
+            if (tieneClientes) {
+                $('#tablaClientes').DataTable({
+                    language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
+                    order: [[0, 'asc']],
+                    pageLength: 10,
+                    responsive: true
+                });
+            }
         });
     </script>
 }
