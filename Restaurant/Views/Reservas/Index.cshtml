@@ -1,134 +1,141 @@
 ﻿@model List<Restaurant.Models.Rest_Reserva>
 @{
-    ViewData["Title"] = "Reservas";
+    ViewData["Title"] = "Mis Reservas";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="utf-8" />
-    <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="~/css/Dashboard.css" />
-</head>
-<body>
-    <div class="container-fluid py-4">
-        <div class="dashboard-header">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <h1>Gestión de Reservas</h1>
-                    <p class="mb-0">Listado y administración de reservas del restaurante</p>
-                </div>
-                <div>
-                    <span class="badge bg-light text-dark">
-                        <i class="bi bi-calendar me-2"></i>
-                        <span id="current-date"></span>
-                    </span>
-                </div>
+
+<div class="container-fluid py-4">
+    <div class="dashboard-header">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h1>Gestión de Reservas</h1>
+                <p class="mb-0">Listado de reservas registradas en el restaurante</p>
             </div>
+            <div>
+                <span class="badge bg-light text-dark">
+                    <i class="bi bi-calendar me-2"></i>
+                    <span id="current-date"></span>
+                </span>
+            </div>
+
+
         </div>
+    </div>
 
-        <div class="card card-rutas">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4 class="section-title mb-0">
-                        Listado de Reservas
-                        <span class="badge bg-primary ms-2">@Model.Count</span>
-                    </h4>
-                    <a asp-action="Crear" class="btn btn-success">
-                        <i class="fas fa-plus"></i> Nueva Reserva
-                    </a>
-                </div>
+    <div class="card card-rutas">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="section-title mb-0">
+                    Listado de Reservas
+                    <span class="badge bg-primary ms-2">@Model.Count</span>
+                </h4>
+                <a asp-controller="Reservas" asp-action="Crear" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Nueva Reserva
+                </a>
+            </div>
 
-                <div class="table-responsive">
-                    <table id="tablaReservas" class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>ID</th>
-                                <th>Cliente</th>
-                                <th>Mesa</th>
-                                <th>Fecha y Hora</th>
-                                <th>Personas</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (Model.Any())
-                            {
-                                @foreach (var r in Model)
-                                {
-                                    <tr>
-                                        <td><strong>@r.ReservaId</strong></td>
-                                        <td>@r.Cliente?.Nombre @r.Cliente?.Apellidos</td>
-                                        <td>@r.Mesa?.Numero</td>
-                                        <td>@r.FechaHora.ToString("dd/MM/yyyy HH:mm")</td>
-                                        <td>@r.NumeroPersonas</td>
-                                        <td>
-                                            @if (r.Estado == "Pendiente")
-                                            {
-                                                <span class="badge bg-warning text-dark">@r.Estado</span>
-                                            }
-                                            else if (r.Estado == "Confirmada")
-                                            {
-                                                <span class="badge bg-info">@r.Estado</span>
-                                            }
-                                            else if (r.Estado == "Cancelada")
-                                            {
-                                                <span class="badge bg-danger">@r.Estado</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-success">@r.Estado</span>
-                                            }
-                                        </td>
-                                        <td>
-                                            <div role="group">
-                                                <a asp-action="Editar" asp-route-id="@r.ReservaId" class="btn btn-warning btn-sm">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            }
-                            else
+            <div class="table-responsive">
+                <table id="tablaReservas" class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Personas</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Any())
+                        {
+                            @foreach (var r in Model)
                             {
                                 <tr>
-                                    <td colspan="7" class="text-center py-4">
-                                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                        <p class="text-muted">No hay reservas registradas</p>
-                                        <a asp-action="Crear" class="btn btn-success">
-                                            <i class="fas fa-plus"></i> Crear primera reserva
-                                        </a>
+                                    <td>@r.Cliente?.Nombre</td>
+                                    <td>@r.FechaHora.ToString("dd/MM/yyyy")</td>
+                                    <td>@r.FechaHora.ToString("HH:mm")</td>
+                                    <td>@r.NumeroPersonas</td>
+                                    <td>
+                                        <span class="badge @(r.Estado == "Pendiente" ? "bg-warning text-dark" : "bg-success")">
+                                            @r.Estado
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div role="group">
+                                            <a asp-action="Detalles" asp-route-id="@r.ReservaId"
+                                               class="btn btn-info btn-sm text-white">
+                                                <i class="fas fa-eye"></i> Ver
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             }
-                        </tbody>
-                    </table>
-                </div>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-4">
+                                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">No hay reservas registradas</p>
+                                    <a asp-controller="Reservas" asp-action="Crear" class="btn btn-success">
+                                        <i class="fas fa-plus"></i> Crear primera reserva
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="text-start mt-3">
+                <a asp-controller="Admin" asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                </a>
             </div>
         </div>
     </div>
-</body>
-</html>
+</div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
-        document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-ES', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-        });
-
-        $(document).ready(function () {
-        const tieneReservas = @((Model != null && Model.Any()).ToString().ToLower())
-
-            if (tieneReservas) {
-                $('#tablaReservas').DataTable({
-                    language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
-                    order: [[0, 'asc']],
-                    pageLength: 10,
-                    responsive: true
-                });
+        document.addEventListener('DOMContentLoaded', function () {
+            // Mostrar fecha actual
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const currentDateElement = document.getElementById('current-date');
+            if (currentDateElement) {
+                currentDateElement.textContent = new Date().toLocaleDateString('es-ES', options);
             }
+
+            // Inicializar DataTables
+            $('#tablaReservas').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                },
+                order: [[1, 'desc']],
+                pageLength: 10,
+                responsive: true,
+                columnDefs: [
+                    { orderable: false, targets: [5] }
+                ]
+            });
+
+            // Mostrar mensaje de éxito con SweetAlert si TempData["Success"] existe
+                    var successMessage = @Html.Raw(Json.Serialize(TempData["Success"]));
+        if (successMessage) {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: successMessage,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            });
+        }
         });
     </script>
 }

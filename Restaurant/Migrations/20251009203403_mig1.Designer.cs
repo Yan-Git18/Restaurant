@@ -12,8 +12,8 @@ using RESTAURANT.Data;
 namespace Restaurant.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251005205437_Mig2")]
-    partial class Mig2
+    [Migration("20251009203403_mig1")]
+    partial class mig1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

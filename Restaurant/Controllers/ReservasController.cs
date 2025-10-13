@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Restaurant.Models;
 using Restaurant.ViewModels;
 using RESTAURANT.Data;
-using System.Security.Claims;
-using Microsoft.EntityFrameworkCore;
 
 namespace Restaurant.Controllers
 {
@@ -16,108 +15,145 @@ namespace Restaurant.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        // LISTAR RESERVAS
+        [HttpGet]
+        public async Task<IActionResult> Index()
         {
-            var reservas = _context.Reservas.ToList();
-            return View(reservas);
+            var reservasQuery = _context.Reservas
+                .Include(r => r.Cliente)
+                .Include(r => r.Mesa)
+                .OrderByDescending(r => r.FechaHora)
+                .AsQueryable();
+
+            if (User.Identity!.IsAuthenticated)
+            {
+                var personaIdClaim = User.Claims.FirstOrDefault(c => c.Type == "PersonaId")?.Value;
+                if (int.TryParse(personaIdClaim, out int personaId) && personaId > 0)
+                {
+                    reservasQuery = reservasQuery.Where(r => r.ClienteId == personaId);
+                }
+            }
+
+            var reservas = await reservasQuery.ToListAsync();
+            return View(reservas); // Asegúrate de que la vista Index reciba List<Rest_Reserva>
         }
 
-
+        // CREAR RESERVA (GET)
         [HttpGet]
         public async Task<IActionResult> Crear()
         {
             var model = new ReservaFormViewModel();
 
-            if (User.Identity!.IsAuthenticated)
+            // Autocompletar datos si hay usuario logueado
+            var personaIdClaim = User.Claims.FirstOrDefault(c => c.Type == "PersonaId")?.Value;
+            if (!string.IsNullOrEmpty(personaIdClaim) && int.TryParse(personaIdClaim, out int personaId) && personaId > 0)
             {
-                // Obtener Persona asociada al usuario logueado
-                var personaIdClaim = User.Claims.FirstOrDefault(c => c.Type == "PersonaId")?.Value;
-
-                if (int.TryParse(personaIdClaim, out int personaId) && personaId > 0)
+                var persona = await _context.Personas.FindAsync(personaId);
+                if (persona != null)
                 {
-                    var persona = await _context.Personas.FindAsync(personaId);
-
-                    if (persona != null)
-                    {
-                        // Autocompletar datos
-                        model.Nombre = persona.Nombre;
-                        model.Telefono = persona.Telefono;
-                        model.Email = persona.Correo;
-                    }
+                    model.Nombre = persona.Nombre;
+                    model.Telefono = persona.Telefono;
+                    model.Email = persona.Correo;
                 }
             }
 
             return View(model);
         }
 
+        // CREAR RESERVA (POST)
         [HttpPost]
-        public async Task<IActionResult> Crear(ReservaFormViewModel model)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Crear(ReservaFormViewModel model, string? origen = null)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
 
-            Rest_Persona cliente;
-
-            if (User.Identity!.IsAuthenticated)
+            try
             {
-                // Buscar Persona del usuario logueado
-                var personaIdClaim = User.Claims.FirstOrDefault(c => c.Type == "PersonaId")?.Value;
+                // Validar fecha y hora
+                if (model.Fecha == default || string.IsNullOrEmpty(model.Hora))
+                {
+                    ModelState.AddModelError("", "Fecha u hora inválida.");
+                    return View(model);
+                }
 
-                if (int.TryParse(personaIdClaim, out int personaId) && personaId > 0)
+                if (!TimeSpan.TryParse(model.Hora, out TimeSpan hora))
+                {
+                    ModelState.AddModelError("", "Formato de hora inválido.");
+                    return View(model);
+                }
+
+                DateTime fechaHora = model.Fecha.Date.Add(hora);
+
+                int numeroPersonas = model.Personas == "8+" ? 8 : int.Parse(model.Personas);
+
+                Rest_Persona cliente;
+
+                var personaIdClaim = User.Claims.FirstOrDefault(c => c.Type == "PersonaId")?.Value;
+                if (!string.IsNullOrEmpty(personaIdClaim) && int.TryParse(personaIdClaim, out int personaId) && personaId > 0)
                 {
                     cliente = await _context.Personas.FindAsync(personaId);
-
                     if (cliente == null)
                     {
-                        ModelState.AddModelError("", "No se encontró el cliente asociado.");
-                        return View(model);
+                        cliente = new Rest_Persona
+                        {
+                            Nombre = model.Nombre,
+                            Telefono = model.Telefono,
+                            Correo = model.Email,
+                            FechaRegistro = DateTime.Now
+                        };
+                        _context.Personas.Add(cliente);
+                        await _context.SaveChangesAsync();
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError("", "No se pudo obtener el cliente logueado.");
-                    return View(model);
+                    cliente = new Rest_Persona
+                    {
+                        Nombre = model.Nombre,
+                        Telefono = model.Telefono,
+                        Correo = model.Email,
+                        FechaRegistro = DateTime.Now
+                    };
+                    _context.Personas.Add(cliente);
+                    await _context.SaveChangesAsync();
                 }
-            }
-            else
-            {
-                // Crear nuevo cliente (persona sin usuario asociado)
-                cliente = new Rest_Persona
+
+                var reserva = new Rest_Reserva
                 {
-                    Nombre = model.Nombre,
-                    Telefono = model.Telefono,
-                    Correo = model.Email,
-                    FechaRegistro = DateTime.Now
+                    FechaHora = fechaHora,
+                    NumeroPersonas = numeroPersonas,
+                    Observaciones = $"Ocasion: {model.Ocasion} | Comentarios: {model.Comentarios}",
+                    Estado = "Pendiente",
+                    FechaCreacion = DateTime.Now,
+                    ClienteId = cliente.PersonaId,
+                    MesaId = 1
                 };
 
-                _context.Personas.Add(cliente);
+                _context.Reservas.Add(reserva);
                 await _context.SaveChangesAsync();
+
+                TempData["Success"] = "¡Reserva registrada correctamente!";
+
+                // 🔥 Redirección según origen
+                if (origen == "Administrador")
+                    return RedirectToAction("Index", "Reservas");
+                else
+                    return RedirectToAction("Index", "Home");
             }
-
-            // Crear reserva
-            var reserva = new Rest_Reserva
+            catch (Exception ex)
             {
-                FechaHora = DateTime.Parse($"{model.Fecha:yyyy-MM-dd} {model.Hora}"),
-                NumeroPersonas = model.Personas == "8+" ? 8 : int.Parse(model.Personas),
-                Observaciones = $"Ocasion: {model.Ocasion} | Comentarios: {model.Comentarios}",
-                Estado = "Pendiente",
-                FechaCreacion = DateTime.Now,
-                ClienteId = cliente.PersonaId,
-                MesaId = 1 // luego deberías asignar mesa según disponibilidad
-            };
-
-            _context.Reservas.Add(reserva);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction("Confirmacion");
+                ModelState.AddModelError("", $"Error al guardar: {ex.Message}");
+                return View(model);
+            }
         }
 
+
+        // CONFIRMACION
         public IActionResult Confirmacion()
         {
-            return RedirectToAction("Index", "Home");
+            ViewBag.Mensaje = TempData["Success"];
+            return View();
         }
-
     }
 }
