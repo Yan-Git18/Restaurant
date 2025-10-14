@@ -35,7 +35,7 @@ namespace Restaurant.Controllers
             }
 
             var reservas = await reservasQuery.ToListAsync();
-            return View(reservas); // Asegúrate de que la vista Index reciba List<Rest_Reserva>
+            return View(reservas);
         }
 
         // CREAR RESERVA (GET)
@@ -84,7 +84,6 @@ namespace Restaurant.Controllers
                 }
 
                 DateTime fechaHora = model.Fecha.Date.Add(hora);
-
                 int numeroPersonas = model.Personas == "8+" ? 8 : int.Parse(model.Personas);
 
                 Rest_Persona cliente;
@@ -135,7 +134,6 @@ namespace Restaurant.Controllers
 
                 TempData["Success"] = "¡Reserva registrada correctamente!";
 
-                // 🔥 Redirección según origen
                 if (origen == "Administrador")
                     return RedirectToAction("Index", "Reservas");
                 else
@@ -148,12 +146,120 @@ namespace Restaurant.Controllers
             }
         }
 
+        // VER DETALLE DE RESERVA
+        [HttpGet]
+        public async Task<IActionResult> Detalles(int id)
+        {
+            var reserva = await _context.Reservas
+                .Include(r => r.Cliente)
+                .FirstOrDefaultAsync(r => r.ReservaId == id);
+
+            if (reserva == null)
+                return NotFound();
+
+            var model = new ReservaFormViewModel
+            {
+                Nombre = reserva.Cliente?.Nombre ?? "",
+                Telefono = reserva.Cliente?.Telefono ?? "",
+                Email = reserva.Cliente?.Correo ?? "",
+                Fecha = reserva.FechaHora.Date,
+                Hora = reserva.FechaHora.ToString("HH:mm"),
+                Personas = reserva.NumeroPersonas >= 8 ? "8+" : reserva.NumeroPersonas.ToString(),
+                Ocasion = ExtraerValor(reserva.Observaciones, "Ocasion"),
+                Comentarios = ExtraerValor(reserva.Observaciones, "Comentarios")
+            };
+
+            return View(model);
+        }
+
+
+        // EDITAR RESERVA (GET)
+        [HttpGet]
+        public async Task<IActionResult> Editar(int id)
+        {
+            var reserva = await _context.Reservas
+                .Include(r => r.Cliente)
+                .FirstOrDefaultAsync(r => r.ReservaId == id);
+
+            if (reserva == null)
+                return NotFound();
+
+            var model = new ReservaFormViewModel
+            {
+                Nombre = reserva.Cliente?.Nombre ?? "",
+                Telefono = reserva.Cliente?.Telefono ?? "",
+                Email = reserva.Cliente?.Correo ?? "",
+                Fecha = reserva.FechaHora.Date,
+                Hora = reserva.FechaHora.ToString("HH:mm"),
+                Personas = reserva.NumeroPersonas >= 8 ? "8+" : reserva.NumeroPersonas.ToString(),
+                Ocasion = ExtraerValor(reserva.Observaciones, "Ocasion"),
+                Comentarios = ExtraerValor(reserva.Observaciones, "Comentarios")
+            };
+
+            return View(model);
+        }
+
+        // EDITAR RESERVA (POST)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Editar(int id, ReservaFormViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var reserva = await _context.Reservas
+                .Include(r => r.Cliente)
+                .FirstOrDefaultAsync(r => r.ReservaId == id);
+
+            if (reserva == null)
+                return NotFound();
+
+            try
+            {
+                reserva.FechaHora = model.Fecha.Date.Add(TimeSpan.Parse(model.Hora));
+                reserva.NumeroPersonas = model.Personas == "8+" ? 8 : int.Parse(model.Personas);
+                reserva.Observaciones = $"Ocasion: {model.Ocasion} | Comentarios: {model.Comentarios}";
+                reserva.FechaCreacion = DateTime.Now;
+
+                if (reserva.Cliente != null)
+                {
+                    reserva.Cliente.Nombre = model.Nombre;
+                    reserva.Cliente.Telefono = model.Telefono;
+                    reserva.Cliente.Correo = model.Email;
+                }
+
+                _context.Update(reserva);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "¡Reserva actualizada correctamente!";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Error al actualizar: {ex.Message}");
+                return View(model);
+            }
+        }
 
         // CONFIRMACION
         public IActionResult Confirmacion()
         {
             ViewBag.Mensaje = TempData["Success"];
             return View();
+        }
+
+        // 🔹 MÉTODO AUXILIAR PARA EXTRAER DATOS DE "Observaciones"
+        private string? ExtraerValor(string? observaciones, string clave)
+        {
+            if (string.IsNullOrEmpty(observaciones)) return null;
+
+            var partes = observaciones.Split('|', StringSplitOptions.RemoveEmptyEntries);
+            foreach (var parte in partes)
+            {
+                if (parte.Trim().StartsWith(clave + ":", StringComparison.OrdinalIgnoreCase))
+                    return parte.Split(':')[1].Trim();
+            }
+            return null;
         }
     }
 }

@@ -23,6 +23,7 @@
 
     <form asp-action="Crear" method="post" class="row g-3">
         @Html.AntiForgeryToken()
+        <input type="hidden" name="origen" value="Administrador" />
 
         <!-- Nombre -->
         <div class="col-md-6">

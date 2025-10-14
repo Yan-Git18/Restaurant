@@ -29,9 +29,9 @@ namespace Restaurant.Controllers
             var totalReservas = await _context.Reservas.CountAsync();
             var totalRoles = await _context.Roles.CountAsync();
             var totalUsuarios = await _context.Usuarios.CountAsync();
-            var totalVentas= await _context.Ventas.CountAsync();
+            var totalVentas = await _context.Ventas.CountAsync();
             var totalProductos = await _context.Productos.CountAsync();
-            
+
 
             ViewData["TotalCategorias"] = totalCategorias;
             ViewData["TotalComprobantes"] = totalComprobantes;

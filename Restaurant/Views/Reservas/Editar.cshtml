@@ -1,69 +1,118 @@
-﻿@model Restaurant.Models.Rest_Reserva
+﻿@model Restaurant.ViewModels.ReservaFormViewModel
 @{
     ViewData["Title"] = "Editar Reserva";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
-<div class="container-fluid py-4">
-    <div class="dashboard-header mb-4">
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <h1><i class="fas fa-edit text-warning me-2"></i>Editar Reserva</h1>
-                <p class="mb-0">Modifique los datos de la reserva</p>
-            </div>
-        </div>
-    </div>
 
-    <div class="row">
+<div class="container mt-4">
+    <h3 class="fw-bold mb-3">✏️ Editar Reserva</h3>
+    <p class="text-muted">Modifica los datos de la reserva seleccionada.</p>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <ul>
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
+
+    <form asp-action="Editar" method="post" class="row g-3">
+        @Html.AntiForgeryToken()
+
+        <!-- Nombre -->
+        <div class="col-md-6">
+            <label asp-for="Nombre" class="form-label">Nombre Completo</label>
+            <input asp-for="Nombre" class="form-control" />
+            <span asp-validation-for="Nombre" class="text-danger"></span>
+        </div>
+
+        <!-- Teléfono -->
+        <div class="col-md-6">
+            <label asp-for="Telefono" class="form-label">Teléfono</label>
+            <input asp-for="Telefono" class="form-control" />
+            <span asp-validation-for="Telefono" class="text-danger"></span>
+        </div>
+
+        <!-- Correo -->
         <div class="col-12">
-            <div class="card shadow">
-                <div class="card-header bg-warning text-white">
-                    <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Información de Reserva</h5>
-                </div>
-                <div class="card-body">
-                    <form asp-action="Editar" method="post">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" asp-for="ReservaId" />
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="FechaHora" class="form-label fw-bold">Fecha y Hora</label>
-                                <input asp-for="FechaHora" type="datetime-local" class="form-control" value="@Model.FechaHora.ToString("yyyy-MM-ddTHH:mm")" />
-                                <span asp-validation-for="FechaHora" class="text-danger small"></span>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <label asp-for="NumeroPersonas" class="form-label fw-bold">Personas</label>
-                                <input asp-for="NumeroPersonas" type="number" class="form-control" min="1" max="20"/>
-                                <span asp-validation-for="NumeroPersonas" class="text-danger small"></span>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <label asp-for="Estado" class="form-label fw-bold">Estado</label>
-                                <select asp-for="Estado" class="form-select" asp-items="@(new List<SelectListItem> {
-                                                                                     new SelectListItem { Text = "Pendiente", Value = "Pendiente" },
-                                                                                     new SelectListItem { Text = "Confirmada", Value = "Confirmada" },
-                                                                                     new SelectListItem { Text = "Cancelada", Value = "Cancelada" },
-                                                                                     new SelectListItem { Text = "Completada", Value = "Completada" }
-                                                                                 })">
-                                </select>
-                                <span asp-validation-for="Estado" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-12 mb-3">
-                                <label asp-for="Observaciones" class="form-label fw-bold">Observaciones</label>
-                                <textarea asp-for="Observaciones" class="form-control" rows="3"></textarea>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-between">
-                            <a asp-action="Index" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Cancelar</a>
-                            <button type="submit" class="btn btn-warning"><i class="fas fa-save me-1"></i> Actualizar</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+            <label asp-for="Email" class="form-label">Correo Electrónico</label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
         </div>
-    </div>
+
+        <!-- Fecha -->
+        <div class="col-md-6">
+            <label asp-for="Fecha" class="form-label">Fecha</label>
+            <input asp-for="Fecha" type="date" class="form-control" />
+            <span asp-validation-for="Fecha" class="text-danger"></span>
+        </div>
+
+        <!-- Hora -->
+        <div class="col-md-6">
+            <label asp-for="Hora" class="form-label">Hora</label>
+            <select asp-for="Hora" class="form-select">
+                <option value="">Selecciona una hora</option>
+                @for (int h = 12; h <= 23; h++)
+                {
+                    <option value="@($"{h:00}:00")">@($"{h:00}:00")</option>
+                    <option value="@($"{h:00}:30")">@($"{h:00}:30")</option>
+                }
+            </select>
+            <span asp-validation-for="Hora" class="text-danger"></span>
+        </div>
+
+        <!-- Número de Personas -->
+        <div class="col-md-6">
+            <label asp-for="Personas" class="form-label">Número de Personas</label>
+            <select asp-for="Personas" class="form-select">
+                <option value="">Selecciona</option>
+                @for (int i = 1; i <= 7; i++)
+                {
+                    <option value="@i">@i persona@(i > 1 ? "s" : "")</option>
+                }
+                <option value="8+">8 o más</option>
+            </select>
+            <span asp-validation-for="Personas" class="text-danger"></span>
+        </div>
+
+        <!-- Ocasión -->
+        <div class="col-md-6">
+            <label asp-for="Ocasion" class="form-label">Ocasión Especial</label>
+            <select asp-for="Ocasion" class="form-select">
+                <option value="">Selecciona</option>
+                <option value="Cumpleaños">Cumpleaños</option>
+                <option value="Aniversario">Aniversario</option>
+                <option value="Negocios">Negocios</option>
+                <option value="Otro">Otro</option>
+            </select>
+            <span asp-validation-for="Ocasion" class="text-danger"></span>
+        </div>
+
+        <!-- Comentarios -->
+        <div class="col-12">
+            <label asp-for="Comentarios" class="form-label">Comentarios Especiales</label>
+            <textarea asp-for="Comentarios" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Comentarios" class="text-danger"></span>
+        </div>
+
+        <div class="text-start mt-3">
+            <a asp-controller="Reservas" asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver Atrás
+            </a>
+        </div>
+
+        <div class="col-12 text-end">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
-    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <partial name="_ValidationScriptsPartial" />
 }

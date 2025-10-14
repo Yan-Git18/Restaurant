@@ -1,0 +1,55 @@
+﻿@model Restaurant.ViewModels.ReservaFormViewModel
+@{
+    ViewData["Title"] = "Detalles de Reserva";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container mt-4">
+    <h3 class="fw-bold mb-3">📋 Detalles de la Reserva</h3>
+    <p class="text-muted">Consulta los datos registrados de la reserva.</p>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Nombre:</dt>
+                <dd class="col-sm-9">@Model.Nombre</dd>
+
+                <dt class="col-sm-3">Teléfono:</dt>
+                <dd class="col-sm-9">@Model.Telefono</dd>
+
+                <dt class="col-sm-3">Correo:</dt>
+                <dd class="col-sm-9">@Model.Email</dd>
+
+                <dt class="col-sm-3">Fecha:</dt>
+                <dd class="col-sm-9">@Model.Fecha.ToString("dd/MM/yyyy")</dd>
+
+                <dt class="col-sm-3">Hora:</dt>
+                <dd class="col-sm-9">@Model.Hora</dd>
+
+                <dt class="col-sm-3">Número de Personas:</dt>
+                <dd class="col-sm-9">@Model.Personas</dd>
+
+                @if (!string.IsNullOrEmpty(Model.Ocasion))
+                {
+                    <dt class="col-sm-3">Ocasión Especial:</dt>
+                    <dd class="col-sm-9">@Model.Ocasion</dd>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.Comentarios))
+                {
+                    <dt class="col-sm-3">Comentarios:</dt>
+                    <dd class="col-sm-9">@Model.Comentarios</dd>
+                }
+            </dl>
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-between">
+        <a asp-controller="Reservas" asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver al Listado
+        </a>
+        <a asp-action="Editar" class="btn btn-primary">
+            <i class="fas fa-edit"></i> Editar
+        </a>
+    </div>
+</div>
