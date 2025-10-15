@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RESTAURANT.Data;
 using Restaurant.Models;
 using Restaurant.ViewModels;
+using RESTAURANT.Data;
 
 namespace Restaurant.Controllers
 {
+    [Authorize(Roles = "Administrador, Cajero")]
     public class VentasController : Controller
     {
         private readonly AppDbContext _context;
@@ -20,10 +22,11 @@ namespace Restaurant.Controllers
             return _context.Pedidos
                 .Include(p => p.DetallesPedido)
                 .Where(p => p.Venta == null && p.Estado == EstadoPedido.Pendiente.ToString())
+                .Include(p => p.Cliente)
                 .ToList();
         }
 
-        // GET: Ventas
+        
         public async Task<IActionResult> Index()
         {
             var ventas = await _context.Ventas
@@ -35,14 +38,14 @@ namespace Restaurant.Controllers
             return View(ventas);
         }
 
-        // GET: Ventas/Crear
+        
         public IActionResult Crear()
         {
             ViewBag.Pedidos = GetPedidosDisponibles();
             return View();
         }
 
-        // POST: Ventas/Crear
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Crear(VentaCreateVm vm)
@@ -62,7 +65,7 @@ namespace Restaurant.Controllers
             if (pedido == null)
                 return NotFound();
 
-            // Validación de duplicidad: no crear venta si ya existe
+            // No crear venta si ya existe
             if (pedido.Venta != null)
             {
                 TempData["Mensaje"] = "Este pedido ya tiene una venta registrada.";
@@ -105,7 +108,7 @@ namespace Restaurant.Controllers
                     Total = totalFinal,
                     Descuento = descuento,
                     Impuesto = vm.Impuesto,
-                    Estado = EstadoVenta.Pagada.ToString(),
+                    Estado = EstadoVenta.Registrada.ToString(),
                     PedidoId = pedido.Id
                 };
 
@@ -140,7 +143,7 @@ namespace Restaurant.Controllers
             }
         }
 
-        // GET: Ventas/Editar/5
+
         public async Task<IActionResult> Editar(int id)
         {
             var venta = await _context.Ventas
@@ -153,7 +156,7 @@ namespace Restaurant.Controllers
             return View(venta);
         }
 
-        // POST: Ventas/Editar
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Editar(int id, Rest_Venta venta)
@@ -190,7 +193,7 @@ namespace Restaurant.Controllers
             }
         }
 
-        // POST: Ventas/EliminarConfirmar
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EliminarConfirmar(int id)
@@ -227,5 +230,22 @@ namespace Restaurant.Controllers
             TempData["Tipo"] = "success";
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Detalles(int id)
+        {
+            var venta = await _context.Ventas
+                .Include(v => v.Pedido)
+                    .ThenInclude(p => p.Cliente)
+                .Include(v => v.Pagos)
+                .Include(v => v.Comprobante)
+                .FirstOrDefaultAsync(v => v.Id == id);
+
+            if (venta == null)
+                return NotFound();
+
+            return View(venta);
+        }
+
     }
 }

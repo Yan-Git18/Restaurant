@@ -1,0 +1,82 @@
+﻿@model Restaurant.Models.Rest_Pago
+@{
+    ViewData["Title"] = "Editar Pago";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="dashboard-header mb-4">
+        <h1><i class="fas fa-edit text-warning me-2"></i>Editar Pago</h1>
+        <p class="mb-0">Modifique los datos del pago seleccionado</p>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-warning text-white">
+            <h5 class="mb-0"><i class="fas fa-pen-to-square me-2"></i>Información del Pago</h5>
+        </div>
+        <div class="card-body">
+            <form asp-controller="Pagos" asp-action="Editar" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+
+                <div class="mb-3">
+                    <label asp-for="VentaId" class="form-label fw-bold">Venta Asociada</label>
+                    <select asp-for="VentaId" class="form-select">
+                        <option value="">-- Seleccione una venta --</option>
+                        @foreach (var v in (List<Restaurant.Models.Rest_Venta>)ViewBag.Ventas)
+                        {
+                            <option value="@v.Id" selected="@(v.Id == Model.VentaId)">
+                                Venta #@v.Id - Cliente: @v.Pedido?.Cliente?.Nombre - Total: S/ @v.Total
+                            </option>
+                        }
+                    </select>
+                    <span asp-validation-for="VentaId" class="text-danger small"></span>
+                </div>
+
+
+                <div class="mb-3">
+                    <label asp-for="Metodo" class="form-label fw-bold">Método de Pago</label>
+                    <select asp-for="Metodo" class="form-select">
+                        <option value="Efectivo" selected="@(Model.Metodo == "Efectivo")">Efectivo</option>
+                        <option value="Tarjeta" selected="@(Model.Metodo == "Tarjeta")">Tarjeta</option>
+                        <option value="Transferencia" selected="@(Model.Metodo == "Transferencia")">Transferencia</option>
+                        <option value="Yape" selected="@(Model.Metodo == "Yape")">Yape</option>
+                        <option value="Plin" selected="@(Model.Metodo == "Plin")">Plin</option>
+                    </select>
+                    <span asp-validation-for="Metodo" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Monto" class="form-label fw-bold">Monto (S/)</label>
+                    <input asp-for="Monto" type="number" step="0.01" class="form-control" />
+                    <span asp-validation-for="Monto" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Referencia" class="form-label fw-bold">Referencia</label>
+                    <input asp-for="Referencia" class="form-control" />
+                    <span asp-validation-for="Referencia" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Observaciones" class="form-label fw-bold">Observaciones</label>
+                    <textarea asp-for="Observaciones" class="form-control" rows="2"></textarea>
+                    <span asp-validation-for="Observaciones" class="text-danger small"></span>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-controller="Pagos" asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-warning text-white">
+                        <i class="fas fa-save me-1"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

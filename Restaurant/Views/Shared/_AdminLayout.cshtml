@@ -37,72 +37,95 @@
         </div>
 
         <div class="px-3 text-white small">MENÚ</div>
-        <nav class="nav flex-column">
+        <nav class="nav flex-column">            
             <a asp-controller="Admin" asp-action="Index" class="nav-link @(currentController == "Admin" ? "active" : "")">
                 <i class="fas fa-table-columns"></i> <span>Dashboard</span>
-            </a>
+            </a>            
         </nav>
 
         <div class="px-3 text-white small mt-3">ADMINISTRACION</div>
         <nav class="nav flex-column">
             <nav class="nav flex-column">
-                @if (rolUsuario == "Administrador")
-                {
-                    <a asp-controller="Categorias" asp-action="Index" class="nav-link @(currentController == "Categorias" ? "active" : "")">
-                        <i class="fa fa-list"></i> <span>Categorías</span>
-                    </a>
-                    <a asp-controller="Productos" asp-action="Index" class="nav-link @(currentController == "Productos" ? "active" : "")">
-                        <i class="fa fa-box"></i> <span>Productos</span>
-                    </a>
-                    <a asp-controller="Inventario" asp-action="Index" class="nav-link @(currentController == "Inventario" ? "active" : "")">
-                        <i class="fa fa-boxes-packing"></i> <span>Inventario</span>
-                    </a>
-                    <a asp-controller="Mesas" asp-action="Index" class="nav-link @(currentController == "Mesas" ? "active" : "")">
-                        <i class="fa fa-chair"></i> <span>Mesas</span>
-                    </a>
+                <nav class="nav flex-column">
+                    
+                    @if (rolUsuario == "Administrador")
+                    {
+                        <a asp-controller="Categorias" asp-action="Index" class="nav-link @(currentController == "Categorias" ? "active" : "")">
+                            <i class="fa fa-list"></i> <span>Categorías</span>
+                        </a>
+                        <a asp-controller="Productos" asp-action="Index" class="nav-link @(currentController == "Productos" ? "active" : "")">
+                            <i class="fa fa-box"></i> <span>Productos</span>
+                        </a>
+                        <a asp-controller="Inventario" asp-action="Index" class="nav-link @(currentController == "Inventario" ? "active" : "")">
+                            <i class="fa fa-boxes-packing"></i> <span>Inventario</span>
+                        </a>
+                        <a asp-controller="Mesas" asp-action="Index" class="nav-link @(currentController == "Mesas" ? "active" : "")">
+                            <i class="fa fa-chair"></i> <span>Mesas</span>
+                        </a>
+                        <a asp-controller="Usuarios" asp-action="Index" class="nav-link @(currentController == "Usuarios" ? "active" : "")">
+                            <i class="fa fa-users"></i> <span>Usuarios</span>
+                        </a>
+                        <a asp-controller="Empleados" asp-action="Index" class="nav-link @(currentController == "Empleados" ? "active" : "")">
+                            <i class="fa fa-user-tie"></i> <span>Empleados</span>
+                        </a>
+                        <a asp-controller="Roles" asp-action="Index" class="nav-link @(currentController == "Roles" ? "active" : "")">
+                            <i class="fa fa-user-shield"></i> <span>Roles</span>
+                        </a>
+                        <a asp-controller="Pedidos" asp-action="Index" class="nav-link @(currentController == "Pedidos" ? "active" : "")">
+                            <i class="fa fa-shopping-cart"></i> <span>Pedidos</span>
+                        </a>
+                        <a asp-controller="Ventas" asp-action="Index" class="nav-link @(currentController == "Ventas" ? "active" : "")">
+                            <i class="fa fa-chart-simple"></i> <span>Ventas</span>
+                        </a>
+                        <a asp-controller="Reservas" asp-action="Index" class="nav-link @(currentController == "Reservas" ? "active" : "")">
+                            <i class="fa-solid fa-check-to-slot"></i> <span>Reservas</span>
+                        </a>
+                    }
 
+                    @* 🔹 CAJERO *@
+                    else if (rolUsuario == "Cajero")
+                    {
+                        <a asp-controller="Pedidos" asp-action="Index" class="nav-link @(currentController == "Pedidos" ? "active" : "")">
+                            <i class="fa fa-shopping-cart"></i> <span>Pedidos</span>
+                        </a>
+                        <a asp-controller="Comprobantes" asp-action="Index" class="nav-link @(currentController == "Comprobantes" ? "active" : "")">
+                            <i class="fa fa-ticket"></i> <span>Comprobantes</span>
+                        </a>
+                        <a asp-controller="Pagos" asp-action="Index" class="nav-link @(currentController == "Pagos" ? "active" : "")">
+                            <i class="fa-solid fa-money-check-dollar"></i> <span>Pagos</span>
+                        </a>
+                        <a asp-controller="Ventas" asp-action="Index" class="nav-link @(currentController == "Ventas" ? "active" : "")">
+                            <i class="fa fa-chart-line"></i> <span>Ventas</span>
+                        </a>
+                    }
 
-                    <div class="px-3 text-white small mt-3">GESTIÓN DE USUARIOS</div>
+                    @* 🔹 MESERO *@
+                    else if (rolUsuario == "Mesero")
+                    {
+                        <a asp-controller="Mesas" asp-action="Index" class="nav-link @(currentController == "Mesas" ? "active" : "")">
+                            <i class="fa fa-chair"></i> <span>Mesas</span>
+                        </a>
+                        <a asp-controller="Pedidos" asp-action="Index" class="nav-link @(currentController == "Pedidos" ? "active" : "")">
+                            <i class="fa fa-utensils"></i> <span>Pedidos</span>
+                        </a>
+                        <a asp-controller="Reservas" asp-action="Index" class="nav-link @(currentController == "Reservas" ? "active" : "")">
+                            <i class="fa fa-calendar"></i> <span>Reservas</span>
+                        </a>
+                    }
 
+                    @* 🔹 CLIENTE *@
+                    else if (rolUsuario == "Cliente")
+                    {
+                        <a asp-controller="Pedidos" asp-action="Index" class="nav-link @(currentController == "Pedidos" && currentAction == "MisPedidos" ? "active" : "")">
+                            <i class="fa fa-shopping-bag"></i> <span>Mis Pedidos</span>
+                        </a>
+                        <a asp-controller="Reservas" asp-action="Index" class="nav-link @(currentController == "Reservas" && currentAction == "MisReservas" ? "active" : "")">
+                            <i class="fa fa-calendar-check"></i> <span>Mis Reservas</span>
+                        </a>
+                    }
 
-                    <a asp-controller="Roles" asp-action="Index" class="nav-link @(currentController == "Roles" ? "active" : "")">
-                        <i class="fa fa-user-shield"></i> <span>Roles</span>
-                    </a>
-                    <a asp-controller="Usuarios" asp-action="Index" class="nav-link @(currentController == "Usuarios" ? "active" : "")">
-                        <i class="fa fa-users"></i> <span>Usuarios</span>
-                    </a>
-                    <a asp-controller="Clientes" asp-action="Index" class="nav-link @(currentController == "Clientes" ? "active" : "")">
-                        <i class="fa fa-users-line"></i> <span>Clientes</span>
-                    </a>
-                    <a asp-controller="Empleados" asp-action="Index" class="nav-link @(currentController == "Empleados" ? "active" : "")">
-                        <i class="fa fa-user-tie"></i> <span>Empleados</span>
-                    </a>
+                </nav>
 
-
-                    <div class="px-3 text-white small mt-3">VENTAS & PEDIDOS</div>
-
-
-                    <a asp-controller="Pedidos" asp-action="Index" class="nav-link @(currentController == "Pedidos" ? "active" : "")">
-                        <i class="fa fa-shopping-cart"></i> <span>Pedidos</span>
-                    </a>
-                    <a asp-controller="Comprobantes" asp-action="Index" class="nav-link @(currentController == "Comprobantes" ? "active" : "")">
-                        <i class="fa fa-ticket"></i> <span>Comprobantes</span>
-                    </a>
-                    <a asp-controller="Pagos" asp-action="Index" class="nav-link @(currentController == "Pagos" ? "active" : "")">
-                        <i class="fa-solid fa-money-check-dollar"></i> <span>Pagos</span>
-                    </a>
-                    <a asp-controller="Ventas" asp-action="Index" class="nav-link @(currentController == "Ventas" ? "active" : "")">
-                        <i class="fa-solid fa-chart-simple"></i> <span>Ventas</span>
-                    </a>
-
-
-                    <div class="px-3 text-white small mt-3">RESERVAS</div>
-
-                    <a asp-controller="Reservas" asp-action="Index" class="nav-link @(currentController == "Reservas" ? "active" : "")">
-                        <i class="fa-solid fa-check-to-slot"></i> <span>Reservas</span>
-                    </a>
-
-                }
             </nav>
         </nav>
         <div class="logout mt-auto px-3 mb-3">

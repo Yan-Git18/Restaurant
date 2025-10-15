@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Restaurant.Models;
 using RESTAURANT.Data;
 
 namespace Restaurant.Controllers
 {
+    [Authorize(Roles = "Administrador, Empleado")]
     public class InventarioController : Controller
     {
         private readonly AppDbContext _context;
@@ -14,7 +16,6 @@ namespace Restaurant.Controllers
             _context = context;
         }
 
-        // GET: Index
         public async Task<IActionResult> Index()
         {
             var inventarios = await _context.Inventarios
@@ -27,7 +28,7 @@ namespace Restaurant.Controllers
                 Nombre = i.Nombre,
                 Descripcion = i.Descripcion,
                 UnidadMedida = i.UnidadMedida,
-                StockTotal = i.Productos.Sum(p => p.Stock),  // 👈 suma de productos
+                StockTotal = i.Productos.Sum(p => p.Stock),
                 StockMinimo = i.StockMinimo,
                 FechaActualizacion = i.FechaActualizacion
             }).ToList();

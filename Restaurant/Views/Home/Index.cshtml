@@ -1,1222 +1,1185 @@
-﻿
-    @{
-        Layout = null;
-    }
+﻿@using System.Security.Claims
 
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Restaurante Delizioso - Sabores Únicos</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script>
-            tailwind.config = {
-                theme: {
-                    extend: {
-                        colors: {
-                            'restaurant-primary': '#8B4513',
-                            'restaurant-secondary': '#D2691E',
-                            'restaurant-accent': '#FF6B35',
-                            'restaurant-dark': '#2C1810',
-                        },
-                        fontFamily: {
-                            'serif': ['Georgia', 'serif'],
-                            'elegant': ['Playfair Display', 'serif']
-                        }
+@{
+    Layout = null;
+}
+
+
+@{
+    var userName = User.Identity != null && User.Identity.IsAuthenticated
+        ? User.FindFirst(ClaimTypes.Name)?.Value ?? ""
+        : "";
+
+    var userRole = User.Identity != null && User.Identity.IsAuthenticated
+        ? User.FindFirst(ClaimTypes.Role)?.Value ?? ""
+        : "";
+}
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurante Delizioso - Sabores Únicos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'restaurant-primary': '#8B4513',
+                        'restaurant-secondary': '#D2691E',
+                        'restaurant-accent': '#FF6B35',
+                        'restaurant-dark': '#2C1810',
+                    },
+                    fontFamily: {
+                        'serif': ['Georgia', 'serif'],
+                        'elegant': ['Playfair Display', 'serif']
                     }
                 }
             }
-        </script>
-        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    </head>
-    <body class="font-sans">
-        <!-- Navigation Bar -->
-        <nav class="bg-white/95 backdrop-blur-md shadow-lg fixed w-full top-0 z-50 transition-all duration-300" id="navbar">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center h-16 lg:h-20">
-                    <!-- Logo -->
-                    <div class="flex-shrink-0 flex items-center">
-                        <div class="text-2xl lg:text-3xl font-elegant font-bold text-restaurant-primary">
-                            <i class="fas fa-utensils mr-2 text-restaurant-accent"></i>
-                            Delizioso
-                        </div>
-                    </div>
-
-                    <!-- Desktop Navigation -->
-                    <div class="hidden lg:block">
-                        <div class="flex items-center space-x-8">
-                            <a href="#inicio" class="text-restaurant-dark hover:text-restaurant-accent transition-colors duration-200 font-medium">
-                                Inicio
-                            </a>
-                            <a href="#nosotros" class="text-restaurant-dark hover:text-restaurant-accent transition-colors duration-200 font-medium">
-                                Nosotros
-                            </a>
-                            <a href="#menu" class="text-restaurant-dark hover:text-restaurant-accent transition-colors duration-200 font-medium">
-                                Menú
-                            </a>
-                            <!-- Botón Reservar -->
-                            <a href="#reservas" class="bg-restaurant-accent hover:bg-restaurant-secondary text-white px-6 py-3 rounded-full font-medium transition-all duration-200 transform hover:scale-105 shadow-lg">
-                                <i class="fas fa-phone mr-2"></i>
-                                Reservar Ya
-                            </a>
-
-                            <!-- Login Dropdown Container -->
-                            <div class="relative" id="loginDropdown">
-                                <!-- Botón cuando NO está logueado -->
-                                <button id="loginBtn" onclick="toggleLoginMenu()" class="bg-restaurant-dark hover:bg-restaurant-accent text-white w-12 h-12 rounded-full font-medium transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center">
-                                    <i class="fas fa-user text-lg"></i>
-                                </button>
-
-                                <!-- Botón cuando SÍ está logueado -->
-                                <button id="loggedInBtn" onclick="toggleUserMenu()" class="bg-restaurant-accent hover:bg-restaurant-secondary text-white w-12 h-12 rounded-full font-medium transition-all duration-200 transform hover:scale-105 shadow-lg items-center justify-center hidden">
-                                    <i class="fas fa-user-check text-lg"></i>
-                                </button>
-
-                                <!-- Menú Dropdown para Login (cuando NO está logueado) -->
-                                <div id="loginMenu" class="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 opacity-0 invisible transform translate-y-2 transition-all duration-300">
-                                    <div class="p-6">
-                                        <div class="text-center mb-6">
-                                            <h3 class="text-xl font-elegant font-bold text-restaurant-primary mb-2">Iniciar Sesión</h3>
-                                            <p class="text-gray-600 text-sm">Selecciona tu tipo de acceso</p>
-                                        </div>
-
-                                        <div class="space-y-3">
-                                            <!-- Opción Cliente -->
-                                            <a href="/Cuenta/Login" class="block w-full bg-gradient-to-r from-restaurant-accent to-yellow-500 hover:from-yellow-500 hover:to-restaurant-accent text-white p-4 rounded-lg transition-all duration-200 transform hover:scale-102 shadow-md">
-                                                <div class="flex items-center">
-                                                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
-                                                        <i class="fas fa-user text-xl"></i>
-                                                    </div>
-                                                    <div class="text-left">
-                                                        <div class="font-semibold">Cliente</div>
-                                                        <div class="text-sm opacity-90">Gestiona tus reservas</div>
-                                                    </div>
-                                                    <i class="fas fa-chevron-right ml-auto"></i>
-                                                </div>
-                                            </a>
-
-                                            <!-- Opción Empleado -->
-                                            <a href="/Cuenta/Login" class="block w-full bg-gradient-to-r from-restaurant-secondary to-amber-700 hover:from-amber-700 hover:to-restaurant-secondary text-white p-4 rounded-lg transition-all duration-200 transform hover:scale-102 shadow-md">
-                                                <div class="flex items-center">
-                                                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
-                                                        <i class="fas fa-id-badge text-xl"></i>
-                                                    </div>
-                                                    <div class="text-left">
-                                                        <div class="font-semibold">Empleado</div>
-                                                        <div class="text-sm opacity-90">Panel de trabajo</div>
-                                                    </div>
-                                                    <i class="fas fa-chevron-right ml-auto"></i>
-                                                </div>
-                                            </a>
-
-                                            <!-- Opción Administrador -->
-                                            <a href="/Cuenta/Login" class="block w-full bg-gradient-to-r from-restaurant-dark to-gray-800 hover:from-gray-800 hover:to-restaurant-dark text-white p-4 rounded-lg transition-all duration-200 transform hover:scale-102 shadow-md">
-                                                <div class="flex items-center">
-                                                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
-                                                        <i class="fas fa-crown text-xl"></i>
-                                                    </div>
-                                                    <div class="text-left">
-                                                        <div class="font-semibold">Administrador</div>
-                                                        <div class="text-sm opacity-90">Gestión completa</div>
-                                                    </div>
-                                                    <i class="fas fa-chevron-right ml-auto"></i>
-                                                </div>
-                                            </a>
-                                        </div>
-
-                                        <div class="mt-6 pt-4 border-t border-gray-200 text-center">
-                                            <p class="text-sm text-gray-600">¿Primera vez aquí?</p>
-                                            <a href="/Cuenta/Register" class="text-restaurant-accent hover:text-restaurant-secondary font-medium text-sm mt-1 transition-colors duration-200">
-                                                Crear cuenta de cliente
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Menú Dropdown para Usuario Logueado -->
-                                <div id="userMenu" class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 opacity-0 invisible transform translate-y-2 transition-all duration-300">
-                                    <div class="p-4">
-                                        <!-- Info del usuario -->
-                                        <div class="flex items-center space-x-3 pb-4 border-b border-gray-200">
-                                            <div class="w-12 h-12 bg-restaurant-accent rounded-full flex items-center justify-center">
-                                                <i id="userIcon" class="fas fa-user text-white"></i>
-                                            </div>
-                                            <div>
-                                                <div id="userName" class="font-semibold text-restaurant-primary">Juan Pérez</div>
-                                                <div id="userType" class="text-sm text-gray-600">Cliente</div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Opciones del menú -->
-                                        <div class="py-4 space-y-2" id="userMenuOptions">
-                                            <!-- Las opciones se cargan dinámicamente según el tipo de usuario -->
-                                        </div>
-
-                                        <!-- Cerrar sesión -->
-                                        <div class="pt-4 border-t border-gray-200">
-                                            <button onclick="logout()" class="flex items-center space-x-3 p-3 w-full rounded-lg hover:bg-red-50 transition-colors duration-200 text-red-600">
-                                                <i class="fas fa-sign-out-alt w-5"></i>
-                                                <span>Cerrar Sesión</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Mobile menu button -->
-                    <div class="lg:hidden">
-                        <button type="button" class="text-restaurant-dark hover:text-restaurant-accent focus:outline-none focus:text-restaurant-accent transition-colors duration-200" id="mobile-menu-button">
-                            <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" id="menu-open" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" id="menu-close" class="hidden" />
-                            </svg>
-                        </button>
+</head>
+<body class="font-sans">
+    <!-- Navigation Bar -->
+    <nav class="bg-white/95 backdrop-blur-md shadow-lg fixed w-full top-0 z-50 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16 lg:h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center">
+                    <div class="text-2xl lg:text-3xl font-elegant font-bold text-restaurant-primary">
+                        <i class="fas fa-utensils mr-2 text-restaurant-accent"></i>
+                        Delizioso
                     </div>
                 </div>
 
-                <!-- Mobile Navigation Menu -->
-                <div class="lg:hidden hidden" id="mobile-menu">
-                    <div class="px-2 pt-2 pb-3 space-y-1 bg-white shadow-lg rounded-lg mt-2">
-                        <a href="#inicio" class="block px-3 py-2 text-restaurant-dark hover:text-restaurant-accent hover:bg-gray-50 rounded-md font-medium transition-colors duration-200">
-                            <i class="fas fa-home w-6"></i> Inicio
+                <!-- Desktop Navigation -->
+                <div class="hidden lg:block">
+                    <div class="flex items-center space-x-8">
+                        <a href="#inicio" class="text-restaurant-dark hover:text-restaurant-accent transition-colors duration-200 font-medium">
+                            Inicio
                         </a>
-                        <a href="#nosotros" class="block px-3 py-2 text-restaurant-dark hover:text-restaurant-accent hover:bg-gray-50 rounded-md font-medium transition-colors duration-200">
-                            <i class="fas fa-users w-6"></i> Nosotros
+                        <a href="#nosotros" class="text-restaurant-dark hover:text-restaurant-accent transition-colors duration-200 font-medium">
+                            Nosotros
                         </a>
-                        <a href="#menu" class="block px-3 py-2 text-restaurant-dark hover:text-restaurant-accent hover:bg-gray-50 rounded-md font-medium transition-colors duration-200">
-                            <i class="fas fa-utensils w-6"></i> Menú
+                        <a href="#menu" class="text-restaurant-dark hover:text-restaurant-accent transition-colors duration-200 font-medium">
+                            Menú
                         </a>
-                        <div class="pt-2 space-y-2">
-                            <!-- Botón Reservar -->
-                            <a href="#reservas" class="block w-full text-center bg-restaurant-accent hover:bg-restaurant-secondary text-white px-6 py-3 rounded-full font-medium transition-all duration-200 transform hover:scale-105 shadow-lg">
-                                <i class="fas fa-phone mr-2"></i>
-                                Reservar Ya
-                            </a>
+                        <!-- Botón Reservar -->
+                        <a href="#reservas" class="bg-restaurant-accent hover:bg-restaurant-secondary text-white px-6 py-3 rounded-full font-medium transition-all duration-200 transform hover:scale-105 shadow-lg">
+                            <i class="fas fa-phone mr-2"></i>
+                            Reservar Ya
+                        </a>
 
-                            <!-- Botón Login - cuando NO está logueado -->
-                            <a href="/Cuenta/Login" id="mobileLoginBtn" class="block w-full text-center bg-restaurant-dark hover:bg-restaurant-accent text-white px-6 py-3 rounded-full font-medium transition-all duration-200 transform hover:scale-105 shadow-lg">
-                                <i class="fas fa-user mr-2"></i>
-                                Iniciar Sesión
-                            </a>
-
-                            <!-- Botón cuando SÍ está logueado -->
-                            <button id="mobileLoggedInBtn" onclick="toggleMobileUserMenu()" class="hidden w-full text-center bg-restaurant-accent hover:bg-restaurant-secondary text-white px-6 py-3 rounded-full font-medium transition-all duration-200 transform hover:scale-105 shadow-lg">
-                                <i class="fas fa-user-check mr-2"></i>
-                                <span id="mobileUserName">Usuario</span>
+                        <!-- Login Dropdown Container -->
+                        <div class="relative" id="loginDropdown">
+                            <!-- Botón cuando NO está logueado -->
+                            <button id="loginBtn" class="bg-restaurant-dark hover:bg-restaurant-accent text-white w-12 h-12 rounded-full font-medium transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center">
+                                <i class="fas fa-user text-lg"></i>
                             </button>
 
-                            <!-- Menú usuario logueado móvil -->
-                            <div id="mobileUserMenu" class="hidden bg-gray-50 rounded-lg p-4 space-y-2">
-                                <div class="flex items-center space-x-3 pb-3 border-b border-gray-200">
-                                    <div class="w-10 h-10 bg-restaurant-accent rounded-full flex items-center justify-center">
-                                        <i class="fas fa-user text-white text-sm"></i>
+                            <!-- Botón cuando SÍ está logueado -->
+                            <button id="loggedInBtn" class="hidden bg-restaurant-accent hover:bg-restaurant-secondary text-white w-12 h-12 rounded-full font-medium transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center">
+                                <i class="fas fa-user-check text-lg"></i>
+                            </button>
+
+                            <!-- Menú cuando NO está logueado -->
+                            <div id="loginMenu" class="absolute right-0 mt-2 w-60 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 opacity-0 invisible transform translate-y-2 transition-all duration-300">
+                                <div class="p-4">
+                                    <div class="text-center mb-4">
+                                        <h3 class="text-lg font-semibold text-restaurant-primary mb-1">Bienvenido</h3>
+                                        <p class="text-gray-600 text-sm">Accede a tu cuenta o crea una nueva</p>
                                     </div>
-                                    <div>
-                                        <div class="font-semibold text-restaurant-primary text-sm" id="mobileUserNameDisplay">Usuario</div>
-                                        <div class="text-xs text-gray-600" id="mobileUserType">Cliente</div>
+
+                                    <div class="space-y-2">
+                                        <a href="/Cuenta/Login"
+                                           class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                                            <i class="fas fa-sign-in-alt text-restaurant-accent w-5"></i>
+                                            <span class="text-restaurant-dark font-medium">Iniciar sesión</span>
+                                        </a>
+                                        <a href="/Cuenta/Register"
+                                           class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                                            <i class="fas fa-user-plus text-restaurant-accent w-5"></i>
+                                            <span class="text-restaurant-dark font-medium">Crear cuenta</span>
+                                        </a>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div id="mobileUserMenuOptions" class="space-y-1">
-                                    <!-- Opciones dinámicas según tipo de usuario -->
+                            <!-- Menú cuando SÍ está logueado -->
+                            <div id="userMenu" class="absolute right-0 mt-2 w-60 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 opacity-0 invisible transform translate-y-2 transition-all duration-300">
+                                <div class="p-4 border-b border-gray-200">
+                                    <div class="font-semibold text-restaurant-primary" id="userName"></div>
+                                    <div class="text-sm text-gray-600" id="userType"></div>
                                 </div>
-
-                                <button onclick="logout()" class="w-full flex items-center justify-center space-x-2 p-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors duration-200">
-                                    <i class="fas fa-sign-out-alt"></i>
-                                    <span>Cerrar Sesión</span>
-                                </button>
+                                <div id="userMenuOptions" class="p-2"></div>
                             </div>
                         </div>
+
                     </div>
                 </div>
-            </div>
-        </nav>    
 
-
-        <!-- Hero Section -->
-        <section id="inicio" class="relative min-h-screen flex items-center justify-center overflow-hidden">
-            <!-- Background Image with Overlay -->
-            <div class="absolute inset-0 z-0">
-                <div class="absolute inset-0 bg-gradient-to-r from-restaurant-dark/80 via-restaurant-dark/60 to-transparent z-10"></div>
-                <img src="~/images/fondo-hero.png"
-                     alt="Restaurante elegante"
-                     class="w-full h-full object-cover">
+                <!-- Mobile menu button -->
+                <div class="lg:hidden">
+                    <button type="button" class="text-restaurant-dark hover:text-restaurant-accent focus:outline-none focus:text-restaurant-accent transition-colors duration-200" id="mobile-menu-button">
+                        <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" id="menu-open" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" id="menu-close" class="hidden" />
+                        </svg>
+                    </button>
+                </div>
             </div>
 
-            <!-- Hero Content -->
-            <div class="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center lg:text-left">
-                <div class="grid lg:grid-cols-2 gap-12 items-center">
-                    <!-- Text Content -->
-                    <div class="space-y-8">
-                        <div class="space-y-4">
-                            <h2 class="text-restaurant-accent font-medium text-lg lg:text-xl tracking-wide animate-fade-in-up">
-                                Bienvenidos a Delizioso
-                            </h2>
-                            <h1 class="text-4xl sm:text-5xl lg:text-7xl font-elegant font-bold text-white leading-tight animate-fade-in-up animation-delay-200">
-                                Sabores que
-                                <span class="text-restaurant-accent">Enamoran</span>
-                            </h1>
-                            <p class="text-xl lg:text-2xl text-gray-200 max-w-2xl animate-fade-in-up animation-delay-400">
-                                Una experiencia culinaria única donde cada plato cuenta una historia de pasión, tradición e innovación.
-                            </p>
-                        </div>
+            <!-- Mobile Navigation Menu -->
+            <div class="lg:hidden hidden" id="mobile-menu">
+                <div class="px-2 pt-2 pb-3 space-y-1 bg-white shadow-lg rounded-lg mt-2">
+                    <a href="#inicio" class="block px-3 py-2 text-restaurant-dark hover:text-restaurant-accent hover:bg-gray-50 rounded-md font-medium transition-colors duration-200">
+                        <i class="fas fa-home w-6"></i> Inicio
+                    </a>
+                    <a href="#nosotros" class="block px-3 py-2 text-restaurant-dark hover:text-restaurant-accent hover:bg-gray-50 rounded-md font-medium transition-colors duration-200">
+                        <i class="fas fa-users w-6"></i> Nosotros
+                    </a>
+                    <a href="#menu" class="block px-3 py-2 text-restaurant-dark hover:text-restaurant-accent hover:bg-gray-50 rounded-md font-medium transition-colors duration-200">
+                        <i class="fas fa-utensils w-6"></i> Menú
+                    </a>
+                    <div class="pt-2 space-y-2">
+                        <!-- Botón Reservar -->
+                        <a href="#reservas" class="block w-full text-center bg-restaurant-accent hover:bg-restaurant-secondary text-white px-6 py-3 rounded-full font-medium transition-all duration-200 transform hover:scale-105 shadow-lg">
+                            <i class="fas fa-phone mr-2"></i>
+                            Reservar Ya
+                        </a>
 
-                        <!-- Hero Buttons -->
-                        <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-fade-in-up animation-delay-600">
-                            <a href="#menu" class="bg-restaurant-accent hover:bg-restaurant-secondary text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl group">
-                                <i class="fas fa-utensils mr-2 group-hover:animate-bounce"></i>
-                                Ver Nuestro Menú
-                            </a>
-                            <a href="#reservas" class="bg-transparent border-2 border-white text-white hover:bg-white hover:text-restaurant-dark px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105">
-                                <i class="fas fa-calendar mr-2"></i>
-                                Hacer Reserva
+                        <!-- Botón Login - cuando NO está logueado -->
+                        <div id="mobileLoginMenu" class="space-y-2">
+                            <a href="/Cuenta/Login"
+                               class="block w-full text-center bg-restaurant-dark hover:bg-restaurant-accent text-white px-6 py-3 rounded-full font-medium transition-all duration-200 transform hover:scale-105 shadow-lg">
+                                <i class="fas fa-sign-in-alt mr-2"></i>
+                                Iniciar Sesión
                             </a>
                         </div>
 
-                        <!-- Stats -->
-                        <div class="grid grid-cols-3 gap-6 pt-8 animate-fade-in-up animation-delay-800">
-                            <div class="text-center">
-                                <div class="text-3xl lg:text-4xl font-bold text-restaurant-accent">15+</div>
-                                <div class="text-white/80 text-sm lg:text-base">Años de Experiencia</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-3xl lg:text-4xl font-bold text-restaurant-accent">50+</div>
-                                <div class="text-white/80 text-sm lg:text-base">Platos Únicos</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-3xl lg:text-4xl font-bold text-restaurant-accent">1000+</div>
-                                <div class="text-white/80 text-sm lg:text-base">Clientes Felices</div>
-                            </div>
-                        </div>
-                    </div>
+                        <!-- Botón cuando SÍ está logueado -->
+                        <button id="mobileLoggedInBtn" onclick="toggleMobileUserMenu()" class="hidden w-full text-center bg-restaurant-accent hover:bg-restaurant-secondary text-white px-6 py-3 rounded-full font-medium transition-all duration-200 transform hover:scale-105 shadow-lg">
+                            <i class="fas fa-user-check mr-2"></i>
+                            <span id="mobileUserName">Usuario</span>
+                        </button>
 
-                    <!-- Hero Image/Card -->
-                    <div class="hidden lg:flex justify-center items-center animate-fade-in-left animation-delay-400">
-                        <div class="relative">
-                            <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-300">
-                                <img src="~/images/Plato-Gourmet.png"
-                                     alt="Plato especial"
-                                     class="rounded-xl w-80 h-80 object-cover shadow-lg">
-                                <div class="absolute -bottom-4 -right-4 bg-restaurant-accent text-white px-6 py-3 rounded-full font-bold shadow-lg">
-                                    Plato del Chef
+                        <!-- Menú usuario logueado móvil -->
+                        <div id="mobileUserMenu" class="hidden bg-gray-50 rounded-lg p-4 space-y-2">
+                            <div class="flex items-center space-x-3 pb-3 border-b border-gray-200">
+                                <div class="w-10 h-10 bg-restaurant-accent rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-white text-sm"></i>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-restaurant-primary text-sm" id="mobileUserNameDisplay">Usuario</div>
+                                    <div class="text-xs text-gray-600" id="mobileUserType">Cliente</div>
                                 </div>
                             </div>
+
+                            <div id="mobileUserMenuOptions" class="space-y-1">
+                                <!-- Opciones dinámicas según tipo de usuario -->
+                            </div>
+
+                            <button onclick="logout()" class="w-full flex items-center justify-center space-x-2 p-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors duration-200">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Cerrar Sesión</span>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </nav>
 
-            <!-- Scroll Down Indicator -->
-            <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
-                <div class="text-white text-center animate-bounce">
-                    <div class="text-sm mb-2">Descubre más</div>
-                    <i class="fas fa-chevron-down text-restaurant-accent text-xl"></i>
-                </div>
-            </div>
-        </section>
 
-        <!-- Sección Nosotros -->
-        <section id="nosotros" class="py-20 lg:py-32 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <!-- Header Section -->
-                <div class="text-center mb-16">
-                    <h3 class="text-restaurant-accent font-medium text-lg lg:text-xl tracking-wide mb-4">
-                        Nuestra Historia
-                    </h3>
-                    <h2 class="text-4xl lg:text-6xl font-elegant font-bold text-restaurant-dark mb-6">
-                        Pasión por la
-                        <span class="text-restaurant-accent">Gastronomía</span>
-                    </h2>
-                    <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                        Desde 2008, hemos dedicado nuestras vidas a crear experiencias culinarias inolvidables,
-                        combinando recetas tradicionales con toques de innovación moderna.
-                    </p>
-                </div>
+    <!-- Hero Section -->
+    <section id="inicio" class="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <!-- Background Image with Overlay -->
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-gradient-to-r from-restaurant-dark/80 via-restaurant-dark/60 to-transparent z-10"></div>
+            <img src="~/images/fondo-hero.png"
+                 alt="Restaurante elegante"
+                 class="w-full h-full object-cover">
+        </div>
 
-                <div class="grid lg:grid-cols-2 gap-16 items-center mb-20">
-                    <!-- Story Content -->
-                    <div class="space-y-8">
-                        <div class="space-y-6">
-                            <div class="flex items-start space-x-4">
-                                <div class="flex-shrink-0 w-12 h-12 bg-restaurant-accent rounded-full flex items-center justify-center">
-                                    <i class="fas fa-heart text-white text-lg"></i>
-                                </div>
-                                <div>
-                                    <h4 class="text-xl font-semibold text-restaurant-dark mb-2">Tradición Familiar</h4>
-                                    <p class="text-gray-600 leading-relaxed">
-                                        Nuestras recetas han pasado de generación en generación, preservando los sabores
-                                        auténticos que nos conectan con nuestras raíces.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="flex items-start space-x-4">
-                                <div class="flex-shrink-0 w-12 h-12 bg-restaurant-accent rounded-full flex items-center justify-center">
-                                    <i class="fas fa-leaf text-white text-lg"></i>
-                                </div>
-                                <div>
-                                    <h4 class="text-xl font-semibold text-restaurant-dark mb-2">Ingredientes Frescos</h4>
-                                    <p class="text-gray-600 leading-relaxed">
-                                        Trabajamos directamente con productores locales para garantizar la frescura y calidad
-                                        en cada uno de nuestros platos.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="flex items-start space-x-4">
-                                <div class="flex-shrink-0 w-12 h-12 bg-restaurant-accent rounded-full flex items-center justify-center">
-                                    <i class="fas fa-users text-white text-lg"></i>
-                                </div>
-                                <div>
-                                    <h4 class="text-xl font-semibold text-restaurant-dark mb-2">Equipo Apasionado</h4>
-                                    <p class="text-gray-600 leading-relaxed">
-                                        Nuestro equipo de chefs y personal de servicio comparte la misma pasión por brindar
-                                        una experiencia gastronómica excepcional.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    
-                    </div>
-
-                    <!-- Images Grid -->
-                    <div class="relative">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="space-y-4">
-                                <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                                     alt="Chef preparando comida"
-                                     class="rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300">
-                                <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                                     alt="Interior del restaurante"
-                                     class="rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300">
-                            </div>
-                            <div class="mt-8 space-y-4">
-                                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                                     alt="Ingredientes frescos"
-                                     class="rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300">
-                                <img src="https://images.unsplash.com/photo-1544148103-0773bf10d330?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                                     alt="Equipo del restaurante"
-                                     class="rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300">
-                            </div>
-                        </div>
-
-                        <!-- Floating decoration -->
-                        <div class="absolute -top-4 -left-4 w-20 h-20 bg-restaurant-accent/10 rounded-full"></div>
-                        <div class="absolute -bottom-4 -right-4 w-32 h-32 bg-restaurant-secondary/10 rounded-full"></div>
-                    </div>
-                </div>
-
-                <!-- Chef Section -->
-                <div class="bg-white rounded-3xl shadow-xl p-8 lg:p-12 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-40 h-40 bg-restaurant-accent/5 rounded-full -mr-20 -mt-20"></div>
-
-                    <div class="grid lg:grid-cols-3 gap-8 items-center relative z-10">
-                        <!-- Chef Photo -->
-                        <div class="lg:col-span-1 text-center">
-                            <div class="relative inline-block">
-                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                                     alt="Chef Principal"
-                                     class="w-48 h-48 lg:w-64 lg:h-64 rounded-full object-cover shadow-xl mx-auto border-4 border-white">
-                                <div class="absolute -bottom-2 -right-2 bg-restaurant-accent text-white w-16 h-16 rounded-full flex items-center justify-center shadow-lg">
-                                    <i class="fas fa-star text-lg"></i>
-                                </div>
-                            </div>
-                            <h4 class="text-2xl font-elegant font-bold text-restaurant-dark mt-6">Chef María González</h4>
-                            <p class="text-restaurant-accent font-medium">Chef Ejecutiva</p>
-                        </div>
-
-                        <!-- Chef Info -->
-                        <div class="lg:col-span-2 space-y-6">
-                            <div>
-                                <h3 class="text-3xl font-elegant font-bold text-restaurant-dark mb-4">
-                                    La Maestra Detrás de Cada Sabor
-                                </h3>
-                                <p class="text-gray-600 text-lg leading-relaxed mb-6">
-                                    Con más de 20 años de experiencia en la alta gastronomía, la Chef María ha trabajado
-                                    en restaurantes de renombre internacional antes de regresar a sus raíces para crear
-                                    Delizioso. Su filosofía combina técnicas clásicas con ingredientes locales frescos.
-                                </p>
-                            </div>
-
-                            <div class="grid sm:grid-cols-2 gap-6">
-                                <div class="bg-gray-50 rounded-2xl p-6">
-                                    <div class="text-3xl font-bold text-restaurant-accent mb-2">20+</div>
-                                    <div class="text-restaurant-dark font-medium">Años de Experiencia</div>
-                                </div>
-                                <div class="bg-gray-50 rounded-2xl p-6">
-                                    <div class="text-3xl font-bold text-restaurant-accent mb-2">5</div>
-                                    <div class="text-restaurant-dark font-medium">Premios Gastronómicos</div>
-                                </div>
-                            </div>
-
-                            <blockquote class="border-l-4 border-restaurant-accent pl-6 italic text-gray-600 text-lg">
-                                "La cocina es un arte donde cada ingrediente cuenta una historia. Mi misión es que cada
-                                plato sea un viaje de sabores que conecte a las personas con emociones auténticas."
-                            </blockquote>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Values Section -->
-                <div class="mt-20">
-                    <div class="text-center mb-12">
-                        <h3 class="text-3xl lg:text-4xl font-elegant font-bold text-restaurant-dark mb-4">
-                            Nuestros Valores
-                        </h3>
-                        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-                            Los principios que guían cada día nuestra pasión por la excelencia culinaria
+        <!-- Hero Content -->
+        <div class="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center lg:text-left">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <!-- Text Content -->
+                <div class="space-y-8">
+                    <div class="space-y-4">
+                        <h2 class="text-restaurant-accent font-medium text-lg lg:text-xl tracking-wide animate-fade-in-up">
+                            Bienvenidos a Delizioso
+                        </h2>
+                        <h1 class="text-4xl sm:text-5xl lg:text-7xl font-elegant font-bold text-white leading-tight animate-fade-in-up animation-delay-200">
+                            Sabores que
+                            <span class="text-restaurant-accent">Enamoran</span>
+                        </h1>
+                        <p class="text-xl lg:text-2xl text-gray-200 max-w-2xl animate-fade-in-up animation-delay-400">
+                            Una experiencia culinaria única donde cada plato cuenta una historia de pasión, tradición e innovación.
                         </p>
                     </div>
 
-                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <div class="text-center group">
-                            <div class="w-20 h-20 bg-restaurant-accent/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-restaurant-accent group-hover:scale-110 transition-all duration-300">
-                                <i class="fas fa-award text-restaurant-accent text-2xl group-hover:text-white"></i>
-                            </div>
-                            <h4 class="text-xl font-semibold text-restaurant-dark mb-3">Calidad</h4>
-                            <p class="text-gray-600">Solo utilizamos ingredientes de la más alta calidad para cada preparación.</p>
-                        </div>
+                    <!-- Hero Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-fade-in-up animation-delay-600">
+                        <a href="#menu" class="bg-restaurant-accent hover:bg-restaurant-secondary text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl group">
+                            <i class="fas fa-utensils mr-2 group-hover:animate-bounce"></i>
+                            Ver Nuestro Menú
+                        </a>
+                        <a href="#reservas" class="bg-transparent border-2 border-white text-white hover:bg-white hover:text-restaurant-dark px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-calendar mr-2"></i>
+                            Hacer Reserva
+                        </a>
+                    </div>
 
-                        <div class="text-center group">
-                            <div class="w-20 h-20 bg-restaurant-accent/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-restaurant-accent group-hover:scale-110 transition-all duration-300">
-                                <i class="fas fa-handshake text-restaurant-accent text-2xl group-hover:text-white"></i>
-                            </div>
-                            <h4 class="text-xl font-semibold text-restaurant-dark mb-3">Servicio</h4>
-                            <p class="text-gray-600">Brindamos una atención personalizada que supera las expectativas.</p>
+                    <!-- Stats -->
+                    <div class="grid grid-cols-3 gap-6 pt-8 animate-fade-in-up animation-delay-800">
+                        <div class="text-center">
+                            <div class="text-3xl lg:text-4xl font-bold text-restaurant-accent">15+</div>
+                            <div class="text-white/80 text-sm lg:text-base">Años de Experiencia</div>
                         </div>
-
-                        <div class="text-center group">
-                            <div class="w-20 h-20 bg-restaurant-accent/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-restaurant-accent group-hover:scale-110 transition-all duration-300">
-                                <i class="fas fa-globe text-restaurant-accent text-2xl group-hover:text-white"></i>
-                            </div>
-                            <h4 class="text-xl font-semibold text-restaurant-dark mb-3">Sostenibilidad</h4>
-                            <p class="text-gray-600">Comprometidos con prácticas responsables con el medio ambiente.</p>
+                        <div class="text-center">
+                            <div class="text-3xl lg:text-4xl font-bold text-restaurant-accent">50+</div>
+                            <div class="text-white/80 text-sm lg:text-base">Platos Únicos</div>
                         </div>
-
-                        <div class="text-center group">
-                            <div class="w-20 h-20 bg-restaurant-accent/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-restaurant-accent group-hover:scale-110 transition-all duration-300">
-                                <i class="fas fa-lightbulb text-restaurant-accent text-2xl group-hover:text-white"></i>
-                            </div>
-                            <h4 class="text-xl font-semibold text-restaurant-dark mb-3">Innovación</h4>
-                            <p class="text-gray-600">Constantemente evolucionamos para ofrecer nuevas experiencias gastronómicas.</p>
+                        <div class="text-center">
+                            <div class="text-3xl lg:text-4xl font-bold text-restaurant-accent">1000+</div>
+                            <div class="text-white/80 text-sm lg:text-base">Clientes Felices</div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
 
-        <!-- Sección Menú -->
-        <section id="menu" class="py-20 lg:py-32 bg-restaurant-dark text-white relative overflow-hidden">
-            <!-- Elementos decorativos de fondo -->
-            <div class="absolute inset-0">
-                <div class="absolute top-10 left-10 w-32 h-32 bg-restaurant-accent/10 rounded-full animate-pulse"></div>
-                <div class="absolute bottom-20 right-20 w-48 h-48 bg-restaurant-secondary/5 rounded-full"></div>
-                <div class="absolute top-1/2 left-1/4 w-20 h-20 bg-white/5 rounded-full"></div>
-            </div>
-
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <!-- Header -->
-                <div class="text-center mb-16">
-                    <h3 class="text-restaurant-accent font-medium text-lg lg:text-xl tracking-wide mb-4">
-                        Nuestras Especialidades
-                    </h3>
-                    <h2 class="text-4xl lg:text-6xl font-elegant font-bold mb-6">
-                        Menú <span class="text-restaurant-accent">Delizioso</span>
-                    </h2>
-                    <p class="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-                        Descubre una selección cuidadosamente curada de platos que combinan tradición,
-                        innovación y los mejores ingredientes de temporada.
-                    </p>
-                </div>
-
-                <!-- Categorías Tabs -->
-                <div class="flex flex-wrap justify-center gap-4 mb-12" id="menu-tabs">
-                    <button class="menu-tab active px-6 py-3 rounded-full font-medium transition-all duration-300 bg-restaurant-accent text-white" data-category="all">
-                        Todos los Platos
-                    </button>
-                    <button class="menu-tab px-6 py-3 rounded-full font-medium transition-all duration-300 bg-white/10 text-white hover:bg-restaurant-accent" data-category="entradas">
-                        Entradas
-                    </button>
-                    <button class="menu-tab px-6 py-3 rounded-full font-medium transition-all duration-300 bg-white/10 text-white hover:bg-restaurant-accent" data-category="principales">
-                        Platos Principales
-                    </button>
-                    <button class="menu-tab px-6 py-3 rounded-full font-medium transition-all duration-300 bg-white/10 text-white hover:bg-restaurant-accent" data-category="postres">
-                        Postres
-                    </button>
-                    <button class="menu-tab px-6 py-3 rounded-full font-medium transition-all duration-300 bg-white/10 text-white hover:bg-restaurant-accent" data-category="bebidas">
-                        Bebidas
-                    </button>
-                </div>
-
-                <!-- Menú Items Grid -->
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="menu-items">
-
-                    <!-- Entradas -->
-                    <div class="menu-item bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-2" data-category="entradas">
-                        <div class="relative mb-6">
-                            <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                                 alt="Ensalada César"
-                                 class="w-full h-48 object-cover rounded-xl">
-                            <div class="absolute top-3 right-3 bg-restaurant-accent text-white px-3 py-1 rounded-full text-sm font-medium">
-                                Popular
-                            </div>
-                        </div>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-start">
-                                <h4 class="text-xl font-semibold text-white">Ensalada César Premium</h4>
-                                <span class="text-restaurant-accent font-bold text-lg">S/. 28</span>
-                            </div>
-                            <p class="text-gray-300 leading-relaxed">
-                                Lechuga romana fresca, crutones artesanales, queso parmesano y nuestra exclusiva salsa César.
-                            </p>
-                            <div class="flex items-center justify-between pt-2">
-                                <div class="flex items-center space-x-1">
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <span class="text-sm text-gray-400 ml-2">(4.9)</span>
-                                </div>
-                                <button class="bg-restaurant-accent hover:bg-restaurant-secondary text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
-                                    Agregar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="menu-item bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-2" data-category="entradas">
-                        <div class="relative mb-6">
-                            <img src="https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                                 alt="Bruschetta"
-                                 class="w-full h-48 object-cover rounded-xl">
-                            <div class="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                                Vegetariano
-                            </div>
-                        </div>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-start">
-                                <h4 class="text-xl font-semibold text-white">Bruschetta Mediterránea</h4>
-                                <span class="text-restaurant-accent font-bold text-lg">S/. 24</span>
-                            </div>
-                            <p class="text-gray-300 leading-relaxed">
-                                Pan artesanal tostado con tomate fresco, albahaca, aceite de oliva extra virgen y burrata.
-                            </p>
-                            <div class="flex items-center justify-between pt-2">
-                                <div class="flex items-center space-x-1">
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star-half-alt text-restaurant-accent"></i>
-                                    <span class="text-sm text-gray-400 ml-2">(4.7)</span>
-                                </div>
-                                <button class="bg-restaurant-accent hover:bg-restaurant-secondary text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
-                                    Agregar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Platos Principales -->
-                    <div class="menu-item bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-2" data-category="principales">
-                        <div class="relative mb-6">
-                            <img src="https://images.unsplash.com/photo-1546833999-b9f581a1996d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                                 alt="Risotto"
-                                 class="w-full h-48 object-cover rounded-xl">
-                            <div class="absolute top-3 right-3 bg-restaurant-accent text-white px-3 py-1 rounded-full text-sm font-medium">
-                                Chef's Choice
-                            </div>
-                        </div>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-start">
-                                <h4 class="text-xl font-semibold text-white">Risotto de Mariscos</h4>
-                                <span class="text-restaurant-accent font-bold text-lg">S/. 65</span>
-                            </div>
-                            <p class="text-gray-300 leading-relaxed">
-                                Arroz cremoso con camarones, calamares, mejillones y un toque de azafrán peruano.
-                            </p>
-                            <div class="flex items-center justify-between pt-2">
-                                <div class="flex items-center space-x-1">
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <span class="text-sm text-gray-400 ml-2">(5.0)</span>
-                                </div>
-                                <button class="bg-restaurant-accent hover:bg-restaurant-secondary text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
-                                    Agregar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="menu-item bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-2" data-category="principales">
-                        <div class="relative mb-6">
-                            <img src="https://images.unsplash.com/photo-1558030006-450675393462?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                                 alt="Lomo Saltado"
-                                 class="w-full h-48 object-cover rounded-xl">
-                        </div>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-start">
-                                <h4 class="text-xl font-semibold text-white">Lomo Saltado Premium</h4>
-                                <span class="text-restaurant-accent font-bold text-lg">S/. 58</span>
-                            </div>
-                            <p class="text-gray-300 leading-relaxed">
-                                Lomo fino salteado con cebolla, tomate, papas fritas y arroz jazmín, al estilo de la casa.
-                            </p>
-                            <div class="flex items-center justify-between pt-2">
-                                <div class="flex items-center space-x-1">
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <span class="text-sm text-gray-400 ml-2">(4.8)</span>
-                                </div>
-                                <button class="bg-restaurant-accent hover:bg-restaurant-secondary text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
-                                    Agregar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Postres -->
-                    <div class="menu-item bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-2" data-category="postres">
-                        <div class="relative mb-6">
-                            <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                                 alt="Tiramisú"
-                                 class="w-full h-48 object-cover rounded-xl">
-                            <div class="absolute top-3 right-3 bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                                Artesanal
-                            </div>
-                        </div>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-start">
-                                <h4 class="text-xl font-semibold text-white">Tiramisú de la Casa</h4>
-                                <span class="text-restaurant-accent font-bold text-lg">S/. 18</span>
-                            </div>
-                            <p class="text-gray-300 leading-relaxed">
-                                Postre tradicional italiano con mascarpone, café espresso y un toque de licor.
-                            </p>
-                            <div class="flex items-center justify-between pt-2">
-                                <div class="flex items-center space-x-1">
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star-half-alt text-restaurant-accent"></i>
-                                    <span class="text-sm text-gray-400 ml-2">(4.6)</span>
-                                </div>
-                                <button class="bg-restaurant-accent hover:bg-restaurant-secondary text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
-                                    Agregar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Bebidas -->
-                    <div class="menu-item bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-2" data-category="bebidas">
-                        <div class="relative mb-6">
-                            <img src="https://images.unsplash.com/photo-1544145945-f90425340c7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                                 alt="Pisco Sour"
-                                 class="w-full h-48 object-cover rounded-xl">
-                            <div class="absolute top-3 right-3 bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                                Signature
-                            </div>
-                        </div>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-start">
-                                <h4 class="text-xl font-semibold text-white">Pisco Sour Delizioso</h4>
-                                <span class="text-restaurant-accent font-bold text-lg">S/. 22</span>
-                            </div>
-                            <p class="text-gray-300 leading-relaxed">
-                                Nuestra versión especial del clásico peruano con pisco premium y un toque único.
-                            </p>
-                            <div class="flex items-center justify-between pt-2">
-                                <div class="flex items-center space-x-1">
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <i class="fas fa-star text-restaurant-accent"></i>
-                                    <span class="text-sm text-gray-400 ml-2">(4.9)</span>
-                                </div>
-                                <button class="bg-restaurant-accent hover:bg-restaurant-secondary text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
-                                    Agregar
-                                </button>
+                <!-- Hero Image/Card -->
+                <div class="hidden lg:flex justify-center items-center animate-fade-in-left animation-delay-400">
+                    <div class="relative">
+                        <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-300">
+                            <img src="~/images/Plato-Gourmet.png"
+                                 alt="Plato especial"
+                                 class="rounded-xl w-80 h-80 object-cover shadow-lg">
+                            <div class="absolute -bottom-4 -right-4 bg-restaurant-accent text-white px-6 py-3 rounded-full font-bold shadow-lg">
+                                Plato del Chef
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- Sección Reservas -->
-        <section id="reservas" class="py-20 lg:py-32 bg-gradient-to-br from-gray-50 via-white to-gray-100 relative overflow-hidden">
-            <!-- Elementos decorativos -->
-            <div class="absolute inset-0">
-                <div class="absolute top-20 right-10 w-40 h-40 bg-restaurant-accent/5 rounded-full"></div>
-                <div class="absolute bottom-10 left-10 w-60 h-60 bg-restaurant-secondary/10 rounded-full"></div>
-                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-restaurant-primary/5 rounded-full"></div>
+        <!-- Scroll Down Indicator -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
+            <div class="text-white text-center animate-bounce">
+                <div class="text-sm mb-2">Descubre más</div>
+                <i class="fas fa-chevron-down text-restaurant-accent text-xl"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Nosotros -->
+    <section id="nosotros" class="py-20 lg:py-32 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Header Section -->
+            <div class="text-center mb-16">
+                <h3 class="text-restaurant-accent font-medium text-lg lg:text-xl tracking-wide mb-4">
+                    Nuestra Historia
+                </h3>
+                <h2 class="text-4xl lg:text-6xl font-elegant font-bold text-restaurant-dark mb-6">
+                    Pasión por la
+                    <span class="text-restaurant-accent">Gastronomía</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                    Desde 2008, hemos dedicado nuestras vidas a crear experiencias culinarias inolvidables,
+                    combinando recetas tradicionales con toques de innovación moderna.
+                </p>
             </div>
 
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <!-- Header -->
-                <div class="text-center mb-16">
-                    <h3 class="text-restaurant-accent font-medium text-lg lg:text-xl tracking-wide mb-4">
-                        Reserva tu Mesa
-                    </h3>
-                    <h2 class="text-4xl lg:text-6xl font-elegant font-bold text-restaurant-dark mb-6">
-                        Una Experiencia <span class="text-restaurant-accent">Inolvidable</span>
-                    </h2>
-                    <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                        Asegura tu lugar en Delizioso y prepárate para vivir una velada gastronómica excepcional.
-                        Te esperamos con los brazos abiertos.
-                    </p>
-                </div>
-
-                <div class="grid lg:grid-cols-2 gap-16 items-start">
-                    <!-- Formulario de Reserva -->
-                    <div class="bg-white rounded-3xl shadow-2xl p-8 lg:p-10 border border-gray-100">
-                        <div class="mb-8">
-                            <h3 class="text-2xl font-elegant font-bold text-restaurant-dark mb-2">
-                                Hacer una Reserva
-                            </h3>
-                            <p class="text-gray-600">
-                                Completa el formulario y te confirmaremos tu reserva en menos de 30 minutos
-                            </p>
-                        </div>
-
-                        <form asp-action="Crear" asp-controller="Reservas" method="post" class="space-y-6" id="reservation-form">
-                            <div class="grid md:grid-cols-2 gap-6">
-                                <div>
-                                    <label for="nombre" class="block text-sm font-medium text-gray-700 mb-2">
-                                        <i class="fas fa-user mr-2 text-restaurant-accent"></i>Nombre Completo
-                                    </label>
-                                    <input type="text" id="nombre" name="nombre" required
-                                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200"
-                                           placeholder="Tu nombre completo">
-                                </div>
-
-                                <div>
-                                    <label for="telefono" class="block text-sm font-medium text-gray-700 mb-2">
-                                        <i class="fas fa-phone mr-2 text-restaurant-accent"></i>Teléfono
-                                    </label>
-                                    <input type="tel" id="telefono" name="telefono" required
-                                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200"
-                                           placeholder="999 888 777">
-                                </div>
+            <div class="grid lg:grid-cols-2 gap-16 items-center mb-20">
+                <!-- Story Content -->
+                <div class="space-y-8">
+                    <div class="space-y-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-restaurant-accent rounded-full flex items-center justify-center">
+                                <i class="fas fa-heart text-white text-lg"></i>
                             </div>
-
                             <div>
-                                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                                    <i class="fas fa-envelope mr-2 text-restaurant-accent"></i>Correo Electrónico
-                                </label>
-                                <input type="email" id="email" name="email" required
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200"
-                                       placeholder="tu@email.com">
-                            </div>
-
-                            <div class="grid md:grid-cols-2 gap-6">
-                                <div>
-                                    <label for="fecha" class="block text-sm font-medium text-gray-700 mb-2">
-                                        <i class="fas fa-calendar mr-2 text-restaurant-accent"></i>Fecha
-                                    </label>
-                                    <input type="date" id="fecha" name="fecha" required
-                                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200">
-                                </div>
-
-                                <div>
-                                    <label for="hora" class="block text-sm font-medium text-gray-700 mb-2">
-                                        <i class="fas fa-clock mr-2 text-restaurant-accent"></i>Hora
-                                    </label>
-                                    <select id="hora" name="hora" required
-                                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200">
-                                        <option value="">Selecciona una hora</option>
-                                        <option value="13:00">1:00 PM</option>
-                                        <option value="14:00">2:00 PM</option>
-                                        <option value="14:00">3:00 PM</option>
-                                        <option value="14:00">4:00 PM</option>
-                                        <option value="14:00">5:00 PM</option>
-                                        <option value="14:00">6:00 PM</option>
-                                        <option value="19:00">7:00 PM</option>
-                                        <option value="19:30">8:00 PM</option>
-                                        <option value="20:00">9:00 PM</option>
-                                        <option value="22:00">10:00 PM</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="grid md:grid-cols-2 gap-6">
-                                <div>
-                                    <label for="personas" class="block text-sm font-medium text-gray-700 mb-2">
-                                        <i class="fas fa-users mr-2 text-restaurant-accent"></i>Número de Personas
-                                    </label>
-                                    <select id="personas" name="personas" required
-                                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200">
-                                        <option value="">Selecciona</option>
-                                        <option value="1">1 persona</option>
-                                        <option value="2">2 personas</option>
-                                        <option value="3">3 personas</option>
-                                        <option value="4">4 personas</option>
-                                        <option value="5">5 personas</option>
-                                        <option value="6">6 personas</option>
-                                        <option value="7">7 personas</option>
-                                        <option value="8">8 personas</option>
-                                        <option value="8+">Más de 8 personas</option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label for="ocasion" class="block text-sm font-medium text-gray-700 mb-2">
-                                        <i class="fas fa-star mr-2 text-restaurant-accent"></i>Ocasión Especial
-                                    </label>
-                                    <select id="ocasion" name="ocasion"
-                                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200">
-                                        <option value="">Selecciona (opcional)</option>
-                                        <option value="cumpleanos">Cumpleaños</option>
-                                        <option value="aniversario">Aniversario</option>
-                                        <option value="cita">Cita Romántica</option>
-                                        <option value="negocio">Reunión de Negocios</option>
-                                        <option value="familia">Reunión Familiar</option>
-                                        <option value="otro">Otra ocasión</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label for="comentarios" class="block text-sm font-medium text-gray-700 mb-2">
-                                    <i class="fas fa-comment mr-2 text-restaurant-accent"></i>Comentarios Especiales
-                                </label>
-                                <textarea id="comentarios" name="comentarios" rows="4"
-                                          class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200 resize-none"
-                                          placeholder="Alergias, preferencias de mesa, solicitudes especiales..."></textarea>
-                            </div>
-
-                            <button type="submit"
-                                    class="w-full bg-restaurant-accent hover:bg-restaurant-secondary text-white py-4 px-8 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg">
-                                <i class="fas fa-calendar-check mr-2"></i>
-                                Confirmar Reserva
-                            </button>
-
-                            <p class="text-sm text-gray-500 text-center">
-                                Al hacer clic en "Confirmar Reserva", aceptas nuestros
-                                <a href="#" class="text-restaurant-accent hover:underline">términos y condiciones</a>
-                            </p>
-                        </form>
-                    </div>
-
-                    <!-- Información y Beneficios -->
-                    <div class="space-y-8">
-                        <!-- Horarios de Atención -->
-                        <div class="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
-                            <h3 class="text-2xl font-elegant font-bold text-restaurant-dark mb-6 flex items-center">
-                                <i class="fas fa-clock mr-3 text-restaurant-accent"></i>
-                                Horarios de Atención
-                            </h3>
-
-                            <div class="space-y-4">
-                                <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                                    <span class="font-medium text-gray-700">Lunes - Jueves</span>
-                                    <span class="text-restaurant-dark font-semibold">12:00 PM - 10:00 PM</span>
-                                </div>
-                                <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                                    <span class="font-medium text-gray-700">Viernes - Sábado</span>
-                                    <span class="text-restaurant-dark font-semibold">12:00 PM - 11:00 PM</span>
-                                </div>
-                                <div class="flex justify-between items-center py-2">
-                                    <span class="font-medium text-gray-700">Domingo</span>
-                                    <span class="text-restaurant-dark font-semibold">12:00 PM - 9:00 PM</span>
-                                </div>
-                            </div>
-
-                            <div class="mt-6 p-4 bg-restaurant-accent/10 rounded-xl">
-                                <p class="text-sm text-restaurant-dark">
-                                    <i class="fas fa-info-circle mr-2 text-restaurant-accent"></i>
-                                    <strong>Nota:</strong> Las reservas se confirman hasta 2 días de anticipación.
-                                    Para grupos de más de 8 personas, contacta directamente.
+                                <h4 class="text-xl font-semibold text-restaurant-dark mb-2">Tradición Familiar</h4>
+                                <p class="text-gray-600 leading-relaxed">
+                                    Nuestras recetas han pasado de generación en generación, preservando los sabores
+                                    auténticos que nos conectan con nuestras raíces.
                                 </p>
                             </div>
                         </div>
 
-                        <!-- Beneficios de Reservar -->
-                        <div class="bg-gradient-to-br from-restaurant-accent to-restaurant-secondary rounded-3xl shadow-xl p-8 text-white">
-                            <h3 class="text-2xl font-elegant font-bold mb-6 flex items-center">
-                                <i class="fas fa-gift mr-3"></i>
-                                Beneficios de Reservar
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-restaurant-accent rounded-full flex items-center justify-center">
+                                <i class="fas fa-leaf text-white text-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-semibold text-restaurant-dark mb-2">Ingredientes Frescos</h4>
+                                <p class="text-gray-600 leading-relaxed">
+                                    Trabajamos directamente con productores locales para garantizar la frescura y calidad
+                                    en cada uno de nuestros platos.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-restaurant-accent rounded-full flex items-center justify-center">
+                                <i class="fas fa-users text-white text-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-semibold text-restaurant-dark mb-2">Equipo Apasionado</h4>
+                                <p class="text-gray-600 leading-relaxed">
+                                    Nuestro equipo de chefs y personal de servicio comparte la misma pasión por brindar
+                                    una experiencia gastronómica excepcional.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Images Grid -->
+                <div class="relative">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-4">
+                            <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                                 alt="Chef preparando comida"
+                                 class="rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300">
+                            <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                                 alt="Interior del restaurante"
+                                 class="rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300">
+                        </div>
+                        <div class="mt-8 space-y-4">
+                            <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                                 alt="Ingredientes frescos"
+                                 class="rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300">
+                            <img src="https://images.unsplash.com/photo-1544148103-0773bf10d330?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                                 alt="Equipo del restaurante"
+                                 class="rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300">
+                        </div>
+                    </div>
+
+                    <!-- Floating decoration -->
+                    <div class="absolute -top-4 -left-4 w-20 h-20 bg-restaurant-accent/10 rounded-full"></div>
+                    <div class="absolute -bottom-4 -right-4 w-32 h-32 bg-restaurant-secondary/10 rounded-full"></div>
+                </div>
+            </div>
+
+            <!-- Chef Section -->
+            <div class="bg-white rounded-3xl shadow-xl p-8 lg:p-12 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-40 h-40 bg-restaurant-accent/5 rounded-full -mr-20 -mt-20"></div>
+
+                <div class="grid lg:grid-cols-3 gap-8 items-center relative z-10">
+                    <!-- Chef Photo -->
+                    <div class="lg:col-span-1 text-center">
+                        <div class="relative inline-block">
+                            <img src="~/images/chef.webp"
+                                 alt="Chef Principal"
+                                 class="w-48 h-48 lg:w-64 lg:h-64 rounded-full object-cover shadow-xl mx-auto border-4 border-white">
+                            <div class="absolute -bottom-2 -right-2 bg-restaurant-accent text-white w-16 h-16 rounded-full flex items-center justify-center shadow-lg">
+                                <i class="fas fa-star text-lg"></i>
+                            </div>
+                        </div>
+                        <h4 class="text-2xl font-elegant font-bold text-restaurant-dark mt-6">Chef Miguel González</h4>
+                        <p class="text-restaurant-accent font-medium">Chef Ejecutivo</p>
+                    </div>
+
+                    <!-- Chef Info -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div>
+                            <h3 class="text-3xl font-elegant font-bold text-restaurant-dark mb-4">
+                                El Maestro Detrás de Cada Sabor
                             </h3>
-
-                            <div class="space-y-4">
-                                <div class="flex items-start space-x-4">
-                                    <i class="fas fa-check-circle text-xl mt-1 flex-shrink-0"></i>
-                                    <div>
-                                        <h4 class="font-semibold mb-1">Mesa Garantizada</h4>
-                                        <p class="text-white/90">Sin esperas ni inconvenientes, tu mesa te estará esperando</p>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-start space-x-4">
-                                    <i class="fas fa-birthday-cake text-xl mt-1 flex-shrink-0"></i>
-                                    <div>
-                                        <h4 class="font-semibold mb-1">Atención Personalizada</h4>
-                                        <p class="text-white/90">Celebraciones especiales con detalles únicos</p>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-start space-x-4">
-                                    <i class="fas fa-utensils text-xl mt-1 flex-shrink-0"></i>
-                                    <div>
-                                        <h4 class="font-semibold mb-1">Menú Preferencial</h4>
-                                        <p class="text-white/90">Acceso a platos especiales del chef</p>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-start space-x-4">
-                                    <i class="fas fa-wine-glass text-xl mt-1 flex-shrink-0"></i>
-                                    <div>
-                                        <h4 class="font-semibold mb-1">Copa de Bienvenida</h4>
-                                        <p class="text-white/90">Cortesía de la casa para reservas confirmadas</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    
-                    </div>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- Footer / Pie de página -->
-        <footer class="bg-restaurant-dark text-white relative overflow-hidden">
-            <!-- Decorative elements -->
-            <div class="absolute inset-0">
-                <div class="absolute top-10 left-10 w-20 h-20 bg-restaurant-accent/5 rounded-full"></div>
-                <div class="absolute bottom-10 right-10 w-32 h-32 bg-restaurant-secondary/5 rounded-full"></div>
-            </div>
-
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <!-- Main Footer Content -->
-                <div class="py-16 border-b border-white/10">
-                    <div class="grid lg:grid-cols-4 md:grid-cols-2 gap-16">
-                        <!-- Logo y Descripción -->
-                        <div class="lg:col-span-1">
-                            <div class="flex items-center mb-6">
-                                <div class="text-3xl font-elegant font-bold text-white">
-                                    <i class="fas fa-utensils mr-2 text-restaurant-accent"></i>
-                                    Delizioso
-                                </div>
-                            </div>
-                            <p class="text-gray-300 mb-6 leading-relaxed">
-                                Una experiencia culinaria única donde cada plato cuenta una historia de pasión,
-                                tradición e innovación gastronómica.
+                            <p class="text-gray-600 text-lg leading-relaxed mb-6">
+                                Con más de 20 años de experiencia en la alta gastronomía, el Chef Miguel ha trabajado
+                                en restaurantes de renombre internacional antes de regresar a sus raíces para crear
+                                Delizioso. Su filosofía combina técnicas clásicas con ingredientes locales frescos.
                             </p>
-                            <div class="flex space-x-4">
-                                <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-restaurant-accent transition-colors duration-300">
-                                    <i class="fab fa-facebook-f"></i>
-                                </a>
-                                <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-restaurant-accent transition-colors duration-300">
-                                    <i class="fab fa-instagram"></i>
-                                </a>
-                                <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-restaurant-accent transition-colors duration-300">
-                                    <i class="fab fa-twitter"></i>
-                                </a>
-                                <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-restaurant-accent transition-colors duration-300">
-                                    <i class="fab fa-whatsapp"></i>
-                                </a>
+                        </div>
+
+                        <div class="grid sm:grid-cols-2 gap-6">
+                            <div class="bg-gray-50 rounded-2xl p-6">
+                                <div class="text-3xl font-bold text-restaurant-accent mb-2">20+</div>
+                                <div class="text-restaurant-dark font-medium">Años de Experiencia</div>
+                            </div>
+                            <div class="bg-gray-50 rounded-2xl p-6">
+                                <div class="text-3xl font-bold text-restaurant-accent mb-2">5</div>
+                                <div class="text-restaurant-dark font-medium">Premios Gastronómicos</div>
                             </div>
                         </div>
 
-                        <!-- Enlaces Rápidos -->
-                        <div>
-                            <h4 class="text-lg font-semibold text-white mb-6">Enlaces Rápidos</h4>
-                            <ul class="space-y-3">
-                                <li>
-                                    <a href="#inicio" class="text-gray-300 hover:text-restaurant-accent transition-colors duration-200 flex items-center">
-                                        <i class="fas fa-chevron-right mr-2 text-xs"></i>
-                                        Inicio
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#nosotros" class="text-gray-300 hover:text-restaurant-accent transition-colors duration-200 flex items-center">
-                                        <i class="fas fa-chevron-right mr-2 text-xs"></i>
-                                        Nosotros
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#menu" class="text-gray-300 hover:text-restaurant-accent transition-colors duration-200 flex items-center">
-                                        <i class="fas fa-chevron-right mr-2 text-xs"></i>
-                                        Menú
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#reservas" class="text-gray-300 hover:text-restaurant-accent transition-colors duration-200 flex items-center">
-                                        <i class="fas fa-chevron-right mr-2 text-xs"></i>
-                                        Reservas
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#contacto" class="text-gray-300 hover:text-restaurant-accent transition-colors duration-200 flex items-center">
-                                        <i class="fas fa-chevron-right mr-2 text-xs"></i>
-                                        Contacto
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
+                        <blockquote class="border-l-4 border-restaurant-accent pl-6 italic text-gray-600 text-lg">
+                            "La cocina es un arte donde cada ingrediente cuenta una historia. Mi misión es que cada
+                            plato sea un viaje de sabores que conecte a las personas con emociones auténticas."
+                        </blockquote>
+                    </div>
+                </div>
+            </div>
 
-                        <!-- Horarios de Atención -->
-                        <div>
-                            <h4 class="text-lg font-semibold text-white mb-6">
-                                <i class="fas fa-clock mr-2 text-restaurant-accent"></i>
-                                Horarios de Atención
-                            </h4>
-                            <div class="space-y-4">
-                                <div>
-                                    <div class="text-gray-300 mb-1">Lunes - Jueves</div>
-                                    <div class="text-white font-medium">12:00 PM - 10:00 PM</div>
-                                </div>
-                                <div>
-                                    <div class="text-gray-300 mb-1">Viernes - Sábado</div>
-                                    <div class="text-white font-medium">12:00 PM - 11:00 PM</div>
-                                </div>
-                                <div>
-                                    <div class="text-gray-300 mb-1">Domingo</div>
-                                    <div class="text-white font-medium">12:00 PM - 9:00 PM</div>
-                                </div>
-                            </div>
-                        </div>
+            <!-- Values Section -->
+            <div class="mt-20">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl lg:text-4xl font-elegant font-bold text-restaurant-dark mb-4">
+                        Nuestros Valores
+                    </h3>
+                    <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                        Los principios que guían cada día nuestra pasión por la excelencia culinaria
+                    </p>
+                </div>
 
-                        <!-- Información de Contacto -->
-                        <div>
-                            <h4 class="text-lg font-semibold text-white mb-6">Contacto</h4>
-                            <div class="space-y-4">
-                                <div class="flex items-start space-x-3">
-                                    <i class="fas fa-map-marker-alt text-restaurant-accent mt-1"></i>
-                                    <div>
-                                        <p class="text-gray-300">Av. Larco 1234</p>
-                                        <p class="text-gray-300">Miraflores, Lima</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center space-x-3">
-                                    <i class="fas fa-phone text-restaurant-accent"></i>
-                                    <a href="tel:+5112345678" class="text-gray-300 hover:text-restaurant-accent transition-colors duration-200">
-                                        +51 1 234-5678
-                                    </a>
-                                </div>
-                                <div class="flex items-center space-x-3">
-                                    <i class="fas fa-envelope text-restaurant-accent"></i>
-                                    <a href="mailto:info@delizioso.pe" class="text-gray-300 hover:text-restaurant-accent transition-colors duration-200">
-                                        info@delizioso.pe
-                                    </a>
-                                </div>
-                                <div class="flex items-center space-x-3">
-                                    <i class="fab fa-whatsapp text-green-400"></i>
-                                    <a href="https://wa.me/51987654321" class="text-gray-300 hover:text-green-400 transition-colors duration-200">
-                                        +51 987 654 321
-                                    </a>
-                                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="text-center group">
+                        <div class="w-20 h-20 bg-restaurant-accent/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-restaurant-accent group-hover:scale-110 transition-all duration-300">
+                            <i class="fas fa-award text-restaurant-accent text-2xl group-hover:text-white"></i>
+                        </div>
+                        <h4 class="text-xl font-semibold text-restaurant-dark mb-3">Calidad</h4>
+                        <p class="text-gray-600">Solo utilizamos ingredientes de la más alta calidad para cada preparación.</p>
+                    </div>
+
+                    <div class="text-center group">
+                        <div class="w-20 h-20 bg-restaurant-accent/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-restaurant-accent group-hover:scale-110 transition-all duration-300">
+                            <i class="fas fa-handshake text-restaurant-accent text-2xl group-hover:text-white"></i>
+                        </div>
+                        <h4 class="text-xl font-semibold text-restaurant-dark mb-3">Servicio</h4>
+                        <p class="text-gray-600">Brindamos una atención personalizada que supera las expectativas.</p>
+                    </div>
+
+                    <div class="text-center group">
+                        <div class="w-20 h-20 bg-restaurant-accent/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-restaurant-accent group-hover:scale-110 transition-all duration-300">
+                            <i class="fas fa-globe text-restaurant-accent text-2xl group-hover:text-white"></i>
+                        </div>
+                        <h4 class="text-xl font-semibold text-restaurant-dark mb-3">Sostenibilidad</h4>
+                        <p class="text-gray-600">Comprometidos con prácticas responsables con el medio ambiente.</p>
+                    </div>
+
+                    <div class="text-center group">
+                        <div class="w-20 h-20 bg-restaurant-accent/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-restaurant-accent group-hover:scale-110 transition-all duration-300">
+                            <i class="fas fa-lightbulb text-restaurant-accent text-2xl group-hover:text-white"></i>
+                        </div>
+                        <h4 class="text-xl font-semibold text-restaurant-dark mb-3">Innovación</h4>
+                        <p class="text-gray-600">Constantemente evolucionamos para ofrecer nuevas experiencias gastronómicas.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Menú -->
+    <section id="menu" class="py-20 lg:py-32 bg-restaurant-dark text-white relative overflow-hidden">
+        <!-- Elementos decorativos de fondo -->
+        <div class="absolute inset-0">
+            <div class="absolute top-10 left-10 w-32 h-32 bg-restaurant-accent/10 rounded-full animate-pulse"></div>
+            <div class="absolute bottom-20 right-20 w-48 h-48 bg-restaurant-secondary/5 rounded-full"></div>
+            <div class="absolute top-1/2 left-1/4 w-20 h-20 bg-white/5 rounded-full"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <!-- Header -->
+            <div class="text-center mb-16">
+                <h3 class="text-restaurant-accent font-medium text-lg lg:text-xl tracking-wide mb-4">
+                    Nuestras Especialidades
+                </h3>
+                <h2 class="text-4xl lg:text-6xl font-elegant font-bold mb-6">
+                    Menú <span class="text-restaurant-accent">Delizioso</span>
+                </h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+                    Descubre una selección cuidadosamente curada de platos que combinan tradición,
+                    innovación y los mejores ingredientes de temporada.
+                </p>
+            </div>
+
+            <!-- Categorías Tabs -->
+            <div class="flex flex-wrap justify-center gap-4 mb-12" id="menu-tabs">
+                <button class="menu-tab active px-6 py-3 rounded-full font-medium transition-all duration-300 bg-restaurant-accent text-white" data-category="all">
+                    Todos los Platos
+                </button>
+                <button class="menu-tab px-6 py-3 rounded-full font-medium transition-all duration-300 bg-white/10 text-white hover:bg-restaurant-accent" data-category="entradas">
+                    Entradas
+                </button>
+                <button class="menu-tab px-6 py-3 rounded-full font-medium transition-all duration-300 bg-white/10 text-white hover:bg-restaurant-accent" data-category="principales">
+                    Platos Principales
+                </button>
+                <button class="menu-tab px-6 py-3 rounded-full font-medium transition-all duration-300 bg-white/10 text-white hover:bg-restaurant-accent" data-category="postres">
+                    Postres
+                </button>
+                <button class="menu-tab px-6 py-3 rounded-full font-medium transition-all duration-300 bg-white/10 text-white hover:bg-restaurant-accent" data-category="bebidas">
+                    Bebidas
+                </button>
+            </div>
+
+            <!-- Menú Items Grid -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="menu-items">
+
+                <!-- Entradas -->
+                <div class="menu-item bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-2" data-category="entradas">
+                    <div class="relative mb-6">
+                        <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                             alt="Ensalada César"
+                             class="w-full h-48 object-cover rounded-xl">
+                        <div class="absolute top-3 right-3 bg-restaurant-accent text-white px-3 py-1 rounded-full text-sm font-medium">
+                            Popular
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-start">
+                            <h4 class="text-xl font-semibold text-white">Ensalada César Premium</h4>
+                            <span class="text-restaurant-accent font-bold text-lg">S/. 28</span>
+                        </div>
+                        <p class="text-gray-300 leading-relaxed">
+                            Lechuga romana fresca, crutones artesanales, queso parmesano y nuestra exclusiva salsa César.
+                        </p>
+                        <div class="flex items-center justify-between pt-2">
+                            <div class="flex items-center space-x-1">
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <span class="text-sm text-gray-400 ml-2">(4.9)</span>
                             </div>
+                            <button class="bg-restaurant-accent hover:bg-restaurant-secondary text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
+                                Agregar
+                            </button>
                         </div>
                     </div>
                 </div>
 
-            
-                <!-- Bottom Footer -->
-                <div class="py-8">
-                    <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                        <div class="text-gray-400 text-sm">
-                            © 2024 Restaurante Delizioso. Todos los derechos reservados.
+                <div class="menu-item bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-2" data-category="entradas">
+                    <div class="relative mb-6">
+                        <img src="https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                             alt="Bruschetta"
+                             class="w-full h-48 object-cover rounded-xl">
+                        <div class="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                            Vegetariano
                         </div>
-                        <div class="flex space-x-6 text-sm">
-                            <a href="#" class="text-gray-400 hover:text-restaurant-accent transition-colors duration-200">
-                                Política de Privacidad
-                            </a>
-                            <a href="#" class="text-gray-400 hover:text-restaurant-accent transition-colors duration-200">
-                                Términos de Servicio
-                            </a>
-                            <a href="#" class="text-gray-400 hover:text-restaurant-accent transition-colors duration-200">
-                                Política de Cookies
-                            </a>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-start">
+                            <h4 class="text-xl font-semibold text-white">Bruschetta Mediterránea</h4>
+                            <span class="text-restaurant-accent font-bold text-lg">S/. 24</span>
+                        </div>
+                        <p class="text-gray-300 leading-relaxed">
+                            Pan artesanal tostado con tomate fresco, albahaca, aceite de oliva extra virgen y burrata.
+                        </p>
+                        <div class="flex items-center justify-between pt-2">
+                            <div class="flex items-center space-x-1">
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star-half-alt text-restaurant-accent"></i>
+                                <span class="text-sm text-gray-400 ml-2">(4.7)</span>
+                            </div>
+                            <button class="bg-restaurant-accent hover:bg-restaurant-secondary text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
+                                Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Platos Principales -->
+                <div class="menu-item bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-2" data-category="principales">
+                    <div class="relative mb-6">
+                        <img src="https://images.unsplash.com/photo-1546833999-b9f581a1996d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                             alt="Risotto"
+                             class="w-full h-48 object-cover rounded-xl">
+                        <div class="absolute top-3 right-3 bg-restaurant-accent text-white px-3 py-1 rounded-full text-sm font-medium">
+                            Chef's Choice
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-start">
+                            <h4 class="text-xl font-semibold text-white">Risotto de Mariscos</h4>
+                            <span class="text-restaurant-accent font-bold text-lg">S/. 65</span>
+                        </div>
+                        <p class="text-gray-300 leading-relaxed">
+                            Arroz cremoso con camarones, calamares, mejillones y un toque de azafrán peruano.
+                        </p>
+                        <div class="flex items-center justify-between pt-2">
+                            <div class="flex items-center space-x-1">
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <span class="text-sm text-gray-400 ml-2">(5.0)</span>
+                            </div>
+                            <button class="bg-restaurant-accent hover:bg-restaurant-secondary text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
+                                Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-item bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-2" data-category="principales">
+                    <div class="relative mb-6">
+                        <img src="https://images.unsplash.com/photo-1558030006-450675393462?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                             alt="Lomo Saltado"
+                             class="w-full h-48 object-cover rounded-xl">
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-start">
+                            <h4 class="text-xl font-semibold text-white">Lomo Saltado Premium</h4>
+                            <span class="text-restaurant-accent font-bold text-lg">S/. 58</span>
+                        </div>
+                        <p class="text-gray-300 leading-relaxed">
+                            Lomo fino salteado con cebolla, tomate, papas fritas y arroz jazmín, al estilo de la casa.
+                        </p>
+                        <div class="flex items-center justify-between pt-2">
+                            <div class="flex items-center space-x-1">
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <span class="text-sm text-gray-400 ml-2">(4.8)</span>
+                            </div>
+                            <button class="bg-restaurant-accent hover:bg-restaurant-secondary text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
+                                Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Postres -->
+                <div class="menu-item bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-2" data-category="postres">
+                    <div class="relative mb-6">
+                        <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                             alt="Tiramisú"
+                             class="w-full h-48 object-cover rounded-xl">
+                        <div class="absolute top-3 right-3 bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                            Artesanal
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-start">
+                            <h4 class="text-xl font-semibold text-white">Tiramisú de la Casa</h4>
+                            <span class="text-restaurant-accent font-bold text-lg">S/. 18</span>
+                        </div>
+                        <p class="text-gray-300 leading-relaxed">
+                            Postre tradicional italiano con mascarpone, café espresso y un toque de licor.
+                        </p>
+                        <div class="flex items-center justify-between pt-2">
+                            <div class="flex items-center space-x-1">
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star-half-alt text-restaurant-accent"></i>
+                                <span class="text-sm text-gray-400 ml-2">(4.6)</span>
+                            </div>
+                            <button class="bg-restaurant-accent hover:bg-restaurant-secondary text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
+                                Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bebidas -->
+                <div class="menu-item bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-2" data-category="bebidas">
+                    <div class="relative mb-6">
+                        <img src="https://images.unsplash.com/photo-1544145945-f90425340c7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                             alt="Pisco Sour"
+                             class="w-full h-48 object-cover rounded-xl">
+                        <div class="absolute top-3 right-3 bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                            Signature
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-start">
+                            <h4 class="text-xl font-semibold text-white">Pisco Sour Delizioso</h4>
+                            <span class="text-restaurant-accent font-bold text-lg">S/. 22</span>
+                        </div>
+                        <p class="text-gray-300 leading-relaxed">
+                            Nuestra versión especial del clásico peruano con pisco premium y un toque único.
+                        </p>
+                        <div class="flex items-center justify-between pt-2">
+                            <div class="flex items-center space-x-1">
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <i class="fas fa-star text-restaurant-accent"></i>
+                                <span class="text-sm text-gray-400 ml-2">(4.9)</span>
+                            </div>
+                            <button class="bg-restaurant-accent hover:bg-restaurant-secondary text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
+                                Agregar
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
-        </footer>
+        </div>
+    </section>
 
-        <script>      
+    <!-- Sección Reservas -->
+    <section id="reservas" class="py-20 lg:py-32 bg-gradient-to-br from-gray-50 via-white to-gray-100 relative overflow-hidden">
+        <!-- Elementos decorativos -->
+        <div class="absolute inset-0">
+            <div class="absolute top-20 right-10 w-40 h-40 bg-restaurant-accent/5 rounded-full"></div>
+            <div class="absolute bottom-10 left-10 w-60 h-60 bg-restaurant-secondary/10 rounded-full"></div>
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-restaurant-primary/5 rounded-full"></div>
+        </div>
 
-            // Animation classes usando CSS puro
-            const animationCSS = `
-                <style>
-                    @@keyframes fade-in-up {
-                        from {
-                            opacity: 0;
-                            transform: translateY(30px);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: translateY(0);
-                        }
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <!-- Header -->
+            <div class="text-center mb-16">
+                <h3 class="text-restaurant-accent font-medium text-lg lg:text-xl tracking-wide mb-4">
+                    Reserva tu Mesa
+                </h3>
+                <h2 class="text-4xl lg:text-6xl font-elegant font-bold text-restaurant-dark mb-6">
+                    Una Experiencia <span class="text-restaurant-accent">Inolvidable</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                    Asegura tu lugar en Delizioso y prepárate para vivir una velada gastronómica excepcional.
+                    Te esperamos con los brazos abiertos.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-16 items-start">
+                <!-- Formulario de Reserva -->
+                <div class="bg-white rounded-3xl shadow-2xl p-8 lg:p-10 border border-gray-100">
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-elegant font-bold text-restaurant-dark mb-2">
+                            Hacer una Reserva
+                        </h3>
+                        <p class="text-gray-600">
+                            Completa el formulario y te confirmaremos tu reserva en menos de 30 minutos
+                        </p>
+                    </div>
+
+                    <form asp-action="Crear" asp-controller="Reservas" method="post" class="space-y-6" id="reservation-form">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="nombre" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-user mr-2 text-restaurant-accent"></i>Nombre Completo
+                                </label>
+                                <input type="text" id="nombre" name="nombre" required
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200"
+                                       placeholder="Tu nombre completo">
+                            </div>
+
+                            <div>
+                                <label for="telefono" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-phone mr-2 text-restaurant-accent"></i>Teléfono
+                                </label>
+                                <input type="tel" id="telefono" name="telefono" required
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200"
+                                       placeholder="999 888 777">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-envelope mr-2 text-restaurant-accent"></i>Correo Electrónico
+                            </label>
+                            <input type="email" id="email" name="email" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200"
+                                   placeholder="tu@email.com">
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="fecha" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-calendar mr-2 text-restaurant-accent"></i>Fecha
+                                </label>
+                                <input type="date" id="fecha" name="fecha" required
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200">
+                            </div>
+
+                            <div>
+                                <label for="hora" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-clock mr-2 text-restaurant-accent"></i>Hora
+                                </label>
+                                <select id="hora" name="hora" required
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200">
+                                    <option value="">Selecciona una hora</option>
+                                    <option value="13:00">1:00 PM</option>
+                                    <option value="14:00">2:00 PM</option>
+                                    <option value="14:00">3:00 PM</option>
+                                    <option value="14:00">4:00 PM</option>
+                                    <option value="14:00">5:00 PM</option>
+                                    <option value="14:00">6:00 PM</option>
+                                    <option value="19:00">7:00 PM</option>
+                                    <option value="19:30">8:00 PM</option>
+                                    <option value="20:00">9:00 PM</option>
+                                    <option value="22:00">10:00 PM</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="personas" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-users mr-2 text-restaurant-accent"></i>Número de Personas
+                                </label>
+                                <select id="personas" name="personas" required
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200">
+                                    <option value="">Selecciona</option>
+                                    <option value="1">1 persona</option>
+                                    <option value="2">2 personas</option>
+                                    <option value="3">3 personas</option>
+                                    <option value="4">4 personas</option>
+                                    <option value="5">5 personas</option>
+                                    <option value="6">6 personas</option>
+                                    <option value="7">7 personas</option>
+                                    <option value="8">8 personas</option>
+                                    <option value="8+">Más de 8 personas</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="ocasion" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-star mr-2 text-restaurant-accent"></i>Ocasión Especial
+                                </label>
+                                <select id="ocasion" name="ocasion"
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200">
+                                    <option value="">Selecciona (opcional)</option>
+                                    <option value="cumpleanos">Cumpleaños</option>
+                                    <option value="aniversario">Aniversario</option>
+                                    <option value="cita">Cita Romántica</option>
+                                    <option value="negocio">Reunión de Negocios</option>
+                                    <option value="familia">Reunión Familiar</option>
+                                    <option value="otro">Otra ocasión</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="comentarios" class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-comment mr-2 text-restaurant-accent"></i>Comentarios Especiales
+                            </label>
+                            <textarea id="comentarios" name="comentarios" rows="4"
+                                      class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200 resize-none"
+                                      placeholder="Alergias, preferencias de mesa, solicitudes especiales..."></textarea>
+                        </div>
+
+                        <button type="submit"
+                                class="w-full bg-restaurant-accent hover:bg-restaurant-secondary text-white py-4 px-8 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg">
+                            <i class="fas fa-calendar-check mr-2"></i>
+                            Confirmar Reserva
+                        </button>
+
+                        <p class="text-sm text-gray-500 text-center">
+                            Al hacer clic en "Confirmar Reserva", aceptas nuestros
+                            <a href="#" class="text-restaurant-accent hover:underline">términos y condiciones</a>
+                        </p>
+                    </form>
+                </div>
+
+                <!-- Información y Beneficios -->
+                <div class="space-y-8">
+                    <!-- Horarios de Atención -->
+                    <div class="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+                        <h3 class="text-2xl font-elegant font-bold text-restaurant-dark mb-6 flex items-center">
+                            <i class="fas fa-clock mr-3 text-restaurant-accent"></i>
+                            Horarios de Atención
+                        </h3>
+
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                                <span class="font-medium text-gray-700">Lunes - Jueves</span>
+                                <span class="text-restaurant-dark font-semibold">12:00 PM - 10:00 PM</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                                <span class="font-medium text-gray-700">Viernes - Sábado</span>
+                                <span class="text-restaurant-dark font-semibold">12:00 PM - 11:00 PM</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2">
+                                <span class="font-medium text-gray-700">Domingo</span>
+                                <span class="text-restaurant-dark font-semibold">12:00 PM - 9:00 PM</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 p-4 bg-restaurant-accent/10 rounded-xl">
+                            <p class="text-sm text-restaurant-dark">
+                                <i class="fas fa-info-circle mr-2 text-restaurant-accent"></i>
+                                <strong>Nota:</strong> Las reservas se confirman hasta 2 días de anticipación.
+                                Para grupos de más de 8 personas, contacta directamente.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Beneficios de Reservar -->
+                    <div class="bg-gradient-to-br from-restaurant-accent to-restaurant-secondary rounded-3xl shadow-xl p-8 text-white">
+                        <h3 class="text-2xl font-elegant font-bold mb-6 flex items-center">
+                            <i class="fas fa-gift mr-3"></i>
+                            Beneficios de Reservar
+                        </h3>
+
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-4">
+                                <i class="fas fa-check-circle text-xl mt-1 flex-shrink-0"></i>
+                                <div>
+                                    <h4 class="font-semibold mb-1">Mesa Garantizada</h4>
+                                    <p class="text-white/90">Sin esperas ni inconvenientes, tu mesa te estará esperando</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-4">
+                                <i class="fas fa-birthday-cake text-xl mt-1 flex-shrink-0"></i>
+                                <div>
+                                    <h4 class="font-semibold mb-1">Atención Personalizada</h4>
+                                    <p class="text-white/90">Celebraciones especiales con detalles únicos</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-4">
+                                <i class="fas fa-utensils text-xl mt-1 flex-shrink-0"></i>
+                                <div>
+                                    <h4 class="font-semibold mb-1">Menú Preferencial</h4>
+                                    <p class="text-white/90">Acceso a platos especiales del chef</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-4">
+                                <i class="fas fa-wine-glass text-xl mt-1 flex-shrink-0"></i>
+                                <div>
+                                    <h4 class="font-semibold mb-1">Copa de Bienvenida</h4>
+                                    <p class="text-white/90">Cortesía de la casa para reservas confirmadas</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Footer / Pie de página -->
+    <footer class="bg-restaurant-dark text-white relative overflow-hidden">
+        <!-- Decorative elements -->
+        <div class="absolute inset-0">
+            <div class="absolute top-10 left-10 w-20 h-20 bg-restaurant-accent/5 rounded-full"></div>
+            <div class="absolute bottom-10 right-10 w-32 h-32 bg-restaurant-secondary/5 rounded-full"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <!-- Main Footer Content -->
+            <div class="py-16 border-b border-white/10">
+                <div class="grid lg:grid-cols-4 md:grid-cols-2 gap-16">
+                    <!-- Logo y Descripción -->
+                    <div class="lg:col-span-1">
+                        <div class="flex items-center mb-6">
+                            <div class="text-3xl font-elegant font-bold text-white">
+                                <i class="fas fa-utensils mr-2 text-restaurant-accent"></i>
+                                Delizioso
+                            </div>
+                        </div>
+                        <p class="text-gray-300 mb-6 leading-relaxed">
+                            Una experiencia culinaria única donde cada plato cuenta una historia de pasión,
+                            tradición e innovación gastronómica.
+                        </p>
+                        <div class="flex space-x-4">
+                            <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-restaurant-accent transition-colors duration-300">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-restaurant-accent transition-colors duration-300">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-restaurant-accent transition-colors duration-300">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-restaurant-accent transition-colors duration-300">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Enlaces Rápidos -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-white mb-6">Enlaces Rápidos</h4>
+                        <ul class="space-y-3">
+                            <li>
+                                <a href="#inicio" class="text-gray-300 hover:text-restaurant-accent transition-colors duration-200 flex items-center">
+                                    <i class="fas fa-chevron-right mr-2 text-xs"></i>
+                                    Inicio
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#nosotros" class="text-gray-300 hover:text-restaurant-accent transition-colors duration-200 flex items-center">
+                                    <i class="fas fa-chevron-right mr-2 text-xs"></i>
+                                    Nosotros
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#menu" class="text-gray-300 hover:text-restaurant-accent transition-colors duration-200 flex items-center">
+                                    <i class="fas fa-chevron-right mr-2 text-xs"></i>
+                                    Menú
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#reservas" class="text-gray-300 hover:text-restaurant-accent transition-colors duration-200 flex items-center">
+                                    <i class="fas fa-chevron-right mr-2 text-xs"></i>
+                                    Reservas
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Horarios de Atención -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-white mb-6">
+                            <i class="fas fa-clock mr-2 text-restaurant-accent"></i>
+                            Horarios de Atención
+                        </h4>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="text-gray-300 mb-1">Lunes - Jueves</div>
+                                <div class="text-white font-medium">12:00 PM - 10:00 PM</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-300 mb-1">Viernes - Sábado</div>
+                                <div class="text-white font-medium">12:00 PM - 11:00 PM</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-300 mb-1">Domingo</div>
+                                <div class="text-white font-medium">12:00 PM - 9:00 PM</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información de Contacto -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-white mb-6">Contacto</h4>
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-3">
+                                <i class="fas fa-map-marker-alt text-restaurant-accent mt-1"></i>
+                                <div>
+                                    <p class="text-gray-300">Av. Gourmet 123 - Lima, Perú</p>                                    
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-phone text-restaurant-accent"></i>
+                                <a href="tel:+5112345678" class="text-gray-300 hover:text-restaurant-accent transition-colors duration-200">
+                                    +51 1 234-5678
+                                </a>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-envelope text-restaurant-accent"></i>
+                                <a href="mailto:info@delizioso.pe" class="text-gray-300 hover:text-restaurant-accent transition-colors duration-200">
+                                    info@delizioso.pe
+                                </a>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <i class="fab fa-whatsapp text-green-400"></i>
+                                <a href="https://wa.me/51987654321" class="text-gray-300 hover:text-green-400 transition-colors duration-200">
+                                    +51 987 654 321
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Bottom Footer -->
+            <div class="py-8">
+                <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                    <div class="text-gray-400 text-sm">
+                        © 2024 Restaurante Delizioso. Todos los derechos reservados.
+                    </div>
+                    <div class="flex space-x-6 text-sm">
+                        <a href="#" class="text-gray-400 hover:text-restaurant-accent transition-colors duration-200">
+                            Política de Privacidad
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-restaurant-accent transition-colors duration-200">
+                            Términos de Servicio
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-restaurant-accent transition-colors duration-200">
+                            Política de Cookies
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+
+
+        // Animation classes usando CSS puro
+        const animationCSS = `
+            <style>
+                @@keyframes fade-in-up {
+                    from {
+                        opacity: 0;
+                        transform: translateY(30px);
                     }
-
-                    @@keyframes fade-in-left {
-                        from {
-                            opacity: 0;
-                            transform: translateX(30px);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: translateX(0);
-                        }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
                     }
+                }
 
-                    .animate-fade-in-up {
-                        animation: fade-in-up 0.8s ease-out;
+                @@keyframes fade-in-left {
+                    from {
+                        opacity: 0;
+                        transform: translateX(30px);
                     }
-
-                    .animate-fade-in-left {
-                        animation: fade-in-left 1s ease-out;
+                    to {
+                        opacity: 1;
+                        transform: translateX(0);
                     }
+                }
 
-                    .animation-delay-200 {
-                        animation-delay: 0.2s;
-                        animation-fill-mode: both;
-                    }
+                .animate-fade-in-up {
+                    animation: fade-in-up 0.8s ease-out;
+                }
 
-                    .animation-delay-400 {
-                        animation-delay: 0.4s;
-                        animation-fill-mode: both;
-                    }
+                .animate-fade-in-left {
+                    animation: fade-in-left 1s ease-out;
+                }
 
-                    .animation-delay-600 {
-                        animation-delay: 0.6s;
-                        animation-fill-mode: both;
-                    }
+                .animation-delay-200 {
+                    animation-delay: 0.2s;
+                    animation-fill-mode: both;
+                }
 
-                    .animation-delay-800 {
-                        animation-delay: 0.8s;
-                        animation-fill-mode: both;
-                    }
+                .animation-delay-400 {
+                    animation-delay: 0.4s;
+                    animation-fill-mode: both;
+                }
 
-                    .slow {
-                        animation-duration: 3s;
-                    }
-                </style>
-            `;
-            document.head.insertAdjacentHTML('beforeend', animationCSS);
-        </script>
+                .animation-delay-600 {
+                    animation-delay: 0.6s;
+                    animation-fill-mode: both;
+                }
 
-        <script src="~/js/navHome.js"></script>
+                .animation-delay-800 {
+                    animation-delay: 0.8s;
+                    animation-fill-mode: both;
+                }
 
-        <script src="~/js/site.js"></script>
+                .slow {
+                    animation-duration: 3s;
+                }
+            </style>
+        `;
+        document.head.insertAdjacentHTML('beforeend', animationCSS);
+    </script>
 
-    </body>
-    </html>
+    <script>
+        window.userData = {
+            isAuthenticated: @User.Identity.IsAuthenticated.ToString().ToLower(),
+            role: "@userRole",
+            name: "@userName"
+        };
+    </script>
+
+    <script src="~/js/navHome.js"></script>
+
+    <script src="~/js/site.js"></script>
+
+    <script src="~/js/sweetalert-notify.js"></script>
+
+</body>
+</html>

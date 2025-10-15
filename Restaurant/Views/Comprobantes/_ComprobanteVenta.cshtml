@@ -1,0 +1,15 @@
+﻿@model Restaurant.Models.Rest_Comprobante
+
+<div class="card border shadow-sm">
+    <div class="card-body">
+        <p><strong>ID Comprobante:</strong> @Model.Id</p>
+        <p><strong>Tipo:</strong> @Model.Tipo</p>
+        <p><strong>Número:</strong> @Model.Numero</p>
+        <p><strong>Fecha Emisión:</strong> @Model.FechaEmision.ToString("dd/MM/yyyy HH:mm")</p>
+        
+        @if (Model.Venta != null)
+        {
+            <p><strong>Total Venta:</strong> S/ @Model.Venta.Total.ToString("F2")</p>
+        }
+    </div>
+</div>

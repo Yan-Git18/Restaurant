@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Restaurant.Models;
 using RESTAURANT.Data;
 
 namespace Restaurant.Controllers
 {
+    [Authorize(Roles = "Administrador")]
     public class RolesController : Controller
     {
         private readonly AppDbContext _context;

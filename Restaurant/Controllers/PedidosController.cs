@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using RESTAURANT.Data;
 using Restaurant.Models;
 using Restaurant.ViewModels;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using RESTAURANT.Data;
 
 namespace Restaurant.Controllers
 {
+    [Authorize(Roles = "Administrador, Cajero, Mesero, Cliente")]
     public class PedidosController : Controller
     {
         private readonly AppDbContext _context;
@@ -83,14 +85,12 @@ namespace Restaurant.Controllers
                 .ToList();
         }
 
-        // GET: Pedidos/Crear
         public IActionResult Crear()
         {
             CargarCombos();
             return View(new PedidoCreateEditVm());
         }
 
-        // POST: Pedidos/Crear
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Crear(PedidoCreateEditVm vm)
@@ -143,7 +143,6 @@ namespace Restaurant.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Pedidos/Editar/5
         public async Task<IActionResult> Editar(int? id)
         {
             if (id == null) return NotFound();
@@ -184,7 +183,6 @@ namespace Restaurant.Controllers
             return View(vm);
         }
 
-        // POST: Pedidos/Editar/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Editar(int id, PedidoCreateEditVm vm)
@@ -249,7 +247,6 @@ namespace Restaurant.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: Pedidos/Eliminar/5
         [HttpPost]
         public async Task<IActionResult> EliminarConfirmar(int id)
         {

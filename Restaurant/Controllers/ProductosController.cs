@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Restaurant.Models;
-using RESTAURANT.Data; // Ajusta si tu namespace es distinto
+using RESTAURANT.Data; 
 using System.Linq;
 
 namespace Restaurant.Controllers
 {
+    [Authorize(Roles = "Administrador, Empleado")]
     public class ProductosController : Controller
     {
         private readonly AppDbContext _context;
@@ -21,7 +23,7 @@ namespace Restaurant.Controllers
             var productos = await _context.Productos
                 .Include(p => p.Categoria)
                 .Include(p => p.Inventario)
-                .Where(p => p.Activo)   // solo activos en el índice
+                .Where(p => p.Activo)
                 .OrderByDescending(p => p.FechaCreacion)
                 .ToListAsync();
 
@@ -29,11 +31,9 @@ namespace Restaurant.Controllers
         }
 
 
-        // GET: Crear
         [HttpGet]
         public IActionResult Crear()
         {
-            // Construyo listas como en tu ejemplo original
             var categorias = _context.Categorias
                 .Select(r => new SelectListItem { Value = r.Id.ToString(), Text = r.Nombre })
                 .ToList();
@@ -62,7 +62,7 @@ namespace Restaurant.Controllers
                 FechaCreacion = DateTime.Now,
                 CategoriaId = p.CategoriaId,
                 InventarioId = p.InventarioId,
-                Stock = p.Stock   // 👈 ahora lo guardamos
+                Stock = p.Stock 
             };
 
             await _context.Productos.AddAsync(producto);
@@ -72,8 +72,7 @@ namespace Restaurant.Controllers
             TempData["Tipo"] = "success";
             return RedirectToAction("Index");
         }
-
-        // GET: Editar
+                
         [HttpGet]
         public IActionResult Editar(int id)
         {
@@ -95,7 +94,6 @@ namespace Restaurant.Controllers
             return View(producto);
         }
 
-        // POST: Editar
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Editar(Rest_Producto p)
@@ -114,7 +112,6 @@ namespace Restaurant.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: EliminarConfirmar
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EliminarConfirmar(int id)
@@ -127,11 +124,11 @@ namespace Restaurant.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Validación: no desactivar si está en pedidos actuales (opcional)
+            // No desactivar si está en pedidos actuales
             var enDetalles = await _context.DetallesPedido.AnyAsync(d => d.ProductoId == id);
             if (enDetalles)
             {
-                // en lugar de eliminar, marcamos inactivo; si quieres bloquear desactivación puedes retornar error
+                // en lugar de eliminar, marcamos inactivo
                 producto.Activo = false;
                 _context.Productos.Update(producto);
                 await _context.SaveChangesAsync();
@@ -141,7 +138,7 @@ namespace Restaurant.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Si no está en detalles, igual lo desactivamos (no remove)
+            // Si no está en detalles, igual lo desactivamos
             producto.Activo = false;
             _context.Productos.Update(producto);
             await _context.SaveChangesAsync();

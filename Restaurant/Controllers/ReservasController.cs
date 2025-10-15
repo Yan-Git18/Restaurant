@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Restaurant.Models;
 using Restaurant.ViewModels;
@@ -6,6 +7,7 @@ using RESTAURANT.Data;
 
 namespace Restaurant.Controllers
 {
+    [Authorize(Roles = "Administrador, Cliente, Mesero")]
     public class ReservasController : Controller
     {
         private readonly AppDbContext _context;
@@ -38,7 +40,7 @@ namespace Restaurant.Controllers
             return View(reservas);
         }
 
-        // CREAR RESERVA (GET)
+        
         [HttpGet]
         public async Task<IActionResult> Crear()
         {
@@ -60,7 +62,7 @@ namespace Restaurant.Controllers
             return View(model);
         }
 
-        // CREAR RESERVA (POST)
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Crear(ReservaFormViewModel model, string? origen = null)
@@ -146,7 +148,7 @@ namespace Restaurant.Controllers
             }
         }
 
-        // VER DETALLE DE RESERVA
+        
         [HttpGet]
         public async Task<IActionResult> Detalles(int id)
         {
@@ -173,7 +175,7 @@ namespace Restaurant.Controllers
         }
 
 
-        // EDITAR RESERVA (GET)
+        
         [HttpGet]
         public async Task<IActionResult> Editar(int id)
         {
@@ -199,7 +201,7 @@ namespace Restaurant.Controllers
             return View(model);
         }
 
-        // EDITAR RESERVA (POST)
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Editar(int id, ReservaFormViewModel model)
@@ -241,14 +243,14 @@ namespace Restaurant.Controllers
             }
         }
 
-        // CONFIRMACION
+        
         public IActionResult Confirmacion()
         {
             ViewBag.Mensaje = TempData["Success"];
             return View();
         }
 
-        // 🔹 MÉTODO AUXILIAR PARA EXTRAER DATOS DE "Observaciones"
+        // PARA EXTRAER DATOS DE "Observaciones"
         private string? ExtraerValor(string? observaciones, string clave)
         {
             if (string.IsNullOrEmpty(observaciones)) return null;

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +10,7 @@ using RESTAURANT.Data;
 using System.Security.Claims;
 
 namespace Restaurant.Controllers
-{
+{    
     public class CuentaController : Controller
     {
         private readonly AppDbContext _context;
@@ -44,13 +45,11 @@ namespace Restaurant.Controllers
                 return View(model);
             }
 
-            // Buscar usuario por correo electrónico con sus relaciones
             var usuario = await _context.Usuarios
                 .Include(u => u.Rol)
                 .Include(u => u.Cliente)
                 .FirstOrDefaultAsync(u => u.Correo == model.Email && u.Activo);
 
-            // Verificar que el usuario exista
             if (usuario == null)
             {
                 TempData["Mensaje"] = "Usuario no encontrado";
@@ -58,7 +57,6 @@ namespace Restaurant.Controllers
                 return View(model);
             }
 
-            // Verificar que esté activo
             if (!usuario.Activo)
             {
                 TempData["Mensaje"] = "Tu cuenta está desactivada. Contacta al administrador";
@@ -127,9 +125,8 @@ namespace Restaurant.Controllers
             return usuario.Rol.Nombre switch
             {
                 "Administrador" => RedirectToAction("Index", "Admin"),
-                "Empleado" => RedirectToAction("Index", "Empleado"),
-                "Cliente" => RedirectToAction("Index", "Home"),
-                _ => RedirectToAction("Index", "Home")
+                //"Cliente" => RedirectToAction("Index", "Home"),
+                _ => RedirectToAction("Index", "Admin")
             };
         }
 
@@ -226,7 +223,8 @@ namespace Restaurant.Controllers
         {
             TempData["Mensaje"] = "Acceso denegado. No tienes permisos para esta página";
             TempData["Tipo"] = "error";
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Admin");
+            
         }
 
         public IActionResult Perfil()

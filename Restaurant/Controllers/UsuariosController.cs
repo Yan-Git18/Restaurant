@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Restaurant.Models;
@@ -7,6 +8,7 @@ using RESTAURANT.Data;
 
 namespace Restaurant.Controllers
 {
+    [Authorize(Roles = "Administrador")]
     public class UsuariosController : Controller
     {
         private readonly AppDbContext _context;
@@ -26,7 +28,7 @@ namespace Restaurant.Controllers
                     query = query.Where(u => !u.Activo);
                     break;
                 case "Todos":
-                    // no filtramos nada
+                    
                     break;
                 default: // Activos
                     query = query.Where(u => u.Activo);
@@ -36,17 +38,6 @@ namespace Restaurant.Controllers
             ViewBag.FiltroActual = filtro;
             return View(await query.ToListAsync());
         }
-
-
-        //public async Task<IActionResult> Index()
-        //{
-        //    var usuariosActivos = await _context.Usuarios
-        //        .Include(u => u.Rol)
-        //        .Where(u => u.Activo)
-        //        .ToListAsync();
-
-        //    return View(usuariosActivos);
-        //}
 
         public IActionResult Create()
         {

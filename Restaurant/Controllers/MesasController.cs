@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RESTAURANT.Data;
 using Restaurant.Models;
+using RESTAURANT.Data;
 
 namespace Restaurant.Controllers
 {
+    [Authorize(Roles = "Administrador, Mesero")]
     public class MesasController : Controller
     {
         private readonly AppDbContext _context;
@@ -14,24 +16,20 @@ namespace Restaurant.Controllers
             _context = context;
         }
 
-        // GET: Mesas
         public async Task<IActionResult> Index()
         {
             var mesas = await _context.Mesas
-                .Where(m => m.Activo) // solo las activas
+                .Where(m => m.Activo)
                 .ToListAsync();
 
             return View(mesas);
         }
 
-
-        // GET: Mesas/Crear
         public IActionResult Crear()
         {
             return View();
         }
 
-        // POST: Mesas/Crear
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Crear(Rest_Mesa mesa)
@@ -46,7 +44,7 @@ namespace Restaurant.Controllers
                     return View(mesa);
                 }
 
-                mesa.FechaCreacion = DateTime.Now; // si quieres tener fecha
+                mesa.FechaCreacion = DateTime.Now;
                 _context.Add(mesa);
                 await _context.SaveChangesAsync();
 
@@ -58,7 +56,6 @@ namespace Restaurant.Controllers
             return View(mesa);
         }
 
-        // GET: Mesas/Editar/5
         public async Task<IActionResult> Editar(int id)
         {
             var mesa = await _context.Mesas.FindAsync(id);
@@ -67,7 +64,6 @@ namespace Restaurant.Controllers
             return View(mesa);
         }
 
-        // POST: Mesas/Editar/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Editar(Rest_Mesa mesa)
@@ -96,7 +92,6 @@ namespace Restaurant.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: Mesas/Eliminar
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EliminarConfirmar(int id)
@@ -111,7 +106,7 @@ namespace Restaurant.Controllers
                 return NotFound();
             }
 
-            // ⚠️ Validación: no desactivar si tiene reservas o pedidos asociados
+            // No desactivar si tiene reservas o pedidos asociados
             if (mesa.Reservas.Any() || mesa.Pedidos.Any())
             {
                 TempData["Mensaje"] = $"No se puede desactivar la mesa #{mesa.Numero} porque tiene reservas o pedidos asociados.";
@@ -119,7 +114,7 @@ namespace Restaurant.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            mesa.Activo = false; // 👈 solo desactivar
+            mesa.Activo = false;
             _context.Mesas.Update(mesa);
             await _context.SaveChangesAsync();
 

@@ -1,0 +1,51 @@
+﻿@model Restaurant.Models.Rest_Pago
+@{
+    ViewData["Title"] = "Detalles del Pago";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="dashboard-header mb-4">
+        <h1><i class="fas fa-eye text-info me-2"></i>Detalles del Pago</h1>
+        <p class="mb-0">Información completa del pago seleccionado</p>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Información del Pago</h5>
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">ID:</dt>
+                <dd class="col-sm-9">@Model.Id</dd>
+
+                <dt class="col-sm-3">Venta Asociada:</dt>
+                <dd class="col-sm-9">Venta #@Model.VentaId - Cliente: @Model.Venta?.Pedido?.Cliente?.Nombre</dd>
+
+                <dt class="col-sm-3">Método:</dt>
+                <dd class="col-sm-9">@Model.Metodo</dd>
+
+                <dt class="col-sm-3">Monto:</dt>
+                <dd class="col-sm-9"><span class="badge bg-success">S/ @Model.Monto</span></dd>
+
+                <dt class="col-sm-3">Fecha:</dt>
+                <dd class="col-sm-9">@Model.FechaPago.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                <dt class="col-sm-3">Referencia:</dt>
+                <dd class="col-sm-9">@Model.Referencia</dd>
+
+                <dt class="col-sm-3">Observaciones:</dt>
+                <dd class="col-sm-9">@Model.Observaciones</dd>
+            </dl>
+
+            <div class="d-flex justify-content-between mt-4">
+                <a asp-controller="Pagos" asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+                <a asp-controller="Pagos" asp-action="Editar" asp-route-id="@Model.Id" class="btn btn-info text-white">
+                    <i class="fas fa-edit me-1"></i> Editar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
