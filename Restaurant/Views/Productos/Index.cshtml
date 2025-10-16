@@ -87,7 +87,7 @@
                                             }
                                         </td>
                                         <td><span class="badge bg-success">@item.Precio.ToString("C")</span></td>
-                                        <td><span class="badge bg-dark">@item.Stock</span></td> <!-- 👈 nuevo -->
+                                        <td><span class="badge bg-dark">@item.Stock</span></td>
                                         <td>
                                             @if (item.Categoria != null)
                                             {
@@ -143,7 +143,7 @@
                             else
                             {
                                 <tr>
-                                    <td colspan="10" class="text-center py-4">
+                                    <td colspan="11" class="text-center py-4">
                                         <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
                                         <p class="text-muted">No hay productos registrados</p>
                                         <a asp-controller="Productos" asp-action="Crear" class="btn btn-success">
@@ -223,17 +223,17 @@
     <script>
         // Inicializar DataTables
         $(document).ready(function () {
-            $('#tablaProductos').DataTable({
-                language: {
-                    url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
-                },
-                order: [[0, 'asc']],
-                pageLength: 10,
-                responsive: true,
-                columnDefs: [
-                    { orderable: false, targets: [1, 9] }
-                ]
-            });
+
+            const tieneProductos = @((Model != null && Model.Any()).ToString().ToLower())
+
+            if (tieneProductos) {
+                $('#tablaProductos').DataTable({
+                    language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
+                    order: [[0, 'asc']],
+                    pageLength: 10,
+                    responsive: true
+                });
+            }
         });
     </script>
 }

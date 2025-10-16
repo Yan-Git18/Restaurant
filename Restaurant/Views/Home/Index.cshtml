@@ -1088,7 +1088,7 @@
             <div class="py-8">
                 <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                     <div class="text-gray-400 text-sm">
-                        © 2024 Restaurante Delizioso. Todos los derechos reservados.
+                        © 2025 Restaurante Delizioso.
                     </div>
                     <div class="flex space-x-6 text-sm">
                         <a href="#" class="text-gray-400 hover:text-restaurant-accent transition-colors duration-200">
@@ -1106,153 +1106,20 @@
         </div>
     </footer>
 
-    <script>
-
-         @{
-             await Html.RenderPartialAsync("_ValidationScriptsPartial");
-         }
-        // Animation classes usando CSS puro
-        const animationCSS = `
-            <style>
-                @@keyframes fade-in-up {
-                    from {
-                        opacity: 0;
-                        transform: translateY(30px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-
-                @@keyframes fade-in-left {
-                    from {
-                        opacity: 0;
-                        transform: translateX(30px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateX(0);
-                    }
-                }
-
-                .animate-fade-in-up {
-                    animation: fade-in-up 0.8s ease-out;
-                }
-
-                .animate-fade-in-left {
-                    animation: fade-in-left 1s ease-out;
-                }
-
-                .animation-delay-200 {
-                    animation-delay: 0.2s;
-                    animation-fill-mode: both;
-                }
-
-                .animation-delay-400 {
-                    animation-delay: 0.4s;
-                    animation-fill-mode: both;
-                }
-
-                .animation-delay-600 {
-                    animation-delay: 0.6s;
-                    animation-fill-mode: both;
-                }
-
-                .animation-delay-800 {
-                    animation-delay: 0.8s;
-                    animation-fill-mode: both;
-                }
-
-                .slow {
-                    animation-duration: 3s;
-                }
-            </style>
-        `;
-        document.head.insertAdjacentHTML('beforeend', animationCSS);
-    </script>
 
     <script>
+
         window.userData = {
-            isAuthenticated: @User.Identity.IsAuthenticated.ToString().ToLower(),
+            isAuthenticated: @(User.Identity != null && User.Identity.IsAuthenticated ? "true" : "false"),
             role: "@userRole",
             name: "@userName"
         };
     </script>
 
     <script src="~/js/navHome.js"></script>
-
+    <script src="~/js/home.js"></script>
     <script src="~/js/site.js"></script>
-
     <script src="~/js/sweetalert-notify.js"></script>
-
-
-
-
-    document.addEventListener("DOMContentLoaded", () => {
-    const btnMisReservas = document.getElementById("btnMisReservas");
-    const modal = document.getElementById("modalMisReservas");
-    const closeModal = document.getElementById("closeModalReservas");
-    const modalContent = document.getElementById("modalContentReservas");
-
-    if (btnMisReservas) {
-    btnMisReservas.addEventListener("click", (e) => {
-    e.preventDefault();
-    modal.classList.remove("hidden");
-    modalContent.innerHTML = `
-    <div class="text-center text-gray-500">
-        <i class="fas fa-spinner fa-spin text-3xl"></i>
-        <p class="mt-2">Cargando reservas...</p>
-    </div>
-    `;
-
-    // Cargar el contenido por AJAX (partial)
-    fetch("/Reservas/MisReservasPartial")
-    .then(response => response.text())
-    .then(html => {
-    modalContent.innerHTML = html;
-    })
-    .catch(() => {
-    modalContent.innerHTML = `
-    <div class="text-center text-red-500">
-        <i class="fas fa-exclamation-triangle text-3xl"></i>
-        <p class="mt-2">Error al cargar tus reservas.</p>
-    </div>
-    `;
-    });
-    });
-    }
-
-    // Cerrar modal
-    closeModal.addEventListener("click", () => {
-    modal.classList.add("hidden");
-    });
-
-    // Cerrar haciendo clic fuera
-    modal.addEventListener("click", (e) => {
-    if (e.target === modal) {
-    modal.classList.add("hidden");
-    }
-    });
-    });
-
-
 </body>
-
-<!-- Modal de Mis Reservas -->
-<div id="modalMisReservas" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50">
-    <div class="bg-white rounded-2xl shadow-xl w-11/12 md:w-3/4 lg:w-1/2 relative">
-        <button id="closeModalReservas" class="absolute top-3 right-3 text-gray-500 hover:text-red-500 text-2xl font-bold">
-            &times;
-        </button>
-
-        <div id="modalContentReservas" class="p-6">
-            <div class="text-center text-gray-500">
-                <i class="fas fa-spinner fa-spin text-3xl"></i>
-                <p class="mt-2">Cargando reservas...</p>
-            </div>
-        </div>
-    </div>
-</div>
 
 </html>

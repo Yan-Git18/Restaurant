@@ -142,8 +142,21 @@ namespace Restaurant.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Crear(ReservaFormViewModel model)
         {
+            // Si el modelo no es válido (faltan campos o errores)
             if (!ModelState.IsValid)
             {
+                // Si el usuario es cliente, volvemos al Index Home manteniendo los errores
+                if (User.IsInRole("Cliente"))
+                {
+                    ViewBag.NombreCliente = model.Nombre;
+                    ViewBag.TelefonoCliente = model.Telefono;
+                    ViewBag.EmailCliente = model.Email;
+
+                    // 👇 Esto devuelve la vista del Home y muestra los errores en el formulario
+                    return View("~/Views/Home/Index.cshtml", model);
+                }
+
+                // Si es admin, seguimos mostrando su vista "Crear"
                 if (User.IsInRole("Administrador"))
                 {
                     var clientes = await _context.Personas
@@ -154,13 +167,17 @@ namespace Restaurant.Controllers
 
                     ViewBag.Clientes = new SelectList(clientes, "PersonaId", "NombreCompleto", model.ClienteId);
                 }
+
                 return View(model);
             }
 
+            // Validar fecha y hora
             if (model.Fecha == default || string.IsNullOrEmpty(model.Hora) || !TimeSpan.TryParse(model.Hora, out var hora))
             {
                 ModelState.AddModelError("", "Fecha u hora inválida.");
-                return View(model);
+                return User.IsInRole("Cliente")
+                    ? View("~/Views/Home/Index.cshtml", model)
+                    : View(model);
             }
 
             int clienteId;
@@ -198,6 +215,8 @@ namespace Restaurant.Controllers
             await _context.SaveChangesAsync();
 
             TempData["Success"] = "¡Reserva registrada correctamente!";
+
+            // Si es cliente, vuelve a MisReservas; si es admin, a su panel
             return User.IsInRole("Administrador") ? RedirectToAction("Index") : RedirectToAction("MisReservas");
         }
 

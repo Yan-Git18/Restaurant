@@ -8,7 +8,7 @@ using RESTAURANT.Data;
 
 namespace Restaurant.Controllers
 {
-    [Authorize(Roles = "Administrador, Cajero, Mesero, Cliente")]
+    [Authorize(Roles = "Administrador, Cajero, Mesero")]
     public class PedidosController : Controller
     {
         private readonly AppDbContext _context;

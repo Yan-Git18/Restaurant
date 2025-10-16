@@ -122,12 +122,6 @@
             const dateEl = document.getElementById('current-date');
             if (dateEl) dateEl.textContent = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-            $('#tablaReservas').DataTable({
-                language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
-                order: [[1, 'asc']],
-                pageLength: 10
-            });
-
             // Confirmar reserva
             document.querySelectorAll('.btn-confirmar').forEach(btn => {
                 btn.addEventListener('click', function () {
@@ -173,6 +167,22 @@
                     });
                 });
             });
+        });
+    </script>
+    <script>
+        // Inicializar DataTables
+        $(document).ready(function () {
+
+            const tieneReservas = @((Model != null && Model.Any()).ToString().ToLower())
+
+            if (tieneReservas) {
+                $('#tablaReservas').DataTable({
+                    language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
+                    order: [[0, 'asc']],
+                    pageLength: 10,
+                    responsive: true
+                });
+            }
         });
     </script>
 }
