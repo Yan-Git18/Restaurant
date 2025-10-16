@@ -65,11 +65,20 @@
                         <a asp-controller="Usuarios" asp-action="Index" class="nav-link @(currentController == "Usuarios" ? "active" : "")">
                             <i class="fa fa-users"></i> <span>Usuarios</span>
                         </a>
+                        <a asp-controller="Clientes" asp-action="Index" class="nav-link @(currentController == "Clientes" ? "active" : "")">
+                            <i class="fa fa-user-tie"></i> <span>Clientes</span>
+                        </a>
                         <a asp-controller="Empleados" asp-action="Index" class="nav-link @(currentController == "Empleados" ? "active" : "")">
                             <i class="fa fa-user-tie"></i> <span>Empleados</span>
                         </a>
                         <a asp-controller="Roles" asp-action="Index" class="nav-link @(currentController == "Roles" ? "active" : "")">
                             <i class="fa fa-user-shield"></i> <span>Roles</span>
+                        </a>
+                        <a asp-controller="Comprobantes" asp-action="Index" class="nav-link @(currentController == "Comprobantes" ? "active" : "")">
+                            <i class="fa fa-ticket"></i> <span>Comprobantes</span>
+                        </a>
+                        <a asp-controller="Pagos" asp-action="Index" class="nav-link @(currentController == "Pagos" ? "active" : "")">
+                            <i class="fa-solid fa-money-check-dollar"></i> <span>Pagos</span>
                         </a>
                         <a asp-controller="Pedidos" asp-action="Index" class="nav-link @(currentController == "Pedidos" ? "active" : "")">
                             <i class="fa fa-shopping-cart"></i> <span>Pedidos</span>
@@ -82,7 +91,7 @@
                         </a>
                     }
 
-                    @* 🔹 CAJERO *@
+                    @* CAJERO *@
                     else if (rolUsuario == "Cajero")
                     {
                         <a asp-controller="Pedidos" asp-action="Index" class="nav-link @(currentController == "Pedidos" ? "active" : "")">
@@ -99,7 +108,7 @@
                         </a>
                     }
 
-                    @* 🔹 MESERO *@
+                    @* MESERO *@
                     else if (rolUsuario == "Mesero")
                     {
                         <a asp-controller="Mesas" asp-action="Index" class="nav-link @(currentController == "Mesas" ? "active" : "")">
@@ -113,7 +122,7 @@
                         </a>
                     }
 
-                    @* 🔹 CLIENTE *@
+                    @* CLIENTE *@
                     else if (rolUsuario == "Cliente")
                     {
                         <a asp-controller="Pedidos" asp-action="Index" class="nav-link @(currentController == "Pedidos" && currentAction == "MisPedidos" ? "active" : "")">

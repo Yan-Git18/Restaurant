@@ -125,9 +125,10 @@ namespace Restaurant.Controllers
             return usuario.Rol.Nombre switch
             {
                 "Administrador" => RedirectToAction("Index", "Admin"),
-                //"Cliente" => RedirectToAction("Index", "Home"),
-                _ => RedirectToAction("Index", "Admin")
+                "Cliente" => RedirectToAction("Index", "Home"),
+                _ => RedirectToAction("Index", "Home")
             };
+
         }
 
         [HttpGet]

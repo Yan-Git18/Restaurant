@@ -1,4 +1,5 @@
 ﻿@using System.Security.Claims
+@model Restaurant.ViewModels.ReservaFormViewModel
 
 @{
     Layout = null;
@@ -70,6 +71,20 @@
                         <a href="#menu" class="text-restaurant-dark hover:text-restaurant-accent transition-colors duration-200 font-medium">
                             Menú
                         </a>
+
+                        @if (User.IsInRole("Cliente"))
+                        {
+                            <a class="nav-link text-dark hover:text-restaurant-accent font-medium transition-colors duration-200"
+                               asp-controller="Reservas" asp-action="MisReservas">
+                                Mis Reservas
+                            </a>
+
+                            <a class="nav-link text-dark hover:text-restaurant-accent font-medium transition-colors duration-200"
+                               asp-controller="Pedidos" asp-action="MisPedidos">
+                                Mis Pedidos
+                            </a>
+
+                        }
                         <!-- Botón Reservar -->
                         <a href="#reservas" class="bg-restaurant-accent hover:bg-restaurant-secondary text-white px-6 py-3 rounded-full font-medium transition-all duration-200 transform hover:scale-105 shadow-lg">
                             <i class="fas fa-phone mr-2"></i>
@@ -195,6 +210,8 @@
             </div>
         </div>
     </nav>
+
+
 
 
     <!-- Hero Section -->
@@ -717,6 +734,8 @@
         </div>
     </section>
 
+
+
     <!-- Sección Reservas -->
     <section id="reservas" class="py-20 lg:py-32 bg-gradient-to-br from-gray-50 via-white to-gray-100 relative overflow-hidden">
         <!-- Elementos decorativos -->
@@ -749,28 +768,32 @@
                             Hacer una Reserva
                         </h3>
                         <p class="text-gray-600">
-                            Completa el formulario y te confirmaremos tu reserva en menos de 30 minutos
+                            Completa el formulario y te confirmaremos tu reserva en menos de 30 minutos.
                         </p>
                     </div>
 
                     <form asp-action="Crear" asp-controller="Reservas" method="post" class="space-y-6" id="reservation-form">
+                        @Html.AntiForgeryToken()
+
                         <div class="grid md:grid-cols-2 gap-6">
                             <div>
                                 <label for="nombre" class="block text-sm font-medium text-gray-700 mb-2">
                                     <i class="fas fa-user mr-2 text-restaurant-accent"></i>Nombre Completo
                                 </label>
-                                <input type="text" id="nombre" name="nombre" required
+                                <input type="text" id="nombre" name="Nombre"
+                                       value="@ViewBag.NombreCliente"
                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200"
-                                       placeholder="Tu nombre completo">
+                                       placeholder="Tu nombre completo" />
                             </div>
 
                             <div>
                                 <label for="telefono" class="block text-sm font-medium text-gray-700 mb-2">
                                     <i class="fas fa-phone mr-2 text-restaurant-accent"></i>Teléfono
                                 </label>
-                                <input type="tel" id="telefono" name="telefono" required
+                                <input type="tel" id="telefono" name="Telefono"
+                                       value="@ViewBag.TelefonoCliente"
                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200"
-                                       placeholder="999 888 777">
+                                       placeholder="999 888 777" />
                             </div>
                         </div>
 
@@ -778,85 +801,73 @@
                             <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
                                 <i class="fas fa-envelope mr-2 text-restaurant-accent"></i>Correo Electrónico
                             </label>
-                            <input type="email" id="email" name="email" required
+                            <input type="email" id="email" name="Email"
+                                   value="@ViewBag.EmailCliente"
                                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200"
-                                   placeholder="tu@email.com">
+                                   placeholder="tu@email.com" />
                         </div>
 
                         <div class="grid md:grid-cols-2 gap-6">
                             <div>
-                                <label for="fecha" class="block text-sm font-medium text-gray-700 mb-2">
+                                <label asp-for="Fecha" class="block text-sm font-medium text-gray-700 mb-2">
                                     <i class="fas fa-calendar mr-2 text-restaurant-accent"></i>Fecha
                                 </label>
-                                <input type="date" id="fecha" name="fecha" required
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200">
+                                <input asp-for="Fecha" type="date" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200" />
+                                <span asp-validation-for="Fecha" class="text-red-500 text-sm"></span>
                             </div>
 
                             <div>
-                                <label for="hora" class="block text-sm font-medium text-gray-700 mb-2">
+                                <label asp-for="Hora" class="block text-sm font-medium text-gray-700 mb-2">
                                     <i class="fas fa-clock mr-2 text-restaurant-accent"></i>Hora
                                 </label>
-                                <select id="hora" name="hora" required
-                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200">
+                                <select asp-for="Hora" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200">
                                     <option value="">Selecciona una hora</option>
-                                    <option value="13:00">1:00 PM</option>
-                                    <option value="14:00">2:00 PM</option>
-                                    <option value="14:00">3:00 PM</option>
-                                    <option value="14:00">4:00 PM</option>
-                                    <option value="14:00">5:00 PM</option>
-                                    <option value="14:00">6:00 PM</option>
-                                    <option value="19:00">7:00 PM</option>
-                                    <option value="19:30">8:00 PM</option>
-                                    <option value="20:00">9:00 PM</option>
-                                    <option value="22:00">10:00 PM</option>
+                                    @for (int h = 13; h <= 22; h++)
+                                    {
+                                        <option value="@($"{h}:00")">@($"{h}:00")</option>
+                                    }
                                 </select>
+                                <span asp-validation-for="Hora" class="text-red-500 text-sm"></span>
                             </div>
                         </div>
 
                         <div class="grid md:grid-cols-2 gap-6">
                             <div>
-                                <label for="personas" class="block text-sm font-medium text-gray-700 mb-2">
+                                <label asp-for="Personas" class="block text-sm font-medium text-gray-700 mb-2">
                                     <i class="fas fa-users mr-2 text-restaurant-accent"></i>Número de Personas
                                 </label>
-                                <select id="personas" name="personas" required
-                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200">
+                                <select asp-for="Personas" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200">
                                     <option value="">Selecciona</option>
-                                    <option value="1">1 persona</option>
-                                    <option value="2">2 personas</option>
-                                    <option value="3">3 personas</option>
-                                    <option value="4">4 personas</option>
-                                    <option value="5">5 personas</option>
-                                    <option value="6">6 personas</option>
-                                    <option value="7">7 personas</option>
-                                    <option value="8">8 personas</option>
+                                    @for (int i = 1; i <= 8; i++)
+                                    {
+                                        <option value="@i">@i persona@(i > 1 ? "s" : "")</option>
+                                    }
                                     <option value="8+">Más de 8 personas</option>
                                 </select>
+                                <span asp-validation-for="Personas" class="text-red-500 text-sm"></span>
                             </div>
 
                             <div>
-                                <label for="ocasion" class="block text-sm font-medium text-gray-700 mb-2">
+                                <label asp-for="Ocasion" class="block text-sm font-medium text-gray-700 mb-2">
                                     <i class="fas fa-star mr-2 text-restaurant-accent"></i>Ocasión Especial
                                 </label>
-                                <select id="ocasion" name="ocasion"
-                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200">
+                                <select asp-for="Ocasion" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200">
                                     <option value="">Selecciona (opcional)</option>
-                                    <option value="cumpleanos">Cumpleaños</option>
-                                    <option value="aniversario">Aniversario</option>
-                                    <option value="cita">Cita Romántica</option>
-                                    <option value="negocio">Reunión de Negocios</option>
-                                    <option value="familia">Reunión Familiar</option>
-                                    <option value="otro">Otra ocasión</option>
+                                    <option value="Cumpleaños">Cumpleaños</option>
+                                    <option value="Aniversario">Aniversario</option>
+                                    <option value="Cita romántica">Cita Romántica</option>
+                                    <option value="Negocios">Reunión de Negocios</option>
+                                    <option value="Familiar">Reunión Familiar</option>
+                                    <option value="Otro">Otra ocasión</option>
                                 </select>
                             </div>
                         </div>
 
                         <div>
-                            <label for="comentarios" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label asp-for="Comentarios" class="block text-sm font-medium text-gray-700 mb-2">
                                 <i class="fas fa-comment mr-2 text-restaurant-accent"></i>Comentarios Especiales
                             </label>
-                            <textarea id="comentarios" name="comentarios" rows="4"
-                                      class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200 resize-none"
-                                      placeholder="Alergias, preferencias de mesa, solicitudes especiales..."></textarea>
+                            <textarea asp-for="Comentarios" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-restaurant-accent focus:border-transparent transition-all duration-200 resize-none" placeholder="Alergias, preferencias de mesa, solicitudes especiales..."></textarea>
                         </div>
 
                         <button type="submit"
@@ -872,15 +883,12 @@
                     </form>
                 </div>
 
-                <!-- Información y Beneficios -->
+                <!-- Panel lateral (información) -->
                 <div class="space-y-8">
-                    <!-- Horarios de Atención -->
                     <div class="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
                         <h3 class="text-2xl font-elegant font-bold text-restaurant-dark mb-6 flex items-center">
-                            <i class="fas fa-clock mr-3 text-restaurant-accent"></i>
-                            Horarios de Atención
+                            <i class="fas fa-clock mr-3 text-restaurant-accent"></i>Horarios de Atención
                         </h3>
-
                         <div class="space-y-4">
                             <div class="flex justify-between items-center py-2 border-b border-gray-100">
                                 <span class="font-medium text-gray-700">Lunes - Jueves</span>
@@ -895,7 +903,6 @@
                                 <span class="text-restaurant-dark font-semibold">12:00 PM - 9:00 PM</span>
                             </div>
                         </div>
-
                         <div class="mt-6 p-4 bg-restaurant-accent/10 rounded-xl">
                             <p class="text-sm text-restaurant-dark">
                                 <i class="fas fa-info-circle mr-2 text-restaurant-accent"></i>
@@ -905,13 +912,10 @@
                         </div>
                     </div>
 
-                    <!-- Beneficios de Reservar -->
                     <div class="bg-gradient-to-br from-restaurant-accent to-restaurant-secondary rounded-3xl shadow-xl p-8 text-white">
                         <h3 class="text-2xl font-elegant font-bold mb-6 flex items-center">
-                            <i class="fas fa-gift mr-3"></i>
-                            Beneficios de Reservar
+                            <i class="fas fa-gift mr-3"></i>Beneficios de Reservar
                         </h3>
-
                         <div class="space-y-4">
                             <div class="flex items-start space-x-4">
                                 <i class="fas fa-check-circle text-xl mt-1 flex-shrink-0"></i>
@@ -946,12 +950,11 @@
                             </div>
                         </div>
                     </div>
-
-
                 </div>
             </div>
         </div>
     </section>
+
 
 
     <!-- Footer / Pie de página -->
@@ -1105,7 +1108,9 @@
 
     <script>
 
-
+         @{
+             await Html.RenderPartialAsync("_ValidationScriptsPartial");
+         }
         // Animation classes usando CSS puro
         const animationCSS = `
             <style>
@@ -1181,5 +1186,73 @@
 
     <script src="~/js/sweetalert-notify.js"></script>
 
+
+
+
+    document.addEventListener("DOMContentLoaded", () => {
+    const btnMisReservas = document.getElementById("btnMisReservas");
+    const modal = document.getElementById("modalMisReservas");
+    const closeModal = document.getElementById("closeModalReservas");
+    const modalContent = document.getElementById("modalContentReservas");
+
+    if (btnMisReservas) {
+    btnMisReservas.addEventListener("click", (e) => {
+    e.preventDefault();
+    modal.classList.remove("hidden");
+    modalContent.innerHTML = `
+    <div class="text-center text-gray-500">
+        <i class="fas fa-spinner fa-spin text-3xl"></i>
+        <p class="mt-2">Cargando reservas...</p>
+    </div>
+    `;
+
+    // Cargar el contenido por AJAX (partial)
+    fetch("/Reservas/MisReservasPartial")
+    .then(response => response.text())
+    .then(html => {
+    modalContent.innerHTML = html;
+    })
+    .catch(() => {
+    modalContent.innerHTML = `
+    <div class="text-center text-red-500">
+        <i class="fas fa-exclamation-triangle text-3xl"></i>
+        <p class="mt-2">Error al cargar tus reservas.</p>
+    </div>
+    `;
+    });
+    });
+    }
+
+    // Cerrar modal
+    closeModal.addEventListener("click", () => {
+    modal.classList.add("hidden");
+    });
+
+    // Cerrar haciendo clic fuera
+    modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+    modal.classList.add("hidden");
+    }
+    });
+    });
+
+
 </body>
+
+<!-- Modal de Mis Reservas -->
+<div id="modalMisReservas" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-2xl shadow-xl w-11/12 md:w-3/4 lg:w-1/2 relative">
+        <button id="closeModalReservas" class="absolute top-3 right-3 text-gray-500 hover:text-red-500 text-2xl font-bold">
+            &times;
+        </button>
+
+        <div id="modalContentReservas" class="p-6">
+            <div class="text-center text-gray-500">
+                <i class="fas fa-spinner fa-spin text-3xl"></i>
+                <p class="mt-2">Cargando reservas...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 </html>

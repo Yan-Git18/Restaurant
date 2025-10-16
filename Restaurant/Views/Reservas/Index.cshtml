@@ -1,25 +1,19 @@
 ﻿@model List<Restaurant.Models.Rest_Reserva>
 @{
-    ViewData["Title"] = "Mis Reservas";
+    ViewData["Title"] = "Gestión de Reservas";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="container-fluid py-4">
-    <div class="dashboard-header">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div>
-                <h1>Gestión de Reservas</h1>
-                <p class="mb-0">Listado de reservas registradas en el restaurante</p>
-            </div>
-            <div>
-                <span class="badge bg-light text-dark">
-                    <i class="bi bi-calendar me-2"></i>
-                    <span id="current-date"></span>
-                </span>
-            </div>
-
-
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1>Gestión de Reservas</h1>
+            <p class="mb-0">Listado de reservas registradas en el restaurante</p>
         </div>
+        <span class="badge bg-light text-dark">
+            <i class="bi bi-calendar me-2"></i>
+            <span id="current-date"></span>
+        </span>
     </div>
 
     <div class="card card-rutas">
@@ -29,9 +23,20 @@
                     Listado de Reservas
                     <span class="badge bg-primary ms-2">@Model.Count</span>
                 </h4>
-                <a asp-controller="Reservas" asp-action="Crear" class="btn btn-success">
-                    <i class="fas fa-plus"></i> Nueva Reserva
-                </a>
+                <div class="d-flex gap-2">
+                    <a asp-action="Index" asp-route-filtro="todas" class="btn btn-outline-dark @(ViewBag.FiltroActual == "todas" ? "active" : "")">
+                        <i class="fas fa-list"></i> Todas
+                    </a>
+                    <a asp-action="Index" asp-route-filtro="confirmadas" class="btn btn-outline-success @(ViewBag.FiltroActual == "confirmadas" ? "active" : "")">
+                        <i class="fas fa-check"></i> Confirmadas
+                    </a>
+                    <a asp-action="Index" asp-route-filtro="canceladas" class="btn btn-outline-danger @(ViewBag.FiltroActual == "canceladas" ? "active" : "")">
+                        <i class="fas fa-times"></i> Canceladas
+                    </a>
+                    <a asp-controller="Reservas" asp-action="Crear" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Nueva Reserva
+                    </a>
+                </div>
             </div>
 
             <div class="table-responsive">
@@ -57,26 +62,34 @@
                                     <td>@r.FechaHora.ToString("HH:mm")</td>
                                     <td>@r.NumeroPersonas</td>
                                     <td>
-                                        <span class="badge @(r.Estado == "Pendiente" ? "bg-warning text-dark" : "bg-success")">
-                                            @r.Estado
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group" role="group">
-                                            <!-- Botón Ver -->
-                                            <a asp-action="Detalles" asp-route-id="@r.ReservaId"
-                                               class="btn btn-info btn-sm text-white">
-                                                <i class="fas fa-eye"></i> Ver
-                                            </a>
-
-                                            <!-- Botón Editar -->
-                                            <a asp-action="Editar" asp-route-id="@r.ReservaId"
-                                               class="btn btn-warning btn-sm text-white ms-1">
-                                                <i class="fas fa-edit"></i> Editar
-                                            </a>
+                                        <span class="badge
+                                                    @(r.Estado == "Pendiente" ? "bg-warning text-dark" :
+                                                                                            r.Estado == "Confirmada" ? "bg-success" :
+                                                                                            "bg-danger")">
+                                    @r.Estado
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a asp-action="Detalles" asp-route-id="@r.ReservaId" class="btn btn-info btn-sm text-white">
+                                        <i class="fas fa-eye"></i> Ver
+                                    </a>
+                                    <a asp-action="Editar" asp-route-id="@r.ReservaId" class="btn btn-warning btn-sm text-white ms-1">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </a>
+                                    @if (r.Estado == "Pendiente")
+                                            {
+                                                <button type="button" class="btn btn-success btn-sm ms-1 btn-confirmar"
+                                                        data-id="@r.ReservaId">
+                                                    <i class="fas fa-check"></i> Confirmar
+                                                </button>
+                                                <button type="button" class="btn btn-danger btn-sm ms-1 btn-cancelar"
+                                                        data-id="@r.ReservaId">
+                                                    <i class="fas fa-times"></i> Cancelar
+                                                </button>
+                                            }
                                         </div>
                                     </td>
-
                                 </tr>
                             }
                         }
@@ -86,9 +99,6 @@
                                 <td colspan="6" class="text-center py-4">
                                     <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
                                     <p class="text-muted">No hay reservas registradas</p>
-                                    <a asp-controller="Reservas" asp-action="Crear" class="btn btn-success">
-                                        <i class="fas fa-plus"></i> Crear primera reserva
-                                    </a>
                                 </td>
                             </tr>
                         }
@@ -107,43 +117,62 @@
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Mostrar fecha actual
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const currentDateElement = document.getElementById('current-date');
-            if (currentDateElement) {
-                currentDateElement.textContent = new Date().toLocaleDateString('es-ES', options);
-            }
+            const dateEl = document.getElementById('current-date');
+            if (dateEl) dateEl.textContent = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-            // Inicializar DataTables
             $('#tablaReservas').DataTable({
-                language: {
-                    url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
-                },
+                language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
                 order: [[1, 'asc']],
-                pageLength: 10,
-                responsive: true,
-                columnDefs: [
-                    { orderable: false, targets: [5] }
-                ]
+                pageLength: 10
             });
 
-            // Mostrar mensaje de éxito con SweetAlert si TempData["Success"] existe
-                    var successMessage = @Html.Raw(Json.Serialize(TempData["Success"]));
-        if (successMessage) {
-            Swal.fire({
-                icon: 'success',
-                title: '¡Éxito!',
-                text: successMessage,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true
+            // Confirmar reserva
+            document.querySelectorAll('.btn-confirmar').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const id = this.dataset.id;
+                    Swal.fire({
+                        title: '¿Confirmar reserva?',
+                        text: 'Esta acción marcará la reserva como CONFIRMADA.',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, confirmar',
+                        cancelButtonText: 'Cancelar'
+                    }).then(result => {
+                        if (result.isConfirmed) {
+                            const form = document.createElement('form');
+                            form.method = 'post';
+                            form.action = `/Reservas/Confirmar/${id}`;
+                            document.body.appendChild(form);
+                            form.submit();
+                        }
+                    });
+                });
             });
-        }
+
+            // Cancelar reserva
+            document.querySelectorAll('.btn-cancelar').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const id = this.dataset.id;
+                    Swal.fire({
+                        title: '¿Cancelar reserva?',
+                        text: 'Esta acción marcará la reserva como CANCELADA.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, cancelar',
+                        cancelButtonText: 'Volver'
+                    }).then(result => {
+                        if (result.isConfirmed) {
+                            const form = document.createElement('form');
+                            form.method = 'post';
+                            form.action = `/Reservas/CancelarAdmin/${id}`;
+                            document.body.appendChild(form);
+                            form.submit();
+                        }
+                    });
+                });
+            });
         });
     </script>
 }

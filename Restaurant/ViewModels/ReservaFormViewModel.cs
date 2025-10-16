@@ -1,9 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Restaurant.ViewModels
 {
     public class ReservaFormViewModel
     {
+        public int? ClienteId { get; set; } 
+
         [Required(ErrorMessage = "El nombre es obligatorio")]
         public string Nombre { get; set; }
 

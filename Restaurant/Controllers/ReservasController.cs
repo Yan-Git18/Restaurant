@@ -1,13 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Restaurant.Models;
 using Restaurant.ViewModels;
 using RESTAURANT.Data;
+using System.Security.Claims;
 
 namespace Restaurant.Controllers
 {
-    [Authorize(Roles = "Administrador, Cliente, Mesero")]
+    [Authorize]
     public class ReservasController : Controller
     {
         private readonly AppDbContext _context;
@@ -17,138 +19,248 @@ namespace Restaurant.Controllers
             _context = context;
         }
 
-        // LISTAR RESERVAS
-        [HttpGet]
-        public async Task<IActionResult> Index()
+        // PANEL ADMINISTRADOR: Ver todas las reservas con filtro
+        [Authorize(Roles = "Administrador, Mesero")]
+        public async Task<IActionResult> Index(string filtro)
         {
-            var reservasQuery = _context.Reservas
-                .Include(r => r.Cliente)
-                .Include(r => r.Mesa)
-                .OrderByDescending(r => r.FechaHora)
-                .AsQueryable();
+            var reservas = _context.Reservas.Include(r => r.Cliente).AsQueryable();
 
-            if (User.Identity!.IsAuthenticated)
+            if (!string.IsNullOrEmpty(filtro))
             {
-                var personaIdClaim = User.Claims.FirstOrDefault(c => c.Type == "PersonaId")?.Value;
-                if (int.TryParse(personaIdClaim, out int personaId) && personaId > 0)
-                {
-                    reservasQuery = reservasQuery.Where(r => r.ClienteId == personaId);
-                }
+                filtro = filtro.ToLower();
+                if (filtro == "confirmadas")
+                    reservas = reservas.Where(r => r.Estado == "Confirmada");
+                else if (filtro == "canceladas")
+                    reservas = reservas.Where(r => r.Estado == "Cancelada");
             }
 
-            var reservas = await reservasQuery.ToListAsync();
+            var lista = await reservas.OrderByDescending(r => r.FechaHora).ToListAsync();
+            ViewBag.FiltroActual = filtro ?? "todas";
+
+            return View(lista);
+        }
+
+        // CLIENTE: Ver solo sus reservas
+        [Authorize(Roles = "Administrador, Cliente")]
+        public async Task<IActionResult> MisReservas()
+        {
+            List<Rest_Reserva> reservas;
+
+            if (User.IsInRole("Administrador"))
+            {
+                reservas = await _context.Reservas
+                    .Include(r => r.Cliente)
+                    .OrderByDescending(r => r.FechaHora)
+                    .ToListAsync();
+            }
+            else
+            {
+                var personaIdClaim = User.FindFirstValue("PersonaId");
+                if (string.IsNullOrEmpty(personaIdClaim) || !int.TryParse(personaIdClaim, out int personaId))
+                    return RedirectToAction("Login", "Cuenta");
+
+                reservas = await _context.Reservas
+                    .Include(r => r.Mesa)
+                    .Where(r => r.ClienteId == personaId)
+                    .OrderByDescending(r => r.FechaHora)
+                    .ToListAsync();
+            }
+
             return View(reservas);
         }
 
-        
+        /// CONFIRMAR reserva (solo admin o mesero)
+        [Authorize(Roles = "Administrador, Mesero")]
+        [HttpPost]
+        [Route("Reservas/Confirmar/{id}")]
+        public async Task<IActionResult> Confirmar(int id)
+        {
+            var reserva = await _context.Reservas.FindAsync(id);
+            if (reserva == null)
+                return NotFound();
+
+            reserva.Estado = "Confirmada";
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "La reserva ha sido confirmada exitosamente.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        // 🔹 CANCELAR reserva (solo admin o mesero)
+        [Authorize(Roles = "Administrador, Mesero")]
+        [HttpPost]
+        [Route("Reservas/CancelarAdmin/{id}")]
+        public async Task<IActionResult> CancelarAdmin(int id)
+        {
+            var reserva = await _context.Reservas.FindAsync(id);
+            if (reserva == null)
+                return NotFound();
+
+            reserva.Estado = "Cancelada";
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "La reserva ha sido cancelada correctamente.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        // 🔹 CREAR reserva
         [HttpGet]
         public async Task<IActionResult> Crear()
         {
             var model = new ReservaFormViewModel();
 
-            // Autocompletar datos si hay usuario logueado
-            var personaIdClaim = User.Claims.FirstOrDefault(c => c.Type == "PersonaId")?.Value;
-            if (!string.IsNullOrEmpty(personaIdClaim) && int.TryParse(personaIdClaim, out int personaId) && personaId > 0)
+            if (User.IsInRole("Administrador"))
             {
-                var persona = await _context.Personas.FindAsync(personaId);
-                if (persona != null)
+                var clientes = await _context.Personas
+                    .Include(p => p.Usuario)
+                    .Where(p => p.Usuario != null && p.Usuario.Rol.Nombre == "Cliente")
+                    .Select(p => new { p.PersonaId, NombreCompleto = p.Nombre + " " + (p.Apellidos ?? "") })
+                    .ToListAsync();
+
+                ViewBag.Clientes = new SelectList(clientes, "PersonaId", "NombreCompleto");
+            }
+            else if (User.IsInRole("Cliente"))
+            {
+                var personaIdClaim = User.FindFirstValue("PersonaId");
+                if (int.TryParse(personaIdClaim, out int personaId))
                 {
-                    model.Nombre = persona.Nombre;
-                    model.Telefono = persona.Telefono;
-                    model.Email = persona.Correo;
+                    var persona = await _context.Personas.FindAsync(personaId);
+                    if (persona != null)
+                    {
+                        model.Nombre = persona.Nombre;
+                        model.Telefono = persona.Telefono;
+                        model.Email = persona.Correo;
+                        model.ClienteId = persona.PersonaId;
+                    }
                 }
             }
 
             return View(model);
         }
 
-        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Crear(ReservaFormViewModel model, string? origen = null)
+        public async Task<IActionResult> Crear(ReservaFormViewModel model)
         {
             if (!ModelState.IsValid)
-                return View(model);
-
-            try
             {
-                // Validar fecha y hora
-                if (model.Fecha == default || string.IsNullOrEmpty(model.Hora))
+                if (User.IsInRole("Administrador"))
                 {
-                    ModelState.AddModelError("", "Fecha u hora inválida.");
-                    return View(model);
+                    var clientes = await _context.Personas
+                        .Include(p => p.Usuario)
+                        .Where(p => p.Usuario != null && p.Usuario.Rol.Nombre == "Cliente")
+                        .Select(p => new { p.PersonaId, NombreCompleto = p.Nombre + " " + (p.Apellidos ?? "") })
+                        .ToListAsync();
+
+                    ViewBag.Clientes = new SelectList(clientes, "PersonaId", "NombreCompleto", model.ClienteId);
                 }
-
-                if (!TimeSpan.TryParse(model.Hora, out TimeSpan hora))
-                {
-                    ModelState.AddModelError("", "Formato de hora inválido.");
-                    return View(model);
-                }
-
-                DateTime fechaHora = model.Fecha.Date.Add(hora);
-                int numeroPersonas = model.Personas == "8+" ? 8 : int.Parse(model.Personas);
-
-                Rest_Persona cliente;
-
-                var personaIdClaim = User.Claims.FirstOrDefault(c => c.Type == "PersonaId")?.Value;
-                if (!string.IsNullOrEmpty(personaIdClaim) && int.TryParse(personaIdClaim, out int personaId) && personaId > 0)
-                {
-                    cliente = await _context.Personas.FindAsync(personaId);
-                    if (cliente == null)
-                    {
-                        cliente = new Rest_Persona
-                        {
-                            Nombre = model.Nombre,
-                            Telefono = model.Telefono,
-                            Correo = model.Email,
-                            FechaRegistro = DateTime.Now
-                        };
-                        _context.Personas.Add(cliente);
-                        await _context.SaveChangesAsync();
-                    }
-                }
-                else
-                {
-                    cliente = new Rest_Persona
-                    {
-                        Nombre = model.Nombre,
-                        Telefono = model.Telefono,
-                        Correo = model.Email,
-                        FechaRegistro = DateTime.Now
-                    };
-                    _context.Personas.Add(cliente);
-                    await _context.SaveChangesAsync();
-                }
-
-                var reserva = new Rest_Reserva
-                {
-                    FechaHora = fechaHora,
-                    NumeroPersonas = numeroPersonas,
-                    Observaciones = $"Ocasion: {model.Ocasion} | Comentarios: {model.Comentarios}",
-                    Estado = "Pendiente",
-                    FechaCreacion = DateTime.Now,
-                    ClienteId = cliente.PersonaId,
-                    MesaId = 1
-                };
-
-                _context.Reservas.Add(reserva);
-                await _context.SaveChangesAsync();
-
-                TempData["Success"] = "¡Reserva registrada correctamente!";
-
-                if (origen == "Administrador")
-                    return RedirectToAction("Index", "Reservas");
-                else
-                    return RedirectToAction("Index", "Home");
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", $"Error al guardar: {ex.Message}");
                 return View(model);
             }
+
+            if (model.Fecha == default || string.IsNullOrEmpty(model.Hora) || !TimeSpan.TryParse(model.Hora, out var hora))
+            {
+                ModelState.AddModelError("", "Fecha u hora inválida.");
+                return View(model);
+            }
+
+            int clienteId;
+            if (User.IsInRole("Administrador"))
+            {
+                if (!model.ClienteId.HasValue || model.ClienteId.Value <= 0)
+                {
+                    ModelState.AddModelError("", "Debe seleccionar un cliente.");
+                    return View(model);
+                }
+                clienteId = model.ClienteId.Value;
+            }
+            else
+            {
+                var personaIdClaim = User.FindFirstValue("PersonaId");
+                if (!int.TryParse(personaIdClaim, out clienteId))
+                    return RedirectToAction("Login", "Cuenta");
+            }
+
+            DateTime fechaHora = model.Fecha.Date.Add(TimeSpan.Parse(model.Hora));
+            int numeroPersonas = model.Personas == "8+" ? 8 : int.Parse(model.Personas);
+
+            var reserva = new Rest_Reserva
+            {
+                FechaHora = fechaHora,
+                NumeroPersonas = numeroPersonas,
+                Observaciones = $"Ocasión: {model.Ocasion ?? "Ninguna"} | Comentarios: {model.Comentarios ?? "Sin comentarios"}",
+                Estado = "Pendiente",
+                FechaCreacion = DateTime.Now,
+                ClienteId = clienteId,
+                MesaId = 1
+            };
+
+            _context.Reservas.Add(reserva);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "¡Reserva registrada correctamente!";
+            return User.IsInRole("Administrador") ? RedirectToAction("Index") : RedirectToAction("MisReservas");
         }
 
-        
+        // EDITAR reserva (solo admin)
+        [Authorize(Roles = "Administrador")]
+        [HttpGet]
+        public async Task<IActionResult> Editar(int id)
+        {
+            var reserva = await _context.Reservas.FindAsync(id);
+            if (reserva == null) return NotFound();
+
+            var model = new ReservaFormViewModel
+            {
+                ClienteId = reserva.ClienteId,
+                Fecha = reserva.FechaHora.Date,
+                Hora = reserva.FechaHora.ToString("HH:mm"),
+                Personas = reserva.NumeroPersonas.ToString(),
+                Ocasion = reserva.Observaciones,
+                Comentarios = reserva.Observaciones
+            };
+
+            var clientes = await _context.Personas
+                .Include(p => p.Usuario)
+                .Where(p => p.Usuario != null && p.Usuario.Rol.Nombre == "Cliente")
+                .Select(p => new { p.PersonaId, NombreCompleto = p.Nombre + " " + (p.Apellidos ?? "") })
+                .ToListAsync();
+
+            ViewBag.Clientes = new SelectList(clientes, "PersonaId", "NombreCompleto", model.ClienteId);
+            return View(model);
+        }
+
+        [Authorize(Roles = "Administrador")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Editar(int id, ReservaFormViewModel model)
+        {
+            var reserva = await _context.Reservas.FindAsync(id);
+            if (reserva == null) return NotFound();
+
+            if (!ModelState.IsValid)
+            {
+                var clientes = await _context.Personas
+                    .Include(p => p.Usuario)
+                    .Where(p => p.Usuario != null && p.Usuario.Rol.Nombre == "Cliente")
+                    .Select(p => new { p.PersonaId, NombreCompleto = p.Nombre + " " + (p.Apellidos ?? "") })
+                    .ToListAsync();
+
+                ViewBag.Clientes = new SelectList(clientes, "PersonaId", "NombreCompleto", model.ClienteId);
+                return View(model);
+            }
+
+            reserva.FechaHora = model.Fecha.Date.Add(TimeSpan.Parse(model.Hora));
+            reserva.NumeroPersonas = model.Personas == "8+" ? 8 : int.Parse(model.Personas);
+            reserva.Observaciones = $"Ocasión: {model.Ocasion} | Comentarios: {model.Comentarios}";
+            reserva.ClienteId = model.ClienteId ?? reserva.ClienteId;
+
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "Reserva actualizada correctamente.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        // DETALLES de reserva
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> Detalles(int id)
         {
@@ -156,112 +268,37 @@ namespace Restaurant.Controllers
                 .Include(r => r.Cliente)
                 .FirstOrDefaultAsync(r => r.ReservaId == id);
 
-            if (reserva == null)
-                return NotFound();
+            if (reserva == null) return NotFound();
 
             var model = new ReservaFormViewModel
             {
-                Nombre = reserva.Cliente?.Nombre ?? "",
-                Telefono = reserva.Cliente?.Telefono ?? "",
-                Email = reserva.Cliente?.Correo ?? "",
+                Nombre = reserva.Cliente?.Nombre,
+                Telefono = reserva.Cliente?.Telefono,
+                Email = reserva.Cliente?.Correo,
                 Fecha = reserva.FechaHora.Date,
                 Hora = reserva.FechaHora.ToString("HH:mm"),
-                Personas = reserva.NumeroPersonas >= 8 ? "8+" : reserva.NumeroPersonas.ToString(),
-                Ocasion = ExtraerValor(reserva.Observaciones, "Ocasion"),
-                Comentarios = ExtraerValor(reserva.Observaciones, "Comentarios")
+                Personas = reserva.NumeroPersonas.ToString(),
+                Ocasion = reserva.Observaciones?.Split('|').FirstOrDefault(o => o.Contains("Ocasión:"))?.Replace("Ocasión:", "").Trim(),
+                Comentarios = reserva.Observaciones?.Split('|').FirstOrDefault(o => o.Contains("Comentarios:"))?.Replace("Comentarios:", "").Trim()
             };
 
-            return View(model);
+            return User.IsInRole("Cliente") ? View("DetallesCliente", model) : View("Detalles", model);
         }
 
-
-        
+        // OBTENER CLIENTE (para autocompletar)
         [HttpGet]
-        public async Task<IActionResult> Editar(int id)
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> ObtenerCliente(int id)
         {
-            var reserva = await _context.Reservas
-                .Include(r => r.Cliente)
-                .FirstOrDefaultAsync(r => r.ReservaId == id);
+            var cliente = await _context.Personas
+                .Where(p => p.PersonaId == id)
+                .Select(p => new { nombre = p.Nombre, telefono = p.Telefono, correo = p.Correo })
+                .FirstOrDefaultAsync();
 
-            if (reserva == null)
+            if (cliente == null)
                 return NotFound();
 
-            var model = new ReservaFormViewModel
-            {
-                Nombre = reserva.Cliente?.Nombre ?? "",
-                Telefono = reserva.Cliente?.Telefono ?? "",
-                Email = reserva.Cliente?.Correo ?? "",
-                Fecha = reserva.FechaHora.Date,
-                Hora = reserva.FechaHora.ToString("HH:mm"),
-                Personas = reserva.NumeroPersonas >= 8 ? "8+" : reserva.NumeroPersonas.ToString(),
-                Ocasion = ExtraerValor(reserva.Observaciones, "Ocasion"),
-                Comentarios = ExtraerValor(reserva.Observaciones, "Comentarios")
-            };
-
-            return View(model);
-        }
-
-        
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Editar(int id, ReservaFormViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            var reserva = await _context.Reservas
-                .Include(r => r.Cliente)
-                .FirstOrDefaultAsync(r => r.ReservaId == id);
-
-            if (reserva == null)
-                return NotFound();
-
-            try
-            {
-                reserva.FechaHora = model.Fecha.Date.Add(TimeSpan.Parse(model.Hora));
-                reserva.NumeroPersonas = model.Personas == "8+" ? 8 : int.Parse(model.Personas);
-                reserva.Observaciones = $"Ocasion: {model.Ocasion} | Comentarios: {model.Comentarios}";
-                reserva.FechaCreacion = DateTime.Now;
-
-                if (reserva.Cliente != null)
-                {
-                    reserva.Cliente.Nombre = model.Nombre;
-                    reserva.Cliente.Telefono = model.Telefono;
-                    reserva.Cliente.Correo = model.Email;
-                }
-
-                _context.Update(reserva);
-                await _context.SaveChangesAsync();
-
-                TempData["Success"] = "¡Reserva actualizada correctamente!";
-                return RedirectToAction("Index");
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", $"Error al actualizar: {ex.Message}");
-                return View(model);
-            }
-        }
-
-        
-        public IActionResult Confirmacion()
-        {
-            ViewBag.Mensaje = TempData["Success"];
-            return View();
-        }
-
-        // PARA EXTRAER DATOS DE "Observaciones"
-        private string? ExtraerValor(string? observaciones, string clave)
-        {
-            if (string.IsNullOrEmpty(observaciones)) return null;
-
-            var partes = observaciones.Split('|', StringSplitOptions.RemoveEmptyEntries);
-            foreach (var parte in partes)
-            {
-                if (parte.Trim().StartsWith(clave + ":", StringComparison.OrdinalIgnoreCase))
-                    return parte.Split(':')[1].Trim();
-            }
-            return null;
+            return Json(cliente);
         }
     }
 }

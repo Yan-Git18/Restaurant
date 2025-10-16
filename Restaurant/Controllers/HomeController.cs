@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Restaurant.Models;
 using RESTAURANT.Data;
@@ -43,6 +43,26 @@ namespace Restaurant.Controllers
             ViewData["TotalUsuarios"] = totalUsuarios;
             ViewData["TotalVentas"] = totalVentas;
             ViewData["TotalProductos"] = totalProductos;
+
+            // Autocompletar datos si el usuario está logueado
+            if (User.Identity!.IsAuthenticated)
+            {
+                var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+
+                if (int.TryParse(userIdClaim, out int userId))
+                {
+                    var persona = await _context.Personas
+                        .FirstOrDefaultAsync(p => p.UsuarioId == userId);
+
+                    if (persona != null)
+                    {
+                        ViewBag.NombreCliente = persona.Nombre + " " + (persona.Apellidos ?? "");
+                        ViewBag.TelefonoCliente = persona.Telefono;
+                        ViewBag.EmailCliente = persona.Correo;
+                        ViewBag.ClienteId = persona.PersonaId;
+                    }
+                }
+            }
 
             return View();
         }

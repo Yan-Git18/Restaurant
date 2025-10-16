@@ -30,33 +30,17 @@
         let menuHtml = "";
 
         switch (user.role.toLowerCase()) {
-            case "cliente":
-                menuHtml = `
-                    <a href="/Cuenta/Perfil" class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg">
-                        <i class="fas fa-user text-restaurant-accent"></i> Perfil
-                    </a>
-                    <a href="/Admin/Index" class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg">
-                        <i class="fas fa-calendar-alt text-restaurant-accent"></i> Ir al Panel
-                    </a>`;
-                break;
-
             case "cajero":
                 menuHtml = `
                     <a href="/Admin/Index" class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg">
                         <i class="fas fa-briefcase text-restaurant-accent"></i> Ir al panel
-                    </a>
-                    <a href="/Cuenta/Perfil" class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg">
-                        <i class="fas fa-user text-restaurant-accent"></i> Perfil
                     </a>`;
                 break;
 
-            case "Mesero":
+            case "mesero":
                 menuHtml = `
                     <a href="/Admin/Index" class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg">
                         <i class="fas fa-briefcase text-restaurant-accent"></i> Ir al panel
-                    </a>
-                    <a href="/Cuenta/Perfil" class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg">
-                        <i class="fas fa-user text-restaurant-accent"></i> Perfil
                     </a>`;
                 break;
 

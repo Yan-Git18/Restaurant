@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - Restaurante Delizioso</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'restaurant-primary': '#8B4513',
+                        'restaurant-secondary': '#D2691E',
+                        'restaurant-accent': '#FF6B35',
+                        'restaurant-dark': '#2C1810',
+                    },
+                    fontFamily: {
+                        'serif': ['Georgia', 'serif'],
+                        'elegant': ['Playfair Display', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="font-sans">
+
+    <!-- Navbar del Home -->
+    @await Html.PartialAsync("_NavbarHome")
+
+    <main class="pt-24">
+        @RenderBody()
+    </main>
+
+    <script>
+        window.userData = {
+            isAuthenticated: @User.Identity.IsAuthenticated.ToString().ToLower(),
+            role: "@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value",
+            name: "@User.Identity.Name"
+        };
+    </script>
+
+    <script src="~/js/navHome.js"></script>
+    <script src="~/js/site.js"></script>
+    <script src="~/js/sweetalert-notify.js"></script>
+
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

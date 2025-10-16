@@ -2,55 +2,46 @@
 @{
     ViewData["Title"] = "Nueva Reserva";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
-
 }
 
 <div class="container mt-4">
-    <h3 class="fw-bold mb-3">📝 Hacer una Reserva</h3>
-    <p class="text-muted">Completa el formulario y te confirmaremos tu reserva en menos de 30 minutos.</p>
-
-    @if (!ViewData.ModelState.IsValid)
-    {
-        <div class="alert alert-danger">
-            <ul>
-                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                {
-                    <li>@error.ErrorMessage</li>
-                }
-            </ul>
-        </div>
-    }
+    <h3 class="fw-bold mb-3">📝 Crear Reserva</h3>
+    <p class="text-muted">Seleccione un cliente y complete los datos de la reserva.</p>
 
     <form asp-action="Crear" method="post" class="row g-3">
         @Html.AntiForgeryToken()
-        <input type="hidden" name="origen" value="Administrador" />
+
+        <!-- Cliente -->
+        <div class="col-md-12">
+            <label for="ClienteId" class="form-label">Seleccionar Cliente</label>
+            <select asp-for="ClienteId" asp-items="ViewBag.Clientes" class="form-select" id="ClienteId">
+                <option value="">Seleccione un cliente...</option>
+            </select>
+            <span asp-validation-for="ClienteId" class="text-danger"></span>
+        </div>
 
         <!-- Nombre -->
         <div class="col-md-6">
             <label asp-for="Nombre" class="form-label">Nombre Completo</label>
-            <input asp-for="Nombre" class="form-control" />
-            <span asp-validation-for="Nombre" class="text-danger"></span>
+            <input asp-for="Nombre" class="form-control" id="Nombre" readonly />
         </div>
 
         <!-- Teléfono -->
         <div class="col-md-6">
             <label asp-for="Telefono" class="form-label">Teléfono</label>
-            <input asp-for="Telefono" class="form-control" />
-            <span asp-validation-for="Telefono" class="text-danger"></span>
+            <input asp-for="Telefono" class="form-control" id="Telefono" readonly />
         </div>
 
         <!-- Correo -->
-        <div class="col-12">
+        <div class="col-md-12">
             <label asp-for="Email" class="form-label">Correo Electrónico</label>
-            <input asp-for="Email" class="form-control" />
-            <span asp-validation-for="Email" class="text-danger"></span>
+            <input asp-for="Email" class="form-control" id="Email" readonly />
         </div>
 
         <!-- Fecha -->
         <div class="col-md-6">
             <label asp-for="Fecha" class="form-label">Fecha</label>
             <input asp-for="Fecha" type="date" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")" />
-            <span asp-validation-for="Fecha" class="text-danger"></span>
         </div>
 
         <!-- Hora -->
@@ -64,7 +55,6 @@
                     <option value="@($"{h:00}:30")">@($"{h:00}:30")</option>
                 }
             </select>
-            <span asp-validation-for="Hora" class="text-danger"></span>
         </div>
 
         <!-- Número de Personas -->
@@ -78,7 +68,6 @@
                 }
                 <option value="8+">8 o más</option>
             </select>
-            <span asp-validation-for="Personas" class="text-danger"></span>
         </div>
 
         <!-- Ocasión -->
@@ -91,28 +80,49 @@
                 <option value="Negocios">Negocios</option>
                 <option value="Otro">Otro</option>
             </select>
-            <span asp-validation-for="Ocasion" class="text-danger"></span>
         </div>
 
         <!-- Comentarios -->
-        <div class="col-12">
+        <div class="col-md-12">
             <label asp-for="Comentarios" class="form-label">Comentarios Especiales</label>
             <textarea asp-for="Comentarios" class="form-control" rows="3"></textarea>
-            <span asp-validation-for="Comentarios" class="text-danger"></span>
-        </div>
-
-        <div class="text-start mt-3">
-            <a asp-controller="Reservas" asp-action="Index" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Volver Atras
-            </a>
         </div>
 
         <div class="col-12 text-end">
-            <button type="submit" class="btn btn-primary">Reservar</button>
+            <a asp-controller="Reservas" asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+            <button type="submit" class="btn btn-primary">Guardar Reserva</button>
         </div>
     </form>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const clienteSelect = document.getElementById('ClienteId');
+            const nombreInput = document.getElementById('Nombre');
+            const telefonoInput = document.getElementById('Telefono');
+            const correoInput = document.getElementById('Email');
+
+            clienteSelect.addEventListener('change', function () {
+                const id = this.value;
+                if (id) {
+                    fetch(`/Reservas/ObtenerCliente?id=${id}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            nombreInput.value = data.nombre || "";
+                            telefonoInput.value = data.telefono || "";
+                            correoInput.value = data.correo || "";
+                        });
+                } else {
+                    nombreInput.value = "";
+                    telefonoInput.value = "";
+                    correoInput.value = "";
+                }
+            });
+        });
+    </script>
 }
