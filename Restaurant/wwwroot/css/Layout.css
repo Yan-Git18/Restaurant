@@ -158,3 +158,89 @@ body {
     margin-top: auto;
     padding: 1rem;
 }
+
+/* ------------------------ */
+/* 🔹 RESPONSIVE ADMIN LAYOUT */
+/* ------------------------ */
+
+/* Overlay oscuro cuando el menú está abierto (solo móviles) */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 99;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+}
+
+/* Sidebar móvil: se muestra encima del contenido */
+@media (max-width: 992px) {
+    body {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -260px;
+        height: 100%;
+        z-index: 100;
+        transition: left 0.3s ease;
+        border-radius: 0;
+        width: 250px;
+    }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+    .sidebar-overlay.active {
+        display: block;
+        opacity: 1;
+    }
+
+    .main-content {
+        width: 100%;
+        margin-left: 0 !important;
+    }
+
+    .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 90;
+        background-color: white;
+        border-bottom: 1px solid #eaeaea;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .topbar-container {
+        padding: 0.5rem 0.75rem;
+    }
+
+    /* Ajuste de textos e iconos */
+    .sidebar .nav-link span {
+        font-size: 0.9rem;
+    }
+
+    .sidebar .nav-link i {
+        margin-right: 8px;
+    }
+}
+
+/* Pantallas muy pequeñas */
+@media (max-width: 576px) {
+    .topbar-container {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .topbar button {
+        font-size: 1.25rem;
+    }
+
+    .sidebar {
+        width: 230px;
+    }
+}
+

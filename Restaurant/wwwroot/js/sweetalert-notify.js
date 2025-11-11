@@ -8,7 +8,7 @@
             title: mensaje,
             confirmButtonText: 'Aceptar',
             timer: 1500,
-            timerProgressBar: true
+            timerProgressBar: true,
         });
     }
 });

@@ -4,61 +4,81 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="container py-4">
-    <div class="roles-header d-flex justify-content-between align-items-center">
-        <h2><i class="fa fa-user-plus me-2"></i>Crear Usuario</h2>
-        <a asp-action="Index" class="btn btn-nuevo">
-            <i class="fa fa-arrow-left me-2"></i>Volver
-        </a>
+<div class="container-fluid py-4">
+    <!-- Encabezado -->
+    <div class="dashboard-header mb-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h1 class="mb-1"><i class="fa fa-user-plus me-2"></i>Crear Usuario</h1>
+                <p class="text-muted mb-0">Registra un nuevo usuario en el sistema</p>
+            </div>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fa fa-arrow-left me-1"></i> Volver al listado
+            </a>
+        </div>
     </div>
 
-    <div class="table-card p-4">
-        <form asp-action="Create" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+    <!-- Tarjeta principal -->
+    <div class="card shadow border-0 card-usuarios">
+        <div class="card-body p-4">
+            <form asp-action="Create" method="post" class="needs-validation" novalidate>
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-            <div class="mb-3">
-                <label asp-for="Correo" class="form-label"></label>
-                <input asp-for="Correo" class="form-control rounded-3" />
-                <span asp-validation-for="Correo" class="text-danger"></span>
-            </div>
+                <div class="row g-3">
+                    <!-- Correo -->
+                    <div class="col-md-6">
+                        <label asp-for="Correo" class="form-label fw-semibold"></label>
+                        <input asp-for="Correo" class="form-control rounded-3" />
+                        <span asp-validation-for="Correo" class="text-danger"></span>
+                    </div>
 
-            <div class="mb-3">
-                <label class="form-label">Contraseña</label>
-                <input asp-for="Password" type="password" class="form-control rounded-3" />
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
+                    <!-- Contraseña -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Contraseña</label>
+                        <input asp-for="Password" type="password" class="form-control rounded-3" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
 
-            <div class="mb-3">
-                <label asp-for="RolId" class="form-label">Rol</label>
-                <select asp-for="RolId" class="form-select rounded-3" asp-items="ViewBag.RolId"></select>
-                <span asp-validation-for="RolId" class="text-danger"></span>
-            </div>
+                    <!-- Rol -->
+                    <div class="col-md-6">
+                        <label asp-for="RolId" class="form-label fw-semibold">Rol</label>
+                        <select asp-for="RolId" class="form-select rounded-3" asp-items="ViewBag.RolId"></select>
+                        <span asp-validation-for="RolId" class="text-danger"></span>
+                    </div>
 
-            <div class="mb-3">
-                <label asp-for="Nombre" class="form-label"></label>
-                <input asp-for="Nombre" class="form-control rounded-3" />
-                <span asp-validation-for="Nombre" class="text-danger"></span>
-            </div>
+                    <!-- Nombre -->
+                    <div class="col-md-6">
+                        <label asp-for="Nombre" class="form-label fw-semibold"></label>
+                        <input asp-for="Nombre" class="form-control rounded-3" />
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
+                    </div>
 
-            <div class="mb-3">
-                <label asp-for="Apellidos" class="form-label"></label>
-                <input asp-for="Apellidos" class="form-control rounded-3" />
-                <span asp-validation-for="Apellidos" class="text-danger"></span>
-            </div>
+                    <!-- Apellidos -->
+                    <div class="col-md-6">
+                        <label asp-for="Apellidos" class="form-label fw-semibold"></label>
+                        <input asp-for="Apellidos" class="form-control rounded-3" />
+                        <span asp-validation-for="Apellidos" class="text-danger"></span>
+                    </div>
 
-            <div class="mb-3">
-                <label asp-for="Telefono" class="form-label"></label>
-                <input asp-for="Telefono" class="form-control rounded-3" />
-                <span asp-validation-for="Telefono" class="text-danger"></span>
-            </div>
+                    <!-- Teléfono -->
+                    <div class="col-md-6">
+                        <label asp-for="Telefono" class="form-label fw-semibold"></label>
+                        <input asp-for="Telefono" class="form-control rounded-3" />
+                        <span asp-validation-for="Telefono" class="text-danger"></span>
+                    </div>
+                </div>
 
-            <button type="submit" class="action-btn btn-edit">
-                <i class="fa fa-save me-1"></i>Guardar
-            </button>
-            <a asp-action="Index" class="action-btn btn-delete">
-                <i class="fa fa-times me-1"></i>Cancelar
-            </a>
-        </form>
+                <!-- Botones -->
+                <div class="mt-4 d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fa fa-save me-1"></i> Guardar
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fa fa-times me-1"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 

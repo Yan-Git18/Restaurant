@@ -7,7 +7,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Crear Cuenta - Delizioso</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -40,25 +40,6 @@
             width: 0 !important;
             height: 0 !important;
         }
-    
-        /* Scroll para el contenedor del formulario en móvil y pantallas medianas */
-        @@media (max-height: 900px) {
-            .form-container
-
-        {
-            max-height: calc(100vh - 8rem);
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-
-        }
-
-        @@media (max-height: 700px) {
-            .form-container
-
-        {
-            max-height: calc(100vh - 4rem);
-        }
 
         }
 
@@ -82,7 +63,7 @@
             }
     </style>
 </head>
-<body class="font-sans min-h-screen bg-gradient-to-br from-restaurant-dark via-restaurant-primary to-restaurant-secondary relative overflow-hidden">
+<body class="font-sans min-h-screen bg-gradient-to-br from-restaurant-dark via-restaurant-primary to-restaurant-secondary relative overflow-x-hidden overflow-y-auto">
 
     <!-- Elementos decorativos de fondo -->
     <div class="absolute inset-0">
@@ -97,7 +78,7 @@
         <div style="background-image: url('data:image/svg+xml,<svg width=" 60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="white" fill-opacity="0.1"><circle cx="30" cy="30" r="4" /></g></svg>'); background-size: 60px 60px;"></div>
     </div>
 
-    <div class="relative z-10 flex items-center justify-center min-h-screen p-4 py-12">
+    <div class="relative z-10 flex flex-col items-center justify-center min-h-screen p-6 md:p-10">
         <div class="w-full max-w-2xl form-container">
 
             <!-- Header con Logo -->
@@ -303,6 +284,7 @@
                 </div>
             </div>
         </div>
+        <div class="pb-10"></div>
     </div>
 
     <script src="~/js/register.js"></script>

@@ -16,7 +16,6 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h1>Registrar nueva categoría</h1>
-                    @* <p class="mb-0">Ingrese el nombre del nuevo rol</p> *@
                 </div>
                 <div>
                     <span class="badge bg-light text-dark">
@@ -47,7 +46,7 @@
                                 <input asp-for="Orden" class="form-control" required />
                                 <span asp-validation-for="Orden" class="text-danger small"></span>
                             </div>
-                            <div class="text-end">
+                            <div class="text-end d-flex justify-content-end flex-wrap gap-2">
                                 <button type="submit" class="btn btn-success">
                                     <i class="fas fa-save me-1"></i> Guardar
                                 </button>
