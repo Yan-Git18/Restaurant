@@ -5,7 +5,7 @@
 }
 <div class="container-fluid py-4">
     <div class="dashboard-header mb-4">
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
             <div>
                 <h1><i class="fas fa-money-bill-wave me-2"></i>Gestión de Pagos</h1>
                 <p class="mb-0">Listado y control de pagos registrados</p>
@@ -21,13 +21,13 @@
 
     <div class="card card-rutas">
         <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-3">
                 <h4 class="section-title mb-0">
                     Listado de Pagos
                     <span class="badge bg-primary ms-2">@Model.Count</span>
                 </h4>
                 <a asp-controller="Pagos" asp-action="Crear" class="btn btn-success">
-                    <i class="fas fa-plus"></i> Nuevo Pago
+                    <i class="fas fa-plus"></i> Nuevo
                 </a>
             </div>
 
