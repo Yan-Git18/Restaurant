@@ -32,6 +32,8 @@ namespace Restaurant.Controllers
         [HttpPost]
         public async Task<IActionResult> Crear(Rest_Categoria cat)
         {
+            if (!ModelState.IsValid) return View(cat);
+
             var existeCat = await _context.Categorias
                 .FirstOrDefaultAsync(r => r.Nombre == cat.Nombre);
 
@@ -63,6 +65,8 @@ namespace Restaurant.Controllers
         [HttpGet]
         public IActionResult Editar(int id)
         {
+            if (!ModelState.IsValid) return View(id);
+
             var cat = _context.Categorias.Find(id);
             if (cat == null)
             {
@@ -74,6 +78,8 @@ namespace Restaurant.Controllers
         [HttpPost]
         public async Task<IActionResult> Editar(Rest_Categoria cat)
         {
+            if (!ModelState.IsValid) return View(cat);
+            
             _context.Categorias.Update(cat);
             await _context.SaveChangesAsync();
             TempData["Mensaje"] = "La categoría se ha actualizado correctamente.";
@@ -85,6 +91,8 @@ namespace Restaurant.Controllers
         [HttpGet]
         public IActionResult Eliminar(int id)
         {
+            if (!ModelState.IsValid) return View(id);
+
             var cat = _context.Categorias.Find(id);
             if (cat == null)
             {
@@ -96,6 +104,8 @@ namespace Restaurant.Controllers
         [HttpPost]
         public IActionResult EliminarConfirmar(int id)
         {
+            if (!ModelState.IsValid) return View(id);
+
             var cat = _context.Categorias.Find(id);
             _context.Categorias.Remove(cat);
             _context.SaveChanges();

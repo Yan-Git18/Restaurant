@@ -34,26 +34,23 @@ namespace Restaurant.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Crear(Rest_Mesa mesa)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid) return View(mesa);
+
+            // Validar duplicado
+            var existe = await _context.Mesas.AnyAsync(m => m.Numero == mesa.Numero);
+            if (existe)
             {
-                // validar duplicado
-                var existe = await _context.Mesas.AnyAsync(m => m.Numero == mesa.Numero);
-                if (existe)
-                {
-                    ModelState.AddModelError("Numero", $"Ya existe una mesa con el número {mesa.Numero}.");
-                    return View(mesa);
-                }
-
-                mesa.FechaCreacion = DateTime.Now;
-                _context.Add(mesa);
-                await _context.SaveChangesAsync();
-
-                TempData["Mensaje"] = "Mesa registrada correctamente";
-                TempData["Tipo"] = "success";
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("Numero", $"Ya existe una mesa con el número {mesa.Numero}.");
+                return View(mesa);
             }
 
-            return View(mesa);
+            mesa.FechaCreacion = DateTime.Now;
+            _context.Add(mesa);
+            await _context.SaveChangesAsync();
+
+            TempData["Mensaje"] = "Mesa registrada correctamente";
+            TempData["Tipo"] = "success";
+            return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Editar(int id)
@@ -68,11 +65,16 @@ namespace Restaurant.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Editar(Rest_Mesa mesa)
         {
+            if (!ModelState.IsValid)
+                return View(mesa);
+
             var mesas = await _context.Mesas.FindAsync(mesa.MesaId);
             if (mesas == null) return NotFound();
 
-            // validar duplicado (excluyendo la misma mesa)
-            var existe = await _context.Mesas.AnyAsync(m => m.Numero == mesa.Numero && m.MesaId != mesa.MesaId);
+            // Validar duplicado (excluyendo la misma mesa)
+            var existe = await _context.Mesas
+                .AnyAsync(m => m.Numero == mesa.Numero && m.MesaId != mesa.MesaId);
+
             if (existe)
             {
                 ModelState.AddModelError("Numero", $"Ya existe otra mesa con el número {mesa.Numero}.");

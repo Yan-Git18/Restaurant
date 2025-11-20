@@ -195,7 +195,6 @@ namespace Restaurant.Controllers
 
             if (pedido == null) return NotFound();
 
-            // Bloquear edición si ya está atendido
             if (pedido.Estado == EstadoPedido.Atendido.ToString())
             {
                 TempData["Mensaje"] = "No se puede editar un pedido ya atendido.";
@@ -223,6 +222,7 @@ namespace Restaurant.Controllers
 
             decimal total = 0m;
             pedido.DetallesPedido = new List<Rest_DetallePedido>();
+
             foreach (var d in vm.Detalles)
             {
                 if (d == null || d.ProductoId <= 0 || d.Cantidad <= 0) continue;
@@ -237,6 +237,7 @@ namespace Restaurant.Controllers
                 pedido.DetallesPedido.Add(detalle);
                 total += detalle.Subtotal;
             }
+
             pedido.Total = total;
 
             _context.Update(pedido);

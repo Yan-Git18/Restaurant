@@ -46,6 +46,8 @@ namespace Restaurant.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Crear(Rest_Inventario inv)
         {
+            if (!ModelState.IsValid) return View(inv);
+
             inv.FechaActualizacion = DateTime.Now;
             await _context.Inventarios.AddAsync(inv);
             await _context.SaveChangesAsync();
@@ -70,6 +72,8 @@ namespace Restaurant.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Editar(Rest_Inventario inv)
         {
+            if (!ModelState.IsValid) return View(inv);
+
             var inventario = await _context.Inventarios.FindAsync(inv.Id);
 
             if (inventario == null)

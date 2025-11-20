@@ -101,7 +101,7 @@ namespace Restaurant.Controllers
             var original = await _context.Productos.AsNoTracking().FirstOrDefaultAsync(x => x.Id == p.Id);
             if (original != null)
             {
-                p.FechaCreacion = original.FechaCreacion;
+                p.FechaCreacion = original.FechaCreacion;                
             }
 
             _context.Productos.Update(p);

@@ -63,7 +63,7 @@ namespace Restaurant.Controllers
 
             if (venta == null)
             {
-                ModelState.AddModelError("VentaId", "La venta seleccionada no existe.");
+                return BadRequest();
             }
             else
             {

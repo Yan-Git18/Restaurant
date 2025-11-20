@@ -152,7 +152,7 @@ namespace Restaurant.Controllers
 
             if (venta == null) return NotFound();
 
-            ViewBag.Pedidos = _context.Pedidos.ToList();
+            ViewBag.Pedidos = _context.Pedidos.ToListAsync();
             return View(venta);
         }
 
@@ -162,12 +162,8 @@ namespace Restaurant.Controllers
         public async Task<IActionResult> Editar(int id, Rest_Venta venta)
         {
             if (id != venta.Id) return NotFound();
-
-            if (!ModelState.IsValid)
-            {
-                ViewBag.Pedidos = _context.Pedidos.ToList();
-                return View(venta);
-            }
+            
+            ViewBag.Pedidos = _context.Pedidos.ToListAsync();               
 
             try
             {

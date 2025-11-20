@@ -86,7 +86,7 @@ namespace Restaurant.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // 🔹 CANCELAR reserva (solo admin o mesero)
+        // CANCELAR reserva (solo admin o mesero)
         [Authorize(Roles = "Administrador, Mesero")]
         [HttpPost]
         [Route("Reservas/CancelarAdmin/{id}")]
@@ -103,7 +103,7 @@ namespace Restaurant.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // 🔹 CREAR reserva
+        // CREAR reserva
         [HttpGet]
         public async Task<IActionResult> Crear()
         {
@@ -152,7 +152,7 @@ namespace Restaurant.Controllers
                     ViewBag.TelefonoCliente = model.Telefono;
                     ViewBag.EmailCliente = model.Email;
 
-                    // 👇 Esto devuelve la vista del Home y muestra los errores en el formulario
+                    // Esto devuelve la vista del Home y muestra los errores en el formulario
                     return View("~/Views/Home/Index.cshtml", model);
                 }
 
