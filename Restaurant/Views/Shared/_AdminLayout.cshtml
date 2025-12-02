@@ -137,7 +137,7 @@
 
             </nav>
         </nav>
-        <div class="logout mt-auto px-3 mb-3">
+        <div class="logout mt-1 px-3 mb-3">
             <form asp-controller="Cuenta" asp-action="Logout" method="post">
                 <button type="submit" class="btn btn-danger w-100 rounded-pill">
                     <i class="fa fa-sign-out-alt me-2"></i> <span>Cerrar Sesión</span>
@@ -265,5 +265,14 @@
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        (function(d){
+          var s = d.createElement("script");
+          s.setAttribute("data-account", "TU_ID_DE_USERWAY");
+          s.setAttribute("src", "https://cdn.userway.org/widget.js");
+          (d.body || d.head).appendChild(s);
+        })(document);
+    </script>
 </body>
 </html>
