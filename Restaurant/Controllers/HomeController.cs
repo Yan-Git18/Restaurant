@@ -44,7 +44,6 @@ namespace Restaurant.Controllers
             ViewData["TotalVentas"] = totalVentas;
             ViewData["TotalProductos"] = totalProductos;
 
-            // Autocompletar datos si el usuario está logueado
             if (User.Identity!.IsAuthenticated)
             {
                 var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;

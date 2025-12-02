@@ -36,7 +36,6 @@ namespace Restaurant.Controllers
                     .ThenInclude(p => p.Cliente)
                 .ToList();
 
-            // Solo ventas con saldo pendiente
             var ventasPendientes = ventasDisponibles
                 .Where(v => v.Pagos.Sum(p => p.Monto) < v.Total)
                 .Select(v => new

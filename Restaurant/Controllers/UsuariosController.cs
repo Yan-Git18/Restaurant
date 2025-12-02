@@ -63,7 +63,6 @@ namespace Restaurant.Controllers
                 _context.Usuarios.Add(usuario);
                 await _context.SaveChangesAsync();
 
-                // Crear la persona asociada al usuario
                 var persona = new Rest_Persona
                 {
                     Nombre = model.Nombre ?? "Sin nombre",
@@ -131,7 +130,6 @@ namespace Restaurant.Controllers
                     usuarioDb.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password);
                 }
 
-                // Actualizar datos de persona
                 if (usuarioDb.Cliente != null)
                 {
                     usuarioDb.Cliente.Nombre = model.Nombre ?? usuarioDb.Cliente.Nombre;
@@ -157,7 +155,6 @@ namespace Restaurant.Controllers
             var usuario = await _context.Usuarios.FindAsync(id);
             if (usuario != null)
             {
-                // En vez de borrar, deshabilitamos
                 usuario.Activo = false;
                 _context.Update(usuario);
                 await _context.SaveChangesAsync();

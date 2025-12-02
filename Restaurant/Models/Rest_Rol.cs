@@ -16,7 +16,6 @@ namespace Restaurant.Models
         [StringLength(200, ErrorMessage = "La descripción no puede exceder 200 caracteres")]
         public string? Descripcion { get; set; }
 
-        // Navegación
         public virtual ICollection<Rest_Usuario> Usuarios { get; set; } = new List<Rest_Usuario>();
     }
 }

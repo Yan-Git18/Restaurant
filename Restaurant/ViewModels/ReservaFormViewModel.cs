@@ -25,7 +25,7 @@ namespace Restaurant.ViewModels
         public string Hora { get; set; }
 
         [Required(ErrorMessage = "El número de personas es obligatorio")]
-        public string Personas { get; set; } // lo dejamos string por el "8+"
+        public string Personas { get; set; } 
 
         public string? Ocasion { get; set; }
 

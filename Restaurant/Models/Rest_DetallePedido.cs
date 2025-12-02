@@ -29,7 +29,6 @@ namespace Restaurant.Models
         [Display(Name = "Producto")]
         public int ProductoId { get; set; }
 
-        // Navegación
         [ForeignKey("PedidoId")]
         public virtual Rest_Pedido Pedido { get; set; }
 

@@ -53,16 +53,15 @@ if (reservationForm && fechaInput) {
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Procesando...';
             submitBtn.disabled = true;
 
-            // Simular envío
             setTimeout(() => {
                 showReservationSuccess(reservationData);
                 reservationForm.reset();
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
-            }, 1000); // ← FALTABA CERRAR EL setTimeout
-        } // ← FALTABA CERRAR EL FINALLY
-    }); // ← FALTABA CERRAR EL addEventListener
-} // ← FALTABA CERRAR EL IF PRINCIPAL
+            }, 1000); 
+        } 
+    }); 
+} 
 
 
 function validateReservation(data) {

@@ -11,7 +11,7 @@ namespace Restaurant.Models
         [Required(ErrorMessage = "El método de pago es obligatorio")]
         [StringLength(30, ErrorMessage = "El método no puede exceder 30 caracteres")]
         [Display(Name = "Método")]
-        public string Metodo { get; set; } // Efectivo, Tarjeta, Transferencia, Yape, Plin
+        public string Metodo { get; set; } 
 
         [Required(ErrorMessage = "El monto es obligatorio")]
         [Range(0.01, 99999.99, ErrorMessage = "El monto debe ser mayor a 0")]
@@ -20,10 +20,10 @@ namespace Restaurant.Models
         public decimal Monto { get; set; }
 
         [Display(Name = "Fecha")]
-        public DateTime FechaPago { get; set; } //= DateTime.Now;
+        public DateTime FechaPago { get; set; } 
 
         [StringLength(100, ErrorMessage = "La referencia no puede exceder 100 caracteres")]
-        public string? Referencia { get; set; } // Número de operación, últimos 4 dígitos de tarjeta, etc.
+        public string? Referencia { get; set; } 
 
         [StringLength(200, ErrorMessage = "Las observaciones no pueden exceder 200 caracteres")]
         public string? Observaciones { get; set; }
@@ -32,7 +32,6 @@ namespace Restaurant.Models
         [Display(Name = "Venta")]
         public int VentaId { get; set; }
 
-        // Navegación
         [ForeignKey("VentaId")]
         public virtual Rest_Venta Venta { get; set; }
     }

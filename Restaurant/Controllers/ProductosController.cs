@@ -124,11 +124,9 @@ namespace Restaurant.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // No desactivar si está en pedidos actuales
             var enDetalles = await _context.DetallesPedido.AnyAsync(d => d.ProductoId == id);
             if (enDetalles)
             {
-                // en lugar de eliminar, marcamos inactivo
                 producto.Activo = false;
                 _context.Productos.Update(producto);
                 await _context.SaveChangesAsync();
@@ -138,7 +136,6 @@ namespace Restaurant.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Si no está en detalles, igual lo desactivamos
             producto.Activo = false;
             _context.Productos.Update(producto);
             await _context.SaveChangesAsync();

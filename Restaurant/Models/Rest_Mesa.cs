@@ -17,16 +17,15 @@ namespace Restaurant.Models
 
         [Required(ErrorMessage = "El estado es obligatorio")]
         [StringLength(20, ErrorMessage = "El estado no puede exceder 20 caracteres")]
-        public string Estado { get; set; } = "Libre"; // Libre, Ocupada, Reservada, Mantenimiento
+        public string Estado { get; set; } = "Libre"; 
 
         [StringLength(500, ErrorMessage = "Las observaciones no pueden exceder 500 caracteres")]
         public string? Observaciones { get; set; }
 
-        public DateTime FechaCreacion { get; set; } //= DateTime.Now;
+        public DateTime FechaCreacion { get; set; } 
 
         public bool Activo { get; set; } = true;
 
-        // Navegación
         public virtual ICollection<Rest_Reserva> Reservas { get; set; } = new List<Rest_Reserva>();
         public virtual ICollection<Rest_Pedido> Pedidos { get; set; } = new List<Rest_Pedido>();
     }

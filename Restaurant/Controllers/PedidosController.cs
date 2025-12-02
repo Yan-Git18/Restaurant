@@ -18,7 +18,6 @@ namespace Restaurant.Controllers
             _context = context;
         }
 
-        // GET: Pedidos
         public async Task<IActionResult> Index()
         {
             var pedidos = await _context.Pedidos
@@ -32,7 +31,6 @@ namespace Restaurant.Controllers
             return View(pedidos);
         }
 
-        // GET: Pedidos/Detalles/5
         public async Task<IActionResult> Detalles(int? id)
         {
             if (id == null) return NotFound();
@@ -153,7 +151,6 @@ namespace Restaurant.Controllers
 
             if (pedido == null) return NotFound();
 
-            // Bloquear edición si ya está atendido
             if (pedido.Estado == EstadoPedido.Atendido.ToString())
             {
                 TempData["Mensaje"] = "No se puede editar un pedido ya atendido.";

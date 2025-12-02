@@ -25,9 +25,6 @@ namespace RESTAURANT.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // ===== CONFIGURACIÓN DE PROPIEDADES =====
-
-            // Fechas por defecto - SOLO para registros nuevos
             modelBuilder.Entity<Rest_Usuario>()
                 .Property(u => u.FechaCreacion)
                 .HasDefaultValueSql("GETDATE()");
@@ -48,7 +45,6 @@ namespace RESTAURANT.Data
                 .Property(r => r.FechaCreacion)
                 .HasDefaultValueSql("GETDATE()");
 
-            // Configuración de decimales para precios
             modelBuilder.Entity<Rest_Producto>()
                 .Property(p => p.Precio)
                 .HasColumnType("decimal(10,2)");
@@ -73,7 +69,6 @@ namespace RESTAURANT.Data
                 .Property(p => p.Monto)
                 .HasColumnType("decimal(10,2)");
 
-            // Configuración de longitudes máximas
             modelBuilder.Entity<Rest_Persona>()
                 .Property(c => c.Nombre)
                 .HasMaxLength(100)
@@ -99,9 +94,6 @@ namespace RESTAURANT.Data
                 .HasMaxLength(100)
                 .IsRequired();
 
-            // ===== ÍNDICES =====
-
-            // Índices únicos
             modelBuilder.Entity<Rest_Usuario>()
                 .HasIndex(u => u.Correo)
                 .IsUnique();
@@ -110,131 +102,107 @@ namespace RESTAURANT.Data
                 .HasIndex(m => m.Numero)
                 .IsUnique();
 
-            // Índices compuestos para optimizar consultas
             modelBuilder.Entity<Rest_Pedido>()
                 .HasIndex(p => new { p.ClienteId, p.Fecha });
 
             modelBuilder.Entity<Rest_Reserva>()
                 .HasIndex(r => new { r.FechaHora, r.MesaId });
 
-            // Para búsquedas de productos por categoría
             modelBuilder.Entity<Rest_Producto>()
                 .HasIndex(p => new { p.CategoriaId, p.Disponible });
 
-            // Para consultas de ventas por fecha
             modelBuilder.Entity<Rest_Venta>()
                 .HasIndex(v => v.Fecha);
 
-            // Para búsqueda de mesas por estado
             modelBuilder.Entity<Rest_Mesa>()
                 .HasIndex(m => m.Estado);
 
-            // Para control de stock (ahora en productos, no inventarios)
             modelBuilder.Entity<Rest_Producto>()
                 .HasIndex(p => p.Stock);
 
-            // ===== RELACIONES =====
-
-            // Cliente - Reserva (1:N)
             modelBuilder.Entity<Rest_Persona>()
                 .HasMany(c => c.Reservas)
                 .WithOne(r => r.Cliente)
                 .HasForeignKey(r => r.ClienteId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Mesa - Reserva (1:N)
             modelBuilder.Entity<Rest_Mesa>()
                 .HasMany(m => m.Reservas)
                 .WithOne(r => r.Mesa)
                 .HasForeignKey(r => r.MesaId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Usuario - Cliente (1:1 opcional)
             modelBuilder.Entity<Rest_Usuario>()
                 .HasOne(u => u.Cliente)
                 .WithOne(c => c.Usuario)
                 .HasForeignKey<Rest_Persona>(c => c.UsuarioId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Categoria - Producto (1:N)
             modelBuilder.Entity<Rest_Categoria>()
                 .HasMany(c => c.Productos)
                 .WithOne(p => p.Categoria)
                 .HasForeignKey(p => p.CategoriaId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Inventario - Productos (1:N)
             modelBuilder.Entity<Rest_Inventario>()
                 .HasMany(i => i.Productos)
                 .WithOne(p => p.Inventario)
                 .HasForeignKey(p => p.InventarioId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Rol - Usuario (1:N)
             modelBuilder.Entity<Rest_Rol>()
                 .HasMany(r => r.Usuarios)
                 .WithOne(u => u.Rol)
                 .HasForeignKey(u => u.RolId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Cliente - Pedido (1:N)
             modelBuilder.Entity<Rest_Persona>()
                 .HasMany(c => c.Pedidos)
                 .WithOne(p => p.Cliente)
                 .HasForeignKey(p => p.ClienteId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Mesa - Pedido (1:N) - Puede ser null para pedidos para llevar
             modelBuilder.Entity<Rest_Mesa>()
                 .HasMany(m => m.Pedidos)
                 .WithOne(p => p.Mesa)
                 .HasForeignKey(p => p.MesaId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            // Pedido - DetallePedido (1:N)
             modelBuilder.Entity<Rest_Pedido>()
                 .HasMany(p => p.DetallesPedido)
                 .WithOne(d => d.Pedido)
                 .HasForeignKey(d => d.PedidoId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Producto - DetallePedido (1:N)
             modelBuilder.Entity<Rest_Producto>()
                 .HasMany(p => p.DetallesPedido)
                 .WithOne(d => d.Producto)
                 .HasForeignKey(d => d.ProductoId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Pedido - Venta (1:1)
             modelBuilder.Entity<Rest_Pedido>()
                 .HasOne(p => p.Venta)
                 .WithOne(v => v.Pedido)
                 .HasForeignKey<Rest_Venta>(v => v.PedidoId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Venta - Pago (1:N) - Una venta puede tener múltiples pagos parciales
             modelBuilder.Entity<Rest_Venta>()
                 .HasMany(v => v.Pagos)
                 .WithOne(p => p.Venta)
                 .HasForeignKey(p => p.VentaId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Venta - Comprobante (1:1)
             modelBuilder.Entity<Rest_Venta>()
                 .HasOne(v => v.Comprobante)
                 .WithOne(c => c.Venta)
                 .HasForeignKey<Rest_Comprobante>(c => c.VentaId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // ===== DATOS INICIALES =====
-
-            // Roles
             modelBuilder.Entity<Rest_Rol>().HasData(
                 new Rest_Rol { RolId = 1, Nombre = "Administrador" },
                 new Rest_Rol { RolId = 2, Nombre = "Cliente" }
             );
 
-            // Usuarios
             modelBuilder.Entity<Rest_Usuario>().HasData(
                 new Rest_Usuario
                 {
@@ -256,7 +224,6 @@ namespace RESTAURANT.Data
                 }
             );
 
-            // Mesas
             modelBuilder.Entity<Rest_Mesa>().HasData(
                 new Rest_Mesa { MesaId = 1, Numero = 1, Capacidad = 4, Estado = "Libre" },
                 new Rest_Mesa { MesaId = 2, Numero = 2, Capacidad = 2, Estado = "Libre" },
@@ -265,12 +232,10 @@ namespace RESTAURANT.Data
                 new Rest_Mesa { MesaId = 5, Numero = 5, Capacidad = 8, Estado = "Libre" }
             );
 
-            // Categorías
             modelBuilder.Entity<Rest_Categoria>().HasData(
                 new Rest_Categoria { Id = 1, Nombre = "Bebidas" }
             );
 
-            // Inventarios (ya sin Stock)
             modelBuilder.Entity<Rest_Inventario>().HasData(
                 new Rest_Inventario
                 {
@@ -282,7 +247,6 @@ namespace RESTAURANT.Data
                 }
             );
 
-            // Productos con stock inicial
             modelBuilder.Entity<Rest_Producto>().HasData(
                 new Rest_Producto
                 {

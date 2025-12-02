@@ -166,9 +166,7 @@
 
     <script>
 
-        // Respaldo en JavaScript para resaltar elemento activo
         document.addEventListener('DOMContentLoaded', function() {
-            // Solo ejecutar si no estamos usando el enfoque Razor
         @if (currentController == null)
         {
             <text>
@@ -217,7 +215,6 @@
             const overlay = document.getElementById('sidebarOverlay');
             const toggleBtn = document.getElementById('toggleSidebar');
 
-            // 🔹 Alternar sidebar (abrir/cerrar)
             if (toggleBtn) {
                 toggleBtn.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -226,7 +223,6 @@
                 });
             }
 
-            // 🔹 Cerrar al hacer clic fuera del menú (overlay)
             if (overlay) {
                 overlay.addEventListener('click', () => {
                     sidebar.classList.remove('active');
@@ -234,7 +230,6 @@
                 });
             }
 
-            // 🔹 Cerrar sidebar automáticamente al cambiar tamaño a escritorio
             window.addEventListener('resize', () => {
                 if (window.innerWidth > 992) {
                     sidebar.classList.remove('active');
@@ -242,7 +237,6 @@
                 }
             });
 
-            // 🔹 Persistir estado visual si hay submenús activos
             const activeLinks = sidebar.querySelectorAll('.nav-link.active');
             activeLinks.forEach(link => {
                 link.closest('.collapse')?.classList.add('show');

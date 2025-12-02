@@ -146,7 +146,6 @@ namespace Restaurant.Controllers
 
                     page.Header().Column(header =>
                     {
-                        // Banner superior
                         header.Item().Background("#D32F2F").Padding(15).Column(bannerCol =>
                         {
                             bannerCol.Item().Text("Delizioso Restaurant 🍝")
@@ -159,7 +158,6 @@ namespace Restaurant.Controllers
                                 .FontColor("#FFEBEE");
                         });
 
-                        // Información de la empresa
                         header.Item().Padding(10).Background("#FAFAFA").Row(row =>
                         {
                             row.RelativeItem().Column(col =>
@@ -190,13 +188,10 @@ namespace Restaurant.Controllers
                         header.Item().PaddingVertical(5);
                     });
 
-                    // Contenido principal
                     page.Content().PaddingVertical(10).Column(col =>
                     {
-                        // Información del comprobante y cliente
                         col.Item().Row(row =>
                         {
-                            // Información del comprobante
                             row.RelativeItem().Padding(5).Column(cardCol =>
                             {
                                 cardCol.Item().Background("#E3F2FD").Padding(12).Column(infoCol =>
@@ -215,7 +210,6 @@ namespace Restaurant.Controllers
                                 });
                             });
 
-                            // Información del cliente
                             row.RelativeItem().Padding(5).Column(cardCol =>
                             {
                                 cardCol.Item().Background("#F3E5F5").Padding(12).Column(infoCol =>
@@ -236,7 +230,6 @@ namespace Restaurant.Controllers
 
                         col.Item().PaddingVertical(15);
 
-                        // Título de la tabla
                         col.Item().Background("#D32F2F").Padding(8).Text("Detalle del Pedido")
                             .FontSize(13)
                             .Bold()
@@ -244,7 +237,6 @@ namespace Restaurant.Controllers
 
                         col.Item().PaddingVertical(5);
 
-                        // Tabla de productos
                         col.Item().Table(table =>
                         {
                             table.ColumnsDefinition(columns =>
@@ -307,7 +299,6 @@ namespace Restaurant.Controllers
 
                         col.Item().PaddingVertical(10);
 
-                        // Sumas totales
                         col.Item().AlignRight().Width(250).Column(totalCol =>
                         {
                             decimal subtotal = detalles.Sum(d => d.Subtotal);
@@ -335,7 +326,6 @@ namespace Restaurant.Controllers
 
                         col.Item().PaddingVertical(15);
 
-                        // Mensaje de agradecimiento
                         col.Item().Background("#E8F5E9").Padding(12).Column(thanksCol =>
                         {
                             thanksCol.Item().Text("¡Gracias por su preferencia! 💚")
@@ -352,7 +342,6 @@ namespace Restaurant.Controllers
                         });
                     });
 
-                    // Pie de página
                     page.Footer().BorderTop(1).BorderColor("#E0E0E0").PaddingTop(10).Column(footer =>
                     {
                         footer.Item().AlignCenter().Text(txt =>

@@ -58,10 +58,6 @@
                     <a href="/Reservas/MisReservas" class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg transition-colors duration-200">
                         <i class="fas fa-calendar-check text-restaurant-accent"></i>
                         <span>Mis Reservas</span>
-                    </a>
-                    <a href="/Pedidos/MisPedidos" class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg transition-colors duration-200">
-                        <i class="fas fa-shopping-bag text-restaurant-accent"></i>
-                        <span>Mis Pedidos</span>
                     </a>`;
                 break;
         }

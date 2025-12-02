@@ -14,7 +14,7 @@ namespace Restaurant.Models
 
         [Required(ErrorMessage = "El estado es obligatorio")]
         [StringLength(20, ErrorMessage = "El estado no puede exceder 20 caracteres")]
-        public string Estado { get; set; } = "Pendiente"; // Pendiente, Confirmada, Cancelada, Completada
+        public string Estado { get; set; } = "Pendiente"; 
 
         [Range(1, 20, ErrorMessage = "El número de personas debe estar entre 1 y 20")]
         [Display(Name = "Número de Personas")]
@@ -24,7 +24,7 @@ namespace Restaurant.Models
         public string? Observaciones { get; set; }
 
         [Display(Name = "Fecha de Creación")]
-        public DateTime FechaCreacion { get; set; } //= DateTime.Now;
+        public DateTime FechaCreacion { get; set; } 
 
         [Required(ErrorMessage = "El cliente es obligatorio")]
         public int ClienteId { get; set; }
@@ -32,7 +32,6 @@ namespace Restaurant.Models
         [Required(ErrorMessage = "La mesa es obligatoria")]
         public int MesaId { get; set; }
 
-        // Navegación
         [ForeignKey("ClienteId")]
         public virtual Rest_Persona Cliente { get; set; }
 

@@ -65,7 +65,6 @@ namespace Restaurant.Controllers
             if (pedido == null)
                 return NotFound();
 
-            // No crear venta si ya existe
             if (pedido.Venta != null)
             {
                 TempData["Mensaje"] = "Este pedido ya tiene una venta registrada.";
@@ -114,7 +113,6 @@ namespace Restaurant.Controllers
 
                 _context.Ventas.Add(venta);
 
-                // Reducir stock de productos
                 foreach (var d in pedido.DetallesPedido)
                 {
                     var prod = await _context.Productos.FindAsync(d.ProductoId);
@@ -123,7 +121,6 @@ namespace Restaurant.Controllers
                     _context.Productos.Update(prod);
                 }
 
-                // Cambiar estado del pedido a Atendido
                 pedido.Estado = EstadoPedido.Atendido.ToString();
                 _context.Pedidos.Update(pedido);
 
@@ -170,7 +167,6 @@ namespace Restaurant.Controllers
                 var ventaDb = await _context.Ventas.FindAsync(id);
                 if (ventaDb == null) return NotFound();
 
-                // Solo se permite editar estado, impuesto o descuento
                 ventaDb.Estado = venta.Estado;
                 ventaDb.Descuento = venta.Descuento;
                 ventaDb.Impuesto = venta.Impuesto;

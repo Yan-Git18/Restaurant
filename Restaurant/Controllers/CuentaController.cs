@@ -66,15 +66,12 @@ namespace Restaurant.Controllers
 
             bool passwordValido = false;
 
-            // Verificar si es hash de BCrypt o texto plano
             if (usuario.PasswordHash.StartsWith("$2a$") || usuario.PasswordHash.StartsWith("$2b$"))
             {
-                // Es un hash de BCrypt (usuarios registrados)
                 passwordValido = BCrypt.Net.BCrypt.Verify(model.Password, usuario.PasswordHash);
             }
             else
             {
-                // Es texto plano (usuarios iniciales de la BD)
                 passwordValido = usuario.PasswordHash == model.Password;
             }
 
@@ -85,14 +82,11 @@ namespace Restaurant.Controllers
                 return View(model);
             }
 
-            // Actualizar último acceso
             usuario.UltimoAcceso = DateTime.Now;
             await _context.SaveChangesAsync();
 
-            // Obtener nombre para mostrar
             string nombreUsuario = usuario.Cliente?.Nombre ?? usuario.Correo;
 
-            // Configurar claims
             var claims = new List<Claim>
             {
                 new Claim("UserId", usuario.UsuarioId.ToString()),
@@ -121,7 +115,6 @@ namespace Restaurant.Controllers
             TempData["Mensaje"] = $"Bienvenido, {nombreUsuario}";
             TempData["Tipo"] = "success";
 
-            // Redirigir según rol
             return usuario.Rol.Nombre switch
             {
                 "Administrador" => RedirectToAction("Index", "Admin"),
@@ -150,7 +143,6 @@ namespace Restaurant.Controllers
                 return View(model);
             }
 
-            // Verificar si el email ya existe
             var existeUsuario = await _context.Usuarios
                 .AnyAsync(u => u.Correo == model.Email);
 
@@ -165,12 +157,11 @@ namespace Restaurant.Controllers
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                // Crear usuario con contraseña encriptada
                 var usuario = new Rest_Usuario
                 {
                     Correo = model.Email,
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
-                    RolId = 2, // Rol Cliente por defecto
+                    RolId = 2, 
                     FechaCreacion = DateTime.Now,
                     Activo = true
                 };
@@ -178,7 +169,6 @@ namespace Restaurant.Controllers
                 _context.Usuarios.Add(usuario);
                 await _context.SaveChangesAsync();
 
-                // Crear persona asociada al usuario
                 var persona = new Rest_Persona
                 {
                     Nombre = model.Nombre,

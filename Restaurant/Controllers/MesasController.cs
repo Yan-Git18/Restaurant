@@ -36,7 +36,6 @@ namespace Restaurant.Controllers
         {
             if (!ModelState.IsValid) return View(mesa);
 
-            // Validar duplicado
             var existe = await _context.Mesas.AnyAsync(m => m.Numero == mesa.Numero);
             if (existe)
             {
@@ -71,7 +70,6 @@ namespace Restaurant.Controllers
             var mesas = await _context.Mesas.FindAsync(mesa.MesaId);
             if (mesas == null) return NotFound();
 
-            // Validar duplicado (excluyendo la misma mesa)
             var existe = await _context.Mesas
                 .AnyAsync(m => m.Numero == mesa.Numero && m.MesaId != mesa.MesaId);
 
@@ -108,7 +106,6 @@ namespace Restaurant.Controllers
                 return NotFound();
             }
 
-            // No desactivar si tiene reservas o pedidos asociados
             if (mesa.Reservas.Any() || mesa.Pedidos.Any())
             {
                 TempData["Mensaje"] = $"No se puede desactivar la mesa #{mesa.Numero} porque tiene reservas o pedidos asociados.";

@@ -39,7 +39,6 @@ namespace Restaurant.Models
         [Display(Name = "Inventario")]
         public int InventarioId { get; set; }
 
-        // Stock ahora está aquí
         [Required(ErrorMessage = "El stock es obligatorio")]
         [Range(0, int.MaxValue, ErrorMessage = "El stock no puede ser negativo")]
         public int Stock { get; set; }
@@ -47,7 +46,6 @@ namespace Restaurant.Models
         [Display(Name = "Activo")]
         public bool Activo { get; set; } = true;
 
-        // Navegación
         [ForeignKey("CategoriaId")]
         public virtual Rest_Categoria Categoria { get; set; }
 

@@ -19,7 +19,6 @@ namespace Restaurant.Controllers
             _context = context;
         }
 
-        // PANEL ADMINISTRADOR: Ver todas las reservas con filtro
         [Authorize(Roles = "Administrador, Mesero")]
         public async Task<IActionResult> Index(string filtro)
         {
@@ -40,7 +39,6 @@ namespace Restaurant.Controllers
             return View(lista);
         }
 
-        // CLIENTE: Ver solo sus reservas
         [Authorize(Roles = "Administrador, Cliente")]
         public async Task<IActionResult> MisReservas()
         {
@@ -69,7 +67,6 @@ namespace Restaurant.Controllers
             return View(reservas);
         }
 
-        /// CONFIRMAR reserva (solo admin o mesero)
         [Authorize(Roles = "Administrador, Mesero")]
         [HttpPost]
         [Route("Reservas/Confirmar/{id}")]
@@ -86,7 +83,6 @@ namespace Restaurant.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // CANCELAR reserva (solo admin o mesero)
         [Authorize(Roles = "Administrador, Mesero")]
         [HttpPost]
         [Route("Reservas/CancelarAdmin/{id}")]
@@ -103,7 +99,6 @@ namespace Restaurant.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // CREAR reserva
         [HttpGet]
         public async Task<IActionResult> Crear()
         {
@@ -142,21 +137,17 @@ namespace Restaurant.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Crear(ReservaFormViewModel model)
         {
-            // Si el modelo no es válido (faltan campos o errores)
             if (!ModelState.IsValid)
             {
-                // Si el usuario es cliente, volvemos al Index Home manteniendo los errores
                 if (User.IsInRole("Cliente"))
                 {
                     ViewBag.NombreCliente = model.Nombre;
                     ViewBag.TelefonoCliente = model.Telefono;
                     ViewBag.EmailCliente = model.Email;
 
-                    // Esto devuelve la vista del Home y muestra los errores en el formulario
                     return View("~/Views/Home/Index.cshtml", model);
                 }
 
-                // Si es admin, seguimos mostrando su vista "Crear"
                 if (User.IsInRole("Administrador"))
                 {
                     var clientes = await _context.Personas
@@ -171,7 +162,6 @@ namespace Restaurant.Controllers
                 return View(model);
             }
 
-            // Validar fecha y hora
             if (model.Fecha == default || string.IsNullOrEmpty(model.Hora) || !TimeSpan.TryParse(model.Hora, out var hora))
             {
                 ModelState.AddModelError("", "Fecha u hora inválida.");
@@ -216,11 +206,9 @@ namespace Restaurant.Controllers
 
             TempData["Success"] = "¡Reserva registrada correctamente!";
 
-            // Si es cliente, vuelve a MisReservas; si es admin, a su panel
             return User.IsInRole("Administrador") ? RedirectToAction("Index") : RedirectToAction("MisReservas");
         }
 
-        // EDITAR reserva (solo admin)
         [Authorize(Roles = "Administrador")]
         [HttpGet]
         public async Task<IActionResult> Editar(int id)
@@ -231,7 +219,6 @@ namespace Restaurant.Controllers
 
             if (reserva == null) return NotFound();
 
-            // Separar ocasión y comentarios desde Observaciones
             string ocasion = reserva.Observaciones?
                 .Split('|')
                 .FirstOrDefault(o => o.Contains("Ocasión:"))
@@ -244,7 +231,6 @@ namespace Restaurant.Controllers
                 ?.Replace("Comentarios:", "")
                 .Trim();
 
-            // 🔥 AQUÍ INCLUYO LOS DATOS QUE FALTABAN
             var model = new ReservaFormViewModel
             {
                 ClienteId = reserva.ClienteId,
@@ -300,7 +286,6 @@ namespace Restaurant.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // DETALLES de reserva
         [Authorize]
         [HttpGet]
         public async Task<IActionResult> Detalles(int id)
@@ -326,7 +311,6 @@ namespace Restaurant.Controllers
             return User.IsInRole("Cliente") ? View("DetallesCliente", model) : View("Detalles", model);
         }
 
-        // OBTENER CLIENTE (para autocompletar)
         [HttpGet]
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> ObtenerCliente(int id)
@@ -343,7 +327,6 @@ namespace Restaurant.Controllers
         }
 
 
-        // CANCELAR reserva (CLIENTE)
         [Authorize(Roles = "Cliente")]
         [HttpPost]
         [Route("Reservas/Cancelar/{id}")]

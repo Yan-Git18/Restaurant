@@ -35,7 +35,6 @@ namespace Restaurant.Models
         [Display(Name = "Total del Pedido")]
         public decimal Total { get; set; } = 0;
 
-        // Navegación
         [ForeignKey("ClienteId")]
         public virtual Rest_Persona Cliente { get; set; }
 

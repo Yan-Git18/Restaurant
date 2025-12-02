@@ -10,17 +10,17 @@ namespace Restaurant.Models
 
         [Required(ErrorMessage = "El tipo es obligatorio")]
         [StringLength(20, ErrorMessage = "El tipo no puede exceder 20 caracteres")]
-        public string Tipo { get; set; } // Boleta, Factura, Ticket
+        public string Tipo { get; set; } 
 
         [Required(ErrorMessage = "El número es obligatorio")]
         [StringLength(20, ErrorMessage = "El número no puede exceder 20 caracteres")]
         public string Numero { get; set; }
 
         [StringLength(50, ErrorMessage = "El formato no puede exceder 50 caracteres")]
-        public string Formato { get; set; } = "PDF"; // PDF, XML, etc.
+        public string Formato { get; set; } = "PDF"; 
 
         [Display(Name = "Fecha de Emisión")]
-        public DateTime FechaEmision { get; set; } //= DateTime.Now;
+        public DateTime FechaEmision { get; set; }
 
         [Display(Name = "Enviado por Email")]
         public bool EnviadoEmail { get; set; } = false;
@@ -32,7 +32,6 @@ namespace Restaurant.Models
         [Display(Name = "Venta")]
         public int VentaId { get; set; }
 
-        // Navegación
         [ForeignKey("VentaId")]
         public virtual Rest_Venta Venta { get; set; }
     }

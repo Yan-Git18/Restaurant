@@ -39,10 +39,9 @@ namespace Restaurant.ViewModels
 
         public int? MesaId { get; set; }
 
-        // Lista de detalles enviada desde la vista
         public List<DetallePedidoVm> Detalles { get; set; } = new List<DetallePedidoVm>();
 
         [Display(Name = "Total del Pedido")]
-        public decimal Total { get; set; } // se calcula en el controlador antes de mostrar la vista
+        public decimal Total { get; set; } 
     }
 }
