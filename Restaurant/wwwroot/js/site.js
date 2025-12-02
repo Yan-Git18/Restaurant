@@ -23,6 +23,13 @@ if (reservationForm && fechaInput) {
             fecha: formData.get('fecha'),
             hora: formData.get('hora'),
             personas: formData.get('personas'),
+        }; // ← FALTABA CERRAR ESTA LLAVE Y ESTE PUNTO Y COMA
+
+        // Validaciones adicionales
+        if (!validateReservation(reservationData)) {
+            return;
+        }
+
         try {
             const response = await fetch(reservationForm.action, {
                 method: 'POST',
@@ -31,7 +38,6 @@ if (reservationForm && fechaInput) {
 
             if (response.ok) {
                 const reservationData = Object.fromEntries(formData.entries());
-
                 showReservationSuccess(reservationData);
                 reservationForm.reset();
             } else {
@@ -41,26 +47,23 @@ if (reservationForm && fechaInput) {
             console.error(err);
             showAlert("Error de conexión con el servidor.", "error");
         } finally {
-        // Validaciones adicionales
-        if (!validateReservation(reservationData)) {
-            return;
-        }
+            // Mostrar loading en el botón
+            const submitBtn = reservationForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Procesando...';
+            submitBtn.disabled = true;
 
-        // Mostrar loading en el botón
-        const submitBtn = reservationForm.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Procesando...';
-        submitBtn.disabled = true;
+            // Simular envío
+            setTimeout(() => {
+                showReservationSuccess(reservationData);
+                reservationForm.reset();
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }, 1000); // ← FALTABA CERRAR EL setTimeout
+        } // ← FALTABA CERRAR EL FINALLY
+    }); // ← FALTABA CERRAR EL addEventListener
+} // ← FALTABA CERRAR EL IF PRINCIPAL
 
-        // Simular envío (conectar con backend en producción)
-        setTimeout(() => {
-            showReservationSuccess(reservationData);
-            reservationForm.reset();
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-        }
-    });
-}
 
 function validateReservation(data) {
     const selectedDate = new Date(data.fecha);
@@ -121,10 +124,11 @@ function showAlert(message, type = 'info') {
     const alertModal = `
         <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" id="alert-modal">
             <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center animate-fade-in-up">
-    const [year, month, day] = dateString.split("-");
-    const date = new Date(year, month - 1, day);
-    const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
-    return date.toLocaleDateString("es-ES", options);
+                <p class="${alertClass} p-4 rounded-xl border mb-4">${message}</p>
+                <button onclick="closeModal('alert-modal')" 
+                        class="bg-restaurant-accent hover:bg-restaurant-secondary text-white px-8 py-3 rounded-xl font-semibold">
+                    Cerrar
+                </button>
             </div>
         </div>
     `;
@@ -133,13 +137,8 @@ function showAlert(message, type = 'info') {
 
 function formatDate(dateString) {
     const date = new Date(dateString);
-    const options = {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    };
-    return date.toLocaleDateString('es-ES', options);
+    const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+    return date.toLocaleDateString("es-ES", options);
 }
 
 function closeModal(modalId) {
@@ -164,7 +163,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             });
         }
 
-        // Cerrar menú móvil si está abierto
         const mobileMenu = document.getElementById('mobile-menu');
         const menuOpen = document.getElementById('menu-open');
         const menuClose = document.getElementById('menu-close');
@@ -190,4 +188,3 @@ window.addEventListener('scroll', () => {
         }
     }
 });
-

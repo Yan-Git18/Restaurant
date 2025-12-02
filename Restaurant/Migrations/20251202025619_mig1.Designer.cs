@@ -12,7 +12,7 @@ using RESTAURANT.Data;
 namespace Restaurant.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251014172623_mig1")]
+    [Migration("20251202025619_mig1")]
     partial class mig1
     {
         /// <inheritdoc />

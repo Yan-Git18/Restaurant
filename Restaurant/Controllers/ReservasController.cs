@@ -225,17 +225,37 @@ namespace Restaurant.Controllers
         [HttpGet]
         public async Task<IActionResult> Editar(int id)
         {
-            var reserva = await _context.Reservas.FindAsync(id);
+            var reserva = await _context.Reservas
+                .Include(r => r.Cliente)
+                .FirstOrDefaultAsync(r => r.ReservaId == id);
+
             if (reserva == null) return NotFound();
 
+            // Separar ocasión y comentarios desde Observaciones
+            string ocasion = reserva.Observaciones?
+                .Split('|')
+                .FirstOrDefault(o => o.Contains("Ocasión:"))
+                ?.Replace("Ocasión:", "")
+                .Trim();
+
+            string comentarios = reserva.Observaciones?
+                .Split('|')
+                .FirstOrDefault(o => o.Contains("Comentarios:"))
+                ?.Replace("Comentarios:", "")
+                .Trim();
+
+            // 🔥 AQUÍ INCLUYO LOS DATOS QUE FALTABAN
             var model = new ReservaFormViewModel
             {
                 ClienteId = reserva.ClienteId,
+                Nombre = reserva.Cliente?.Nombre,
+                Telefono = reserva.Cliente?.Telefono,
+                Email = reserva.Cliente?.Correo,
                 Fecha = reserva.FechaHora.Date,
                 Hora = reserva.FechaHora.ToString("HH:mm"),
-                Personas = reserva.NumeroPersonas.ToString(),
-                Ocasion = reserva.Observaciones,
-                Comentarios = reserva.Observaciones
+                Personas = reserva.NumeroPersonas >= 8 ? "8+" : reserva.NumeroPersonas.ToString(),
+                Ocasion = ocasion,
+                Comentarios = comentarios
             };
 
             var clientes = await _context.Personas
@@ -247,6 +267,8 @@ namespace Restaurant.Controllers
             ViewBag.Clientes = new SelectList(clientes, "PersonaId", "NombreCompleto", model.ClienteId);
             return View(model);
         }
+
+
 
         [Authorize(Roles = "Administrador")]
         [HttpPost]
@@ -319,5 +341,31 @@ namespace Restaurant.Controllers
 
             return Json(cliente);
         }
+
+
+        // CANCELAR reserva (CLIENTE)
+        [Authorize(Roles = "Cliente")]
+        [HttpPost]
+        [Route("Reservas/Cancelar/{id}")]
+        public async Task<IActionResult> Cancelar(int id)
+        {
+            var personaIdClaim = User.FindFirstValue("PersonaId");
+            if (!int.TryParse(personaIdClaim, out int personaId))
+                return Unauthorized();
+
+            var reserva = await _context.Reservas
+                .Where(r => r.ReservaId == id && r.ClienteId == personaId)
+                .FirstOrDefaultAsync();
+
+            if (reserva == null)
+                return NotFound();
+
+            reserva.Estado = "Cancelada";
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Has cancelado tu reserva.";
+            return RedirectToAction("MisReservas");
+        }
+
     }
 }
